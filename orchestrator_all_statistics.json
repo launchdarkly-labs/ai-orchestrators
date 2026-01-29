@@ -1,0 +1,249 @@
+{
+  "summary": {
+    "total_runs": 12,
+    "orchestrators": [
+      "openai-swarm",
+      "langgraph",
+      "strands",
+      "autogen"
+    ],
+    "total_execution_time_minutes": 82.23552739222845,
+    "average_execution_time_minutes": 6.852960616019037,
+    "total_tokens_processed": "933365",
+    "average_tokens_per_run": 77780.41666666667,
+    "total_papers_analyzed": "144",
+    "average_report_size_chars": 43354.916666666664
+  },
+  "orchestrator_stats": {
+    "openai-swarm": {
+      "runs": 3,
+      "avg_execution_time_minutes": 2.896390159924825,
+      "std_execution_time_minutes": 1.0544603964144559,
+      "avg_tokens": 66935.0,
+      "std_tokens": 14273.37002953402,
+      "total_papers": "36",
+      "avg_report_size": 13334.0,
+      "tokens_per_second": 385.1633487673111,
+      "datasets_tested": [
+        "emergent_communication",
+        "self_improvement",
+        "theorem_proving"
+      ]
+    },
+    "langgraph": {
+      "runs": 3,
+      "avg_execution_time_minutes": 7.958330224619971,
+      "std_execution_time_minutes": 0.2113461452561812,
+      "avg_tokens": 88994.0,
+      "std_tokens": 10343.244510307199,
+      "total_papers": "36",
+      "avg_report_size": 66849.33333333333,
+      "tokens_per_second": 186.37494191241117,
+      "datasets_tested": [
+        "theorem_proving",
+        "emergent_communication",
+        "self_improvement"
+      ]
+    },
+    "strands": {
+      "runs": 3,
+      "avg_execution_time_minutes": 5.722237740622627,
+      "std_execution_time_minutes": 1.3830544638884823,
+      "avg_tokens": 98680.0,
+      "std_tokens": 20435.62105735962,
+      "total_papers": "36",
+      "avg_report_size": 32474.0,
+      "tokens_per_second": 287.4166962674489,
+      "datasets_tested": [
+        "emergent_communication",
+        "theorem_proving",
+        "self_improvement"
+      ]
+    },
+    "autogen": {
+      "runs": 3,
+      "avg_execution_time_minutes": 10.834884338908727,
+      "std_execution_time_minutes": 0.9821483401911111,
+      "avg_tokens": 56512.666666666664,
+      "std_tokens": 7614.092876589655,
+      "total_papers": "36",
+      "avg_report_size": 60762.333333333336,
+      "tokens_per_second": 86.93011833965201,
+      "datasets_tested": [
+        "theorem_proving",
+        "self_improvement",
+        "emergent_communication"
+      ]
+    }
+  },
+  "detailed_runs": [
+    {
+      "orchestrator": "openai-swarm",
+      "dataset": "emergent_communication",
+      "file_path": "results/openai_swarm/20260127_203016_openai-swarm-20260127_202623_metadata.json",
+      "execution_time_seconds": 231.6101996898651,
+      "execution_time_minutes": 3.860169994831085,
+      "total_tokens": 62823,
+      "papers_analyzed": 12,
+      "report_size_bytes": 13225,
+      "report_size_chars": 13225,
+      "task": "Research Gap Analysis",
+      "timestamp": "20260127_203016",
+      "status": "completed"
+    },
+    {
+      "orchestrator": "openai-swarm",
+      "dataset": "self_improvement",
+      "file_path": "results/openai_swarm/20260128_144710_openai-swarm-20260128_144405_metadata.json",
+      "execution_time_seconds": 183.5331621170044,
+      "execution_time_minutes": 3.0588860352834066,
+      "total_tokens": 82813,
+      "papers_analyzed": 12,
+      "report_size_bytes": 13407,
+      "report_size_chars": 13407,
+      "task": "Research Gap Analysis",
+      "timestamp": "20260128_144710",
+      "status": "completed"
+    },
+    {
+      "orchestrator": "openai-swarm",
+      "dataset": "theorem_proving",
+      "file_path": "results/openai_swarm/20260128_135432_openai-swarm-20260128_135245_metadata.json",
+      "execution_time_seconds": 106.206866979599,
+      "execution_time_minutes": 1.7701144496599832,
+      "total_tokens": 55169,
+      "papers_analyzed": 12,
+      "report_size_bytes": 13370,
+      "report_size_chars": 13370,
+      "task": "Research Gap Analysis",
+      "timestamp": "20260128_135432",
+      "status": "completed"
+    },
+    {
+      "orchestrator": "langgraph",
+      "dataset": "theorem_proving",
+      "file_path": "results/langgraph/20260128_135155_langgraph-20260128_135155_metadata.json",
+      "execution_time_seconds": 468.13422679901123,
+      "execution_time_minutes": 7.8022371133168535,
+      "total_tokens": 94096,
+      "papers_analyzed": 12,
+      "report_size_bytes": 61099,
+      "report_size_chars": 61099,
+      "task": "Research Gap Analysis",
+      "timestamp": "20260128_135155",
+      "status": "completed"
+    },
+    {
+      "orchestrator": "langgraph",
+      "dataset": "emergent_communication",
+      "file_path": "results/langgraph/20260128_014823_langgraph-20260128_014823_metadata.json",
+      "execution_time_seconds": 472.4349796772003,
+      "execution_time_minutes": 7.873916327953339,
+      "total_tokens": 77091,
+      "papers_analyzed": 12,
+      "report_size_bytes": 77040,
+      "report_size_chars": 77040,
+      "task": "Research Gap Analysis",
+      "timestamp": "20260128_014823",
+      "status": "completed"
+    },
+    {
+      "orchestrator": "langgraph",
+      "dataset": "self_improvement",
+      "file_path": "results/langgraph/20260128_144222_langgraph-20260128_144222_metadata.json",
+      "execution_time_seconds": 491.9302339553833,
+      "execution_time_minutes": 8.198837232589721,
+      "total_tokens": 95795,
+      "papers_analyzed": 12,
+      "report_size_bytes": 62409,
+      "report_size_chars": 62409,
+      "task": "Research Gap Analysis",
+      "timestamp": "20260128_144222",
+      "status": "completed"
+    },
+    {
+      "orchestrator": "strands",
+      "dataset": "emergent_communication",
+      "file_path": "results/strands/20260128_153442_strands-20260128_153442_metadata.json",
+      "execution_time_seconds": 271.85203313827515,
+      "execution_time_minutes": 4.530867218971252,
+      "total_tokens": 76984,
+      "papers_analyzed": 12,
+      "report_size_bytes": 27478,
+      "report_size_chars": 27478,
+      "task": "Research Gap Analysis",
+      "timestamp": "20260128_153442",
+      "status": "completed"
+    },
+    {
+      "orchestrator": "strands",
+      "dataset": "theorem_proving",
+      "file_path": "results/strands/20260128_154020_strands-20260128_154020_metadata.json",
+      "execution_time_seconds": 323.81290912628174,
+      "execution_time_minutes": 5.396881818771362,
+      "total_tokens": 101492,
+      "papers_analyzed": 12,
+      "report_size_bytes": 30858,
+      "report_size_chars": 30858,
+      "task": "Research Gap Analysis",
+      "timestamp": "20260128_154020",
+      "status": "completed"
+    },
+    {
+      "orchestrator": "strands",
+      "dataset": "self_improvement",
+      "file_path": "results/strands/20260128_154743_strands-20260128_154743_metadata.json",
+      "execution_time_seconds": 434.33785104751587,
+      "execution_time_minutes": 7.2389641841252645,
+      "total_tokens": 117564,
+      "papers_analyzed": 12,
+      "report_size_bytes": 39086,
+      "report_size_chars": 39086,
+      "task": "Research Gap Analysis",
+      "timestamp": "20260128_154743",
+      "status": "completed"
+    },
+    {
+      "orchestrator": "autogen",
+      "dataset": "theorem_proving",
+      "file_path": "results/autogen/20260128_140744_autogen-20260128_140744_metadata.json",
+      "execution_time_seconds": 672.3083169460297,
+      "execution_time_minutes": 11.205138615767162,
+      "total_tokens": 59473,
+      "papers_analyzed": 12,
+      "report_size_bytes": 58021,
+      "report_size_chars": 58021,
+      "task": "Research Gap Analysis",
+      "timestamp": "20260128_140744",
+      "status": "completed"
+    },
+    {
+      "orchestrator": "autogen",
+      "dataset": "self_improvement",
+      "file_path": "results/autogen/20260128_144158_autogen-20260128_144158_metadata.json",
+      "execution_time_seconds": 694.6853160858154,
+      "execution_time_minutes": 11.578088601430258,
+      "total_tokens": 62202,
+      "papers_analyzed": 12,
+      "report_size_bytes": 61876,
+      "report_size_chars": 61876,
+      "task": "Research Gap Analysis",
+      "timestamp": "20260128_144158",
+      "status": "completed"
+    },
+    {
+      "orchestrator": "autogen",
+      "dataset": "emergent_communication",
+      "file_path": "results/autogen/20260128_113417_autogen-20260128_113417_metadata.json",
+      "execution_time_seconds": 583.2855479717255,
+      "execution_time_minutes": 9.721425799528758,
+      "total_tokens": 47863,
+      "papers_analyzed": 12,
+      "report_size_bytes": 62390,
+      "report_size_chars": 62390,
+      "task": "Research Gap Analysis",
+      "timestamp": "20260128_113417",
+      "status": "completed"
+    }
+  ]
+}

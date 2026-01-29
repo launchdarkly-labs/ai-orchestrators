@@ -1,0 +1,47 @@
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+
+# AWS credentials (if stored locally)
+.aws/
+*.pem
+
+# Logs
+*.log
+
+# Archive of old runs
+.archive_old_runs/
+
+# Claude Code
+.claude/
+
+# Development folder
+development/
+
+# Results and generated reports
+results/
+reports_pdf/
+reports_markdown/

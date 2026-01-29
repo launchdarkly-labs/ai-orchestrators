@@ -1,0 +1,156 @@
+{
+  "summary": {
+    "orchestrators": [
+      "strands"
+    ],
+    "datasets": [
+      "theorem_proving",
+      "self_improvement"
+    ],
+    "total_runs": 2,
+    "completed_runs": 2,
+    "failed_runs": 0,
+    "average_execution_time_minutes": 6.32,
+    "total_tokens_processed": "219056",
+    "average_tokens_per_run": 109528.0,
+    "average_tokens_per_second": 292.1,
+    "total_papers_analyzed": "24",
+    "average_report_size_chars": 32806.5,
+    "average_output_to_input_ratio": 0.1893
+  },
+  "orchestrator_stats": {
+    "strands": {
+      "runs": 2,
+      "avg_execution_time_minutes": 6.32,
+      "avg_tokens": 109528.0,
+      "avg_tokens_per_second": 292.1,
+      "total_papers": "24",
+      "datasets_tested": [
+        "theorem_proving",
+        "self_improvement"
+      ]
+    }
+  },
+  "dataset_stats": {
+    "theorem_proving": {
+      "runs": 1,
+      "orchestrators_tested": [
+        "strands"
+      ],
+      "avg_execution_time_minutes": 5.4,
+      "avg_tokens": 101492.0,
+      "avg_report_size": 28680.0,
+      "papers_per_run": "12"
+    },
+    "self_improvement": {
+      "runs": 1,
+      "orchestrators_tested": [
+        "strands"
+      ],
+      "avg_execution_time_minutes": 7.24,
+      "avg_tokens": 117564.0,
+      "avg_report_size": 36933.0,
+      "papers_per_run": "12"
+    }
+  },
+  "agent_stats": {
+    "Research Approach Analyzer": {
+      "runs": 2,
+      "total_tokens": 68686,
+      "avg_tokens": 34343.0,
+      "avg_ttft": 8.41
+    },
+    "Contradiction Detection Specialist": {
+      "runs": 2,
+      "total_tokens": 84807,
+      "avg_tokens": 42403.5,
+      "avg_ttft": 17.685000000000002
+    },
+    "Research Gap Synthesizer": {
+      "runs": 2,
+      "total_tokens": 65563,
+      "avg_tokens": 32781.5,
+      "avg_ttft": 41.3
+    }
+  },
+  "detailed_runs": [
+    {
+      "orchestrator": "strands",
+      "dataset": "theorem_proving",
+      "dataset_full": "cat_cs_ai_and_theorem_proving_or_mathematical_reasoning",
+      "log_file": "strands_theorem_test.log",
+      "execution_id": "strands-20260128_154020",
+      "execution_time_seconds": 323.81,
+      "execution_time_minutes": 5.4,
+      "total_tokens": 101492,
+      "input_tokens": 86472,
+      "output_tokens": 15020,
+      "iterations": 3,
+      "agent_count": 3,
+      "papers_analyzed": 12,
+      "report_size_chars": 28680,
+      "status": "completed",
+      "tokens_per_second": 313.46,
+      "output_to_input_ratio": 0.1737,
+      "chars_per_output_token": 1.91,
+      "tokens_per_agent": 33831,
+      "tokens_per_paper": 8458,
+      "agent_details": [
+        {
+          "name": "Research Approach Analyzer",
+          "tokens": 32487,
+          "ttft": 7.27
+        },
+        {
+          "name": "Contradiction Detection Specialist",
+          "tokens": 39265,
+          "ttft": 15.27
+        },
+        {
+          "name": "Research Gap Synthesizer",
+          "tokens": 29740,
+          "ttft": 34.94
+        }
+      ]
+    },
+    {
+      "orchestrator": "strands",
+      "dataset": "self_improvement",
+      "dataset_full": "cat_cs_ai_and_self_improvement_or_self_reflection",
+      "log_file": "strands_self_improvement.log",
+      "execution_id": "strands-20260128_154743",
+      "execution_time_seconds": 434.34,
+      "execution_time_minutes": 7.24,
+      "total_tokens": 117564,
+      "input_tokens": 97578,
+      "output_tokens": 19986,
+      "iterations": 3,
+      "agent_count": 3,
+      "papers_analyzed": 12,
+      "report_size_chars": 36933,
+      "status": "completed",
+      "tokens_per_second": 270.74,
+      "output_to_input_ratio": 0.2049,
+      "chars_per_output_token": 1.85,
+      "tokens_per_agent": 39188,
+      "tokens_per_paper": 9797,
+      "agent_details": [
+        {
+          "name": "Research Approach Analyzer",
+          "tokens": 36199,
+          "ttft": 9.55
+        },
+        {
+          "name": "Contradiction Detection Specialist",
+          "tokens": 45542,
+          "ttft": 20.1
+        },
+        {
+          "name": "Research Gap Synthesizer",
+          "tokens": 35823,
+          "ttft": 47.66
+        }
+      ]
+    }
+  ]
+}

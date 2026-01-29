@@ -1,0 +1,5 @@
+Orchestrator,Runs,Avg Time (min),Avg Tokens,Tokens/sec,Avg Report Size,Datasets
+openai-swarm,3,2.9,66935,385.16,13334,"['emergent_communication', 'self_improvement', 'theorem_proving']"
+langgraph,3,7.96,88994,186.37,66849,"['theorem_proving', 'emergent_communication', 'self_improvement']"
+strands,3,5.72,98680,287.42,32474,"['emergent_communication', 'theorem_proving', 'self_improvement']"
+autogen,3,10.83,56512,86.93,60762,"['theorem_proving', 'self_improvement', 'emergent_communication']"

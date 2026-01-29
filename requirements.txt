@@ -1,0 +1,43 @@
+# Core orchestration frameworks
+strands>=1.0.0
+
+# LaunchDarkly
+launchdarkly-server-sdk>=9.0.0
+ldai>=1.0.0
+
+# AWS Bedrock
+boto3>=1.28.0
+botocore>=1.31.0
+
+# Utilities
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# PDF generation
+reportlab>=4.0.0
+pillow>=10.0.0
+
+# Data processing
+arxiv>=2.0.0
+
+# Strands tools
+strands-tools>=1.0.0
+
+# Ralph - Autonomous coding
+anthropic>=0.18.0
+
+# LangGraph orchestrator
+langgraph>=0.2.0
+langchain>=0.3.0
+langchain-anthropic>=0.3.0
+langchain-aws>=0.2.0
+langchain-core>=0.3.0
+git+https://github.com/langchain-ai/langgraph-swarm-py.git
+
+# OpenAI Swarm
+openai>=1.0.0
+git+https://github.com/openai/swarm.git
+
+pyautogen>=0.2.0
+crewai>=0.28.0
+crewai-tools>=0.2.0

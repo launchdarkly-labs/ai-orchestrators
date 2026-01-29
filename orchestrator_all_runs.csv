@@ -1,0 +1,13 @@
+orchestrator,dataset,file_path,execution_time_seconds,execution_time_minutes,total_tokens,papers_analyzed,report_size_bytes,report_size_chars,task,timestamp,status
+openai-swarm,emergent_communication,results/openai_swarm/20260127_203016_openai-swarm-20260127_202623_metadata.json,231.6101996898651,3.860169994831085,62823,12,13225,13225,Research Gap Analysis,20260127_203016,completed
+openai-swarm,self_improvement,results/openai_swarm/20260128_144710_openai-swarm-20260128_144405_metadata.json,183.5331621170044,3.0588860352834066,82813,12,13407,13407,Research Gap Analysis,20260128_144710,completed
+openai-swarm,theorem_proving,results/openai_swarm/20260128_135432_openai-swarm-20260128_135245_metadata.json,106.206866979599,1.7701144496599832,55169,12,13370,13370,Research Gap Analysis,20260128_135432,completed
+langgraph,theorem_proving,results/langgraph/20260128_135155_langgraph-20260128_135155_metadata.json,468.13422679901123,7.8022371133168535,94096,12,61099,61099,Research Gap Analysis,20260128_135155,completed
+langgraph,emergent_communication,results/langgraph/20260128_014823_langgraph-20260128_014823_metadata.json,472.4349796772003,7.873916327953339,77091,12,77040,77040,Research Gap Analysis,20260128_014823,completed
+langgraph,self_improvement,results/langgraph/20260128_144222_langgraph-20260128_144222_metadata.json,491.9302339553833,8.198837232589721,95795,12,62409,62409,Research Gap Analysis,20260128_144222,completed
+strands,emergent_communication,results/strands/20260128_153442_strands-20260128_153442_metadata.json,271.85203313827515,4.530867218971252,76984,12,27478,27478,Research Gap Analysis,20260128_153442,completed
+strands,theorem_proving,results/strands/20260128_154020_strands-20260128_154020_metadata.json,323.81290912628174,5.396881818771362,101492,12,30858,30858,Research Gap Analysis,20260128_154020,completed
+strands,self_improvement,results/strands/20260128_154743_strands-20260128_154743_metadata.json,434.33785104751587,7.2389641841252645,117564,12,39086,39086,Research Gap Analysis,20260128_154743,completed
+autogen,theorem_proving,results/autogen/20260128_140744_autogen-20260128_140744_metadata.json,672.3083169460297,11.205138615767162,59473,12,58021,58021,Research Gap Analysis,20260128_140744,completed
+autogen,self_improvement,results/autogen/20260128_144158_autogen-20260128_144158_metadata.json,694.6853160858154,11.578088601430258,62202,12,61876,61876,Research Gap Analysis,20260128_144158,completed
+autogen,emergent_communication,results/autogen/20260128_113417_autogen-20260128_113417_metadata.json,583.2855479717255,9.721425799528758,47863,12,62390,62390,Research Gap Analysis,20260128_113417,completed

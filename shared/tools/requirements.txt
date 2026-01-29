@@ -1,0 +1,3 @@
+# Shared tools dependencies
+# These are minimal dependencies needed for tool definitions
+# Framework-specific dependencies are in each framework's requirements.txt
