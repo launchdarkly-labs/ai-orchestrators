@@ -39,7 +39,7 @@ print("=" * 60)
 print("LaunchDarkly Orchestrator Routing + Metrics Demo")
 print("=" * 60)
 
-for orchestrator in ["strands", "langgraph", "llamaindex", "lyzr"]:
+for orchestrator in ["strands", "langgraph", "llamaindex", "lyzr", "bedrock"]:
     context = Context.builder(f"user-{orchestrator}").kind("user").set("orchestrator", orchestrator).build()
     config = ai_client.config("orchestrator-config", context, default)
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Test all 4 orchestrators getting their configs from LaunchDarkly."""
+"""Test all 5 orchestrators getting their configs from LaunchDarkly."""
 import os
 import sys
 import time
@@ -26,7 +26,7 @@ print("=" * 60)
 print("LaunchDarkly Orchestrator Routing Demo")
 print("=" * 60)
 
-for orchestrator in ["strands", "langgraph", "llamaindex", "lyzr"]:
+for orchestrator in ["strands", "langgraph", "llamaindex", "lyzr", "bedrock"]:
     context = Context.builder(f"user-{orchestrator}").kind("user").set("orchestrator", orchestrator).build()
     config = ai_client.config("orchestrator-config", context, default)
 
