@@ -1,0 +1,18 @@
+# LaunchDarkly
+launchdarkly-server-sdk
+launchdarkly-ai-server-sdk
+
+# Strands
+strands-agents
+strands-agents-anthropic
+
+# LangGraph
+langgraph
+langchain-anthropic
+
+# LlamaIndex
+llama-index
+llama-index-llms-anthropic
+
+# Lyzr
+lyzr-agent-api
