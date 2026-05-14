@@ -35,7 +35,7 @@ from shared.metrics import track_generation_metrics, track_token_metrics, track_
 from shared.tools import common as common_tools
 
 # LaunchDarkly imports
-from ldai.client import AIAgentConfigDefault
+from ldai import AIAgentConfigDefault
 from ldai.tracker import TokenUsage
 
 
@@ -51,9 +51,9 @@ def get_agent_config_with_tracker(ai_client, agent_key: str, context, orchestrat
     config = ai_client.agent_config(
         key=agent_key,
         context=context,
-        default_value=AIAgentConfigDefault(enabled=False)
+        default=AIAgentConfigDefault(enabled=False)
     )
-    return config, config.tracker
+    return config, config.create_tracker()
 
 
 
@@ -152,7 +152,7 @@ def run_openai_swarm():
 
         agent_configs_with_trackers[agent_key] = {
             'config': config,
-            'tracker': config.tracker,
+            'tracker': config.create_tracker(),
             'context': agent_context
         }
 
@@ -453,11 +453,11 @@ def run_openai_swarm():
         fresh_config = ai_client.agent_config(
             key=agent_key,
             context=context,  # Use context with both orchestrator and agent
-            default_value=AIAgentConfigDefault(enabled=False)
+            default=AIAgentConfigDefault(enabled=False)
         )
 
-        # Use the fresh tracker from this new config evaluation
-        tracker = fresh_config.tracker
+        # Create a fresh tracker from this new config evaluation
+        tracker = fresh_config.create_tracker()
 
         # Track tokens - AI SDK automatically adds agent attribute
         tracker.track_tokens(TokenUsage(input=input_tokens, output=output_tokens, total=total_tokens))

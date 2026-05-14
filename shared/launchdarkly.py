@@ -9,7 +9,7 @@ from typing import Dict, List, Tuple, Any
 import ldclient
 from ldclient import Context
 from ldclient.config import Config
-from ldai.client import LDAIClient, AIAgentConfigRequest, AIAgentConfigDefault
+from ldai import LDAIClient, AIAgentConfigRequest, AIAgentConfigDefault
 
 
 def init_launchdarkly_clients(sdk_key: str = None, send_events: bool = True, flush_interval: int = 5) -> Tuple[Any, Any]:
@@ -148,7 +148,7 @@ def build_agent_requests(items: List[Dict[str, Any]]) -> Tuple[List[Any], Dict[s
         agent_requests.append(
             AIAgentConfigRequest(
                 key=key,
-                default_value=AIAgentConfigDefault(enabled=False)
+                default=AIAgentConfigDefault(enabled=False)
             )
         )
 

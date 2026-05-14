@@ -12,7 +12,7 @@ load_dotenv(Path(__file__).parent.parent / ".env")
 import ldclient
 from ldclient import Context
 from ldclient.config import Config
-from ldai.client import LDAIClient, AICompletionConfigDefault
+from ldai import LDAIClient, AICompletionConfigDefault
 
 from strands import Agent
 from strands.models.anthropic import AnthropicModel
@@ -37,7 +37,8 @@ def run_strands_agent(prompt: str):
 
     # 3. Get AI config from LaunchDarkly
     default = AICompletionConfigDefault(enabled=False)
-    config = ai_client.config("orchestrator-config", context, default)
+    config = ai_client.completion_config("orchestrator-config", context, default)
+    tracker = config.create_tracker()
 
     if not config.enabled:
         print("Config not enabled")
@@ -59,7 +60,7 @@ def run_strands_agent(prompt: str):
     response = agent(prompt)
 
     # 6. Track completion
-    config.tracker.track_success()
+    tracker.track_success()
 
     ld_client.flush()
     ld_client.close()

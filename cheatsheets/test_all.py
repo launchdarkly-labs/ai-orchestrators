@@ -11,7 +11,7 @@ load_dotenv(Path(__file__).parent.parent / ".env")
 import ldclient
 from ldclient import Context
 from ldclient.config import Config
-from ldai.client import LDAIClient, AICompletionConfigDefault
+from ldai import LDAIClient, AICompletionConfigDefault
 
 # Init
 sdk_key = os.environ.get("LD_CHEATSHEET_SDK_KEY") or os.environ.get("LD_SDK_KEY")
@@ -28,7 +28,7 @@ print("=" * 60)
 
 for orchestrator in ["strands", "langgraph", "llamaindex", "lyzr", "bedrock"]:
     context = Context.builder(f"user-{orchestrator}").kind("user").set("orchestrator", orchestrator).build()
-    config = ai_client.config("orchestrator-config", context, default)
+    config = ai_client.completion_config("orchestrator-config", context, default)
 
     print(f"\n[{orchestrator.upper()}]")
     print(f"  Enabled: {config.enabled}")

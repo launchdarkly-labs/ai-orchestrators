@@ -10,7 +10,7 @@ load_dotenv(Path(__file__).parent.parent / ".env")
 import ldclient
 from ldclient import Context
 from ldclient.config import Config
-from ldai.client import LDAIClient, AICompletionConfigDefault
+from ldai import LDAIClient, AICompletionConfigDefault
 from ldai.tracker import TokenUsage
 
 # Init LD
@@ -41,7 +41,8 @@ print("=" * 60)
 
 for orchestrator in ["strands", "langgraph", "llamaindex", "lyzr", "bedrock"]:
     context = Context.builder(f"user-{orchestrator}").kind("user").set("orchestrator", orchestrator).build()
-    config = ai_client.config("orchestrator-config", context, default)
+    config = ai_client.completion_config("orchestrator-config", context, default)
+    tracker = config.create_tracker()
 
     print(f"\n[{orchestrator.upper()}]")
     print(f"  Prompt: {config.messages[0].content[:50]}...")
@@ -54,14 +55,13 @@ for orchestrator in ["strands", "langgraph", "llamaindex", "lyzr", "bedrock"]:
                 messages = [{"role": "user", "content": [{"text": "What is 2+2? Reply in one word."}]}]
                 system = [{"text": config.messages[0].content}]
 
-                response = config.tracker.track_bedrock_converse_metrics(
-                    bedrock.converse(
-                        modelId="anthropic.claude-3-haiku-20240307-v1:0",
-                        messages=messages,
-                        system=system,
-                        inferenceConfig={"maxTokens": 256, "temperature": 0.7}
-                    )
+                bedrock_response = bedrock.converse(
+                    modelId="anthropic.claude-3-haiku-20240307-v1:0",
+                    messages=messages,
+                    system=system,
+                    inferenceConfig={"maxTokens": 256, "temperature": 0.7}
                 )
+                response = tracker.track_bedrock_converse_metrics(bedrock_response)
                 result = response["output"]["message"]["content"][0]["text"]
                 input_tokens = response["usage"]["inputTokens"]
                 output_tokens = response["usage"]["outputTokens"]
@@ -79,20 +79,20 @@ for orchestrator in ["strands", "langgraph", "llamaindex", "lyzr", "bedrock"]:
 
                 # Manual tracking for Anthropic
                 duration_ms = int((time.time() - start_time) * 1000)
-                config.tracker.track_duration(duration_ms)
-                config.tracker.track_tokens(TokenUsage(
+                tracker.track_duration(duration_ms)
+                tracker.track_tokens(TokenUsage(
                     total=input_tokens + output_tokens,
                     input=input_tokens,
                     output=output_tokens
                 ))
-                config.tracker.track_success()
+                tracker.track_success()
 
             print(f"  Response: {result}")
             print(f"  Tokens: {input_tokens} in / {output_tokens} out")
             print(f"  [Metrics tracked]")
 
         except Exception as e:
-            config.tracker.track_error()
+            tracker.track_error()
             print(f"  Error: {e}")
 
 # Flush events before exit

@@ -18,7 +18,7 @@ load_dotenv(Path(__file__).parent.parent / ".env")
 import ldclient
 from ldclient import Context
 from ldclient.config import Config
-from ldai.client import LDAIClient, AICompletionConfigDefault
+from ldai import LDAIClient, AICompletionConfigDefault
 
 
 def run_lyzr_agent(prompt: str):
@@ -40,7 +40,8 @@ def run_lyzr_agent(prompt: str):
 
     # 3. Get AI config from LaunchDarkly
     default = AICompletionConfigDefault(enabled=False)
-    config = ai_client.config("orchestrator-config", context, default)
+    config = ai_client.completion_config("orchestrator-config", context, default)
+    tracker = config.create_tracker()
 
     if not config.enabled:
         print("Config not enabled")
@@ -65,14 +66,13 @@ def run_lyzr_agent(prompt: str):
         import boto3
         bedrock = boto3.client("bedrock-runtime", region_name=os.environ.get("AWS_DEFAULT_REGION", "us-west-2"))
 
-        response = config.tracker.track_bedrock_converse_metrics(
-            bedrock.converse(
-                modelId="anthropic.claude-3-haiku-20240307-v1:0",
-                messages=[{"role": "user", "content": [{"text": prompt}]}],
-                system=[{"text": system_prompt}],
-                inferenceConfig={"maxTokens": 256}
-            )
+        bedrock_response = bedrock.converse(
+            modelId="anthropic.claude-3-haiku-20240307-v1:0",
+            messages=[{"role": "user", "content": [{"text": prompt}]}],
+            system=[{"text": system_prompt}],
+            inferenceConfig={"maxTokens": 256}
         )
+        response = tracker.track_bedrock_converse_metrics(bedrock_response)
         result = response["output"]["message"]["content"][0]["text"]
     else:
         import anthropic
@@ -88,13 +88,13 @@ def run_lyzr_agent(prompt: str):
             messages=[{"role": "user", "content": prompt}]
         )
 
-        config.tracker.track_duration(int((time.time() - start) * 1000))
-        config.tracker.track_tokens(TokenUsage(
+        tracker.track_duration(int((time.time() - start) * 1000))
+        tracker.track_tokens(TokenUsage(
             total=response.usage.input_tokens + response.usage.output_tokens,
             input=response.usage.input_tokens,
             output=response.usage.output_tokens
         ))
-        config.tracker.track_success()
+        tracker.track_success()
 
         result = response.content[0].text
 

@@ -25,7 +25,7 @@ from dotenv import load_dotenv
 load_dotenv(project_root / '.env')
 
 # LaunchDarkly imports
-from ldai.client import AIAgentConfigDefault
+from ldai import AIAgentConfigDefault
 from ldai.tracker import TokenUsage
 
 # LangGraph imports
@@ -348,12 +348,12 @@ async def run_langgraph_swarm(
         fresh_config = ai_client.agent_config(
             key=key,
             context=agent_context,
-            default_value=AIAgentConfigDefault(enabled=False)
+            default=AIAgentConfigDefault(enabled=False)
         )
 
         # Store tracker for metrics extraction
         agent_trackers[info['name']] = {
-            'tracker': fresh_config.tracker,
+            'tracker': fresh_config.create_tracker(),
             'agent_key': key,
             'model_id': info['model_id']
         }
@@ -536,9 +536,9 @@ async def run_langgraph_swarm(
         fresh_config = ai_client.agent_config(
             key=key,
             context=agent_context,
-            default_value=AIAgentConfigDefault(enabled=False)
+            default=AIAgentConfigDefault(enabled=False)
         )
-        tracker = fresh_config.tracker
+        tracker = fresh_config.create_tracker()
 
         # Determine if this agent actually ran
         agent_ran = key in executed_agents

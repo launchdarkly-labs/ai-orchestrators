@@ -3,7 +3,7 @@ strands>=1.0.0
 
 # LaunchDarkly
 launchdarkly-server-sdk>=9.0.0
-ldai>=1.0.0
+launchdarkly-server-sdk-ai>=0.20.0
 
 # AWS Bedrock
 boto3>=1.28.0

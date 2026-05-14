@@ -14,7 +14,7 @@ import boto3
 import ldclient
 from ldclient import Context
 from ldclient.config import Config
-from ldai.client import LDAIClient, AICompletionConfigDefault
+from ldai import LDAIClient, AICompletionConfigDefault
 
 
 def run_bedrock_agent(prompt: str, orchestrator: str = "bedrock"):
@@ -36,7 +36,8 @@ def run_bedrock_agent(prompt: str, orchestrator: str = "bedrock"):
 
     # 3. Get AI config from LaunchDarkly
     default = AICompletionConfigDefault(enabled=False)
-    config = ai_client.config("orchestrator-config", context, default)
+    config = ai_client.completion_config("orchestrator-config", context, default)
+    tracker = config.create_tracker()
 
     if not config.enabled:
         print("Config not enabled")
@@ -60,14 +61,13 @@ def run_bedrock_agent(prompt: str, orchestrator: str = "bedrock"):
     # Use Claude on Bedrock (or Nova)
     model_id = "anthropic.claude-3-haiku-20240307-v1:0"  # or "amazon.nova-lite-v1:0"
 
-    response = config.tracker.track_bedrock_converse_metrics(
-        bedrock.converse(
-            modelId=model_id,
-            messages=messages,
-            system=system,
-            inferenceConfig={"maxTokens": 256, "temperature": 0.7}
-        )
+    bedrock_response = bedrock.converse(
+        modelId=model_id,
+        messages=messages,
+        system=system,
+        inferenceConfig={"maxTokens": 256, "temperature": 0.7}
     )
+    response = tracker.track_bedrock_converse_metrics(bedrock_response)
 
     # 7. Extract response
     result = response["output"]["message"]["content"][0]["text"]

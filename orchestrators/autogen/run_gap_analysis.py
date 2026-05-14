@@ -25,7 +25,7 @@ from dotenv import load_dotenv
 load_dotenv(project_root / '.env')
 
 # LaunchDarkly imports
-from ldai.client import AIAgentConfigDefault
+from ldai import AIAgentConfigDefault
 from ldai.tracker import TokenUsage
 
 # AutoGen imports
@@ -396,11 +396,11 @@ async def run_autogen_swarm(
         fresh_config = ai_client.agent_config(
             key=key,
             context=agent_context,  # Use context with both orchestrator and agent
-            default_value=AIAgentConfigDefault(enabled=False)
+            default=AIAgentConfigDefault(enabled=False)
         )
 
-        # Use the fresh tracker from this new config evaluation
-        tracker = fresh_config.tracker
+        # Create a fresh tracker from this new config evaluation
+        tracker = fresh_config.create_tracker()
 
         # Track tokens - AI SDK automatically adds agent attribute
         tracker.track_tokens(TokenUsage(
