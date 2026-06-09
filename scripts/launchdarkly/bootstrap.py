@@ -245,16 +245,19 @@ class MedicalDiagnosisBootstrap:
                 model_config_key = f"{provider}.{model_id.replace('/', '-')}"
                 print(f"    WARNING: No mapping found for {lookup_key}, using generated: {model_config_key}")
 
+            # Model tuning params (temperature, max_tokens, …) must live under
+            # model.parameters — that is the ONLY place the SDK reads them at runtime
+            # (ldai client.py: parameters = variation['model'].get('parameters')). A
+            # top-level variation `parameters` field is silently ignored, so merge the
+            # manifest's customParameters into the model parameters here.
+            model_parameters = dict(model_config.get("parameters", {}))
+            model_parameters.update(custom_params)
             payload["model"] = {
                 "modelName": model_id,
-                "parameters": model_config.get("parameters", {}),
+                "parameters": model_parameters,
                 "custom": {}
             }
             payload["modelConfigKey"] = model_config_key
-
-        # Add custom parameters if provided
-        if custom_params:
-            payload["parameters"] = custom_params
 
         print(f"  Processing variation '{variation_key}'...")
         print(f"    Model: {model_id}, Provider: {provider}")
