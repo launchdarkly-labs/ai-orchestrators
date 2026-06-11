@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Medical Diagnosis Swarm - LaunchDarkly Bootstrap Script
-Creates tools, AI agent configs, and variations programmatically.
+Graph Experiment - LaunchDarkly Bootstrap Script
+Creates the agent graph, node AI configs, tools, the orchestrator flag, and the
+gap-quality judge from a manifest. Assumes the project already exists.
 """
 
 import sys
@@ -14,7 +15,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-class MedicalDiagnosisBootstrap:
+class AgentGraphBootstrap:
     def __init__(self, api_key, base_url="https://app.launchdarkly.com"):
         self.api_key = api_key
         self.base_url = base_url
@@ -24,112 +25,21 @@ class MedicalDiagnosisBootstrap:
             "Content-Type": "application/json"
         }
 
-    def create_segment(self, project_key, segment_data):
-        """Create user segment for targeting using two-step process"""
-        url = f"{self.base_url}/api/v2/segments/{project_key}/production"
+    def verify_project(self, project_key):
+        """Confirm the (preconfigured) project exists.
 
-        # Step 1: Create empty segment (LaunchDarkly ignores rules in POST)
-        payload = {
-            "key": segment_data["key"],
-            "name": segment_data["key"].replace("-", " ").title()
-        }
-
-        response = requests.post(url, headers=self.headers, json=payload, timeout=30)
-
-        if response.status_code in [200, 201]:
-            print(f"    ✓ Empty segment '{segment_data['key']}' created")
-            time.sleep(0.5)
-            # Step 2: Add rules via semantic patch
-            return self.add_segment_rules(project_key, segment_data)
-        elif response.status_code == 409:
-            print(f"    ℹ️  Segment '{segment_data['key']}' already exists, adding rules...")
-            return self.add_segment_rules(project_key, segment_data)
-        else:
-            print(f"    ✗ Failed to create segment: {response.text}")
-            return None
-
-    def add_segment_rules(self, project_key, segment_data):
-        """Add rules to existing segment using semantic patch"""
-        segment_key = segment_data["key"]
-        url = f"{self.base_url}/api/v2/segments/{project_key}/production/{segment_key}"
-
-        # Build instructions for semantic patch
-        instructions = []
-
-        # Each segment should have one rule with multiple clauses
-        if segment_data.get("rules"):
-            clauses = []
-            for clause in segment_data["rules"]:
-                clauses.append({
-                    "attribute": clause["attribute"],
-                    "op": clause["op"],
-                    "values": clause["values"],
-                    "contextKind": clause["contextKind"],
-                    "negate": clause["negate"]
-                })
-
-            instructions.append({
-                "kind": "addRule",
-                "clauses": clauses
-            })
-
-        payload = {
-            "environmentKey": "production",
-            "instructions": instructions
-        }
-
-        print(f"    Adding {len(instructions)} rules to segment '{segment_key}'")
-
-        # Use semantic patch headers for segment rule updates
-        patch_headers = self.headers.copy()
-        patch_headers["Content-Type"] = "application/json; domain-model=launchdarkly.semanticpatch"
-
-        response = requests.patch(url, headers=patch_headers, json=payload, timeout=30)
-
-        if response.status_code == 200:
-            result = response.json()
-            rules_count = len(result.get("rules", []))
-            print(f"    ✓ Rules added to segment '{segment_key}' (final count: {rules_count})")
-            time.sleep(0.5)
-            return result
-        else:
-            print(f"    ✗ Failed to add rules to segment '{segment_key}': {response.text}")
-            return None
-
-    def create_project(self, project_key, project_name):
-        """Create LaunchDarkly project if it doesn't exist"""
-        # Check if project exists
+        The bootstrap does not create projects — the user supplies the key of a project
+        they have already set up (via LD_PROJECT_KEY or the manifest's project.key).
+        We check it here so a bad key fails fast with a clear message instead of producing
+        confusing 404s from every downstream config/graph/flag call.
+        """
         check_url = f"{self.base_url}/api/v2/projects/{project_key}"
-        check_response = requests.get(check_url, headers=self.headers, timeout=30)
-
-        if check_response.status_code == 200:
-            print(f"  ℹ️  Project '{project_key}' already exists")
+        response = requests.get(check_url, headers=self.headers, timeout=30)
+        if response.status_code == 200:
+            print(f"  ℹ️  Project '{project_key}' found")
             return True
-
-        # Create project
-        url = f"{self.base_url}/api/v2/projects"
-        payload = {
-            "key": project_key,
-            "name": project_name,
-            "environments": [
-                {
-                    "key": "production",
-                    "name": "Production",
-                    "color": "417505"
-                }
-            ]
-        }
-
-        print(f"  Creating project '{project_key}'...")
-        response = requests.post(url, headers=self.headers, json=payload, timeout=30)
-
-        if response.status_code in [200, 201]:
-            print(f"    ✓ Project '{project_key}' created")
-            time.sleep(1)
-            return True
-        else:
-            print(f"    ✗ Failed to create project: {response.text}")
-            return False
+        print(f"    ✗ Project '{project_key}' not found: {response.status_code} {response.text}")
+        return False
 
     def create_tool(self, project_key, tool_data):
         """Create tool for AI agent function calling"""
@@ -184,9 +94,10 @@ class MedicalDiagnosisBootstrap:
             print(f"  Creating AI Config '{config_key}'...")
             create_url = f"{self.base_url}/api/v2/projects/{project_key}/ai-configs"
 
-            # Get provider and modelName from config level (NOT from variation)
-            provider = ai_config_data.get("provider", "Bedrock")
-            model_id = ai_config_data.get("modelId", "anthropic.claude-3-5-sonnet-20241022-v2:0")
+            # Get provider and modelName from config level (NOT from variation).
+            # The manifest sets these per node; the defaults match the pinned model.
+            provider = ai_config_data.get("provider", "anthropic")
+            model_id = ai_config_data.get("modelId", "claude-sonnet-4-5")
 
             # Create AI Config WITHOUT inline variation
             # This ensures provider/modelName are stored at config level where UI reads them
@@ -245,11 +156,8 @@ class MedicalDiagnosisBootstrap:
                 model_config_key = f"{provider}.{model_id.replace('/', '-')}"
                 print(f"    WARNING: No mapping found for {lookup_key}, using generated: {model_config_key}")
 
-            # Model tuning params (temperature, max_tokens, …) must live under
-            # model.parameters — that is the ONLY place the SDK reads them at runtime
-            # (ldai client.py: parameters = variation['model'].get('parameters')). A
-            # top-level variation `parameters` field is silently ignored, so merge the
-            # manifest's customParameters into the model parameters here.
+            # The SDK reads model tuning params (temperature, max_tokens, …) from
+            # model.parameters at runtime, so merge the manifest's customParameters there.
             model_parameters = dict(model_config.get("parameters", {}))
             model_parameters.update(custom_params)
             payload["model"] = {
@@ -273,37 +181,28 @@ class MedicalDiagnosisBootstrap:
             time.sleep(0.5)
             return response.json()
         elif response.status_code == 409:
-            # Already exists, try to update via patch
+            # Already exists — update via a plain (merge) PATCH. `instructions` is a
+            # string field on the variation, not a semantic-patch op list.
             print(f"    ℹ️  Variation exists, updating...")
-
-            # For updates, we use semantic patch format
-            patch_instructions = []
-
-            # Update instructions
-            patch_instructions.append({
-                "kind": "updateInstructions",
-                "value": variation_data.get("instructions", "")
-            })
-
-            # Update tools
-            patch_instructions.append({
-                "kind": "updateTools",
-                "value": [{"key": tool, "version": 1} for tool in variation_data.get("tools", [])]
-            })
-
             patch_url = f"{self.base_url}/api/v2/projects/{project_key}/ai-configs/{config_key}/variations/{variation_key}"
-            patch_response = requests.patch(
-                patch_url,
-                headers=self.headers,
-                json={"instructions": patch_instructions},
-                timeout=30
-            )
+            patch_body = {
+                "instructions": variation_data.get("instructions", ""),
+                "tools": [{"key": tool, "version": 1} for tool in variation_data.get("tools", [])],
+            }
+            if "model" in payload:
+                # Re-apply model + parameters so a re-run propagates customParameters too.
+                patch_body["model"] = payload["model"]
+            if "modelConfigKey" in payload:
+                # Keep the model-config linkage current — pricing (Cost in AI Insights)
+                # is keyed on modelConfigKey.
+                patch_body["modelConfigKey"] = payload["modelConfigKey"]
+            patch_response = requests.patch(patch_url, headers=self.headers, json=patch_body, timeout=30)
 
             if patch_response.status_code == 200:
                 print(f"    ✓ Variation '{variation_key}' updated")
                 return patch_response.json()
             else:
-                print(f"    ⚠️  Could not update: {patch_response.text}")
+                print(f"    ⚠️  Could not update: {patch_response.status_code} {patch_response.text}")
                 return None
         else:
             print(f"    ✗ Failed: {response.text}")
@@ -338,116 +237,262 @@ class MedicalDiagnosisBootstrap:
             print(f"    ✗ Failed to fetch targeting data: {response.text}")
             return {}
 
-    def update_targeting(self, project_key, config_key, targeting_data):
-        """Update AI Config targeting rules using correct semantic patch format"""
-        # First get the targeting variation IDs (these are different from AI config variation IDs)
-        targeting_variation_map = self.get_targeting_variation_map(project_key, config_key)
-        if not targeting_variation_map:
-            print(f"    ✗ Could not get targeting variation map for '{config_key}'")
+    def enable_config(self, project_key, config_key, default_variation_key):
+        """Serve a real variation via fallthrough so the config is enabled.
+
+        Required for agent-graph nodes: the SDK reports a graph as disabled unless
+        ALL of its node configs are enabled. New AI configs have targeting on but
+        their fallthrough points at the disabled stub variation (index 0), so we
+        just repoint the fallthrough at the real variation.
+        """
+        var_map = self.get_targeting_variation_map(project_key, config_key)
+        vid = var_map.get(default_variation_key)
+        if not vid:
+            print(f"    ✗ Cannot enable '{config_key}': variation '{default_variation_key}' not found")
             return None
-            
-        print(f"    Available targeting variations: {list(targeting_variation_map.keys())}")
-        
+
         url = f"{self.base_url}/api/v2/projects/{project_key}/ai-configs/{config_key}/targeting"
-        
-        instructions = []
-        
-        # Add targeting rules
-        for rule in targeting_data.get("rules", []):
-            variation_key = rule.get("variation")
-            targeting_variation_id = targeting_variation_map.get(variation_key)
-
-            if not targeting_variation_id:
-                print(f"    ⚠  Variation '{variation_key}' not found in targeting variations")
-                continue
-
-            # Check if this is a segment-based rule or direct attribute rule
-            if "segments" in rule:
-                # Create add rule instruction for each segment (segment-based)
-                for segment in rule.get("segments", []):
-                    instruction = {
-                        "kind": "addRule",
-                        "clauses": [
-                            {
-                                "attribute": "segmentMatch",
-                                "op": "segmentMatch",
-                                "values": [segment],
-                                "contextKind": "user"
-                            }
-                        ],
-                        "variationId": targeting_variation_id
-                    }
-                    instructions.append(instruction)
-                    print(f"    Added rule: segment '{segment}' -> variation '{variation_key}'")
-            elif "clauses" in rule:
-                # Handle manifest-style rules with clauses array
-                rule_clauses = []
-                for clause in rule.get("clauses", []):
-                    rule_clause = {
-                        "attribute": clause.get("attribute", "orchestrator"),
-                        "op": clause.get("op", "in"),
-                        "values": clause.get("values", []),
-                        "contextKind": clause.get("contextKind", "user")
-                    }
-                    rule_clauses.append(rule_clause)
-
-                instruction = {
-                    "kind": "addRule",
-                    "clauses": rule_clauses,
-                    "variationId": targeting_variation_id
-                }
-                instructions.append(instruction)
-
-                # Log what we're adding for debugging
-                for clause in rule_clauses:
-                    attr = clause['attribute']
-                    values = clause['values']
-                    print(f"    Added rule: {attr} in {values} -> variation '{variation_key}'")
-            elif "orchestrator" in rule:
-                # Legacy: Direct attribute matching for orchestrator (backward compatibility)
-                instruction = {
-                    "kind": "addRule",
-                    "clauses": [
-                        {
-                            "attribute": "orchestrator",
-                            "op": "in",
-                            "values": [rule["orchestrator"]],
-                            "contextKind": "user"
-                        }
-                    ],
-                    "variationId": targeting_variation_id
-                }
-                instructions.append(instruction)
-                print(f"    Added rule: orchestrator='{rule['orchestrator']}' -> variation '{variation_key}'")
-        
-        # Set fallthrough variation (required)
-        fallthrough_variation_key = targeting_data.get("defaultVariation")
-        fallthrough_variation_id = targeting_variation_map.get(fallthrough_variation_key)
-        
-        if fallthrough_variation_id:
-            instructions.append({
-                "kind": "updateFallthroughVariationOrRollout",
-                "variationId": fallthrough_variation_id
-            })
-            print(f"    Set fallthrough to variation '{fallthrough_variation_key}'")
-        else:
-            print(f"    ⚠  Fallthrough variation '{fallthrough_variation_key}' not found")
-            return None
-        
         payload = {
             "environmentKey": "production",
-            "instructions": instructions
+            "instructions": [
+                {"kind": "updateFallthroughVariationOrRollout", "variationId": vid},
+            ],
         }
-        
-        print(f"  Updating targeting with {len(instructions)} instructions...")
         response = requests.patch(url, headers=self.headers, json=payload, timeout=30)
-
         if response.status_code == 200:
-            print(f"    ✓ Targeting updated (configs must be turned ON manually in UI)")
+            print(f"    ✓ Config '{config_key}' enabled (default variation: {default_variation_key})")
+            time.sleep(0.5)
             return response.json()
+        print(f"    ✗ Failed to enable config '{config_key}': {response.status_code} {response.text}")
+        return None
+
+    def create_flag(self, project_key, flag_data):
+        """Create a feature flag (e.g. the multivariate `orchestrator` routing flag).
+
+        The orchestrator flag is the experiment's treatment: the app evaluates it to
+        route to a framework runner, and an experiment attaches to it to split traffic
+        and attribute metrics per variation. Flags are created with targeting OFF.
+        """
+        flag_key = flag_data["key"]
+        check = requests.get(
+            f"{self.base_url}/api/v2/flags/{project_key}/{flag_key}",
+            headers=self.headers, timeout=30,
+        )
+        if check.status_code == 200:
+            print(f"  ℹ️  Flag '{flag_key}' already exists")
+            return check.json()
+
+        payload = {
+            "key": flag_key,
+            "name": flag_data.get("name", flag_key),
+            "kind": flag_data.get("kind", "multivariate"),
+            "temporary": flag_data.get("temporary", True),
+            "tags": flag_data.get("tags", []),
+            "variations": [
+                {"value": v["value"], "name": v.get("name", v["value"])}
+                for v in flag_data.get("variations", [])
+            ],
+        }
+        print(f"  Creating flag '{flag_key}' ({len(payload['variations'])} variations)...")
+        r = requests.post(
+            f"{self.base_url}/api/v2/flags/{project_key}",
+            headers=self.headers, json=payload, timeout=30,
+        )
+        if r.status_code in (200, 201):
+            vals = [v["value"] for v in payload["variations"]]
+            print(f"    ✓ Flag '{flag_key}' created: {vals}")
+            print(f"    ℹ️  Flag is OFF by default — the experiment controls the split when started")
+            time.sleep(0.5)
+            return r.json()
+        print(f"    ✗ Failed to create flag: {r.status_code} {r.text}")
+        return None
+
+    def create_agent_graph(self, project_key, graph_data):
+        """Create an agent graph: root config + edges (handoffs), then enable it.
+
+        Edges define the topology that the runtime dispatcher walks. Routing is
+        read from edge.handoff at runtime — not hardcoded in the runners.
+        """
+        graph_key = graph_data["key"]
+        root = graph_data["root"]
+        base = f"{self.base_url}/api/v2/projects/{project_key}/agent-graphs"
+
+        # 1. Create the graph with its root config (idempotent)
+        check = requests.get(f"{base}/{graph_key}", headers=self.headers, timeout=30)
+        if check.status_code == 200:
+            print(f"  ℹ️  Agent graph '{graph_key}' already exists")
         else:
-            print(f"    ✗ Failed to update targeting: {response.text}")
-            return None
+            payload = {
+                "key": graph_key,
+                "name": graph_data.get("name", graph_key),
+                "rootConfigKey": root,
+            }
+            print(f"  Creating agent graph '{graph_key}' (root: {root})...")
+            r = requests.post(base, headers=self.headers, json=payload, timeout=30)
+            if r.status_code in (200, 201):
+                print(f"    ✓ Agent graph '{graph_key}' created")
+                time.sleep(1)
+            else:
+                print(f"    ✗ Failed to create agent graph: {r.status_code} {r.text}")
+                return False
+
+        # 2. Add edges (handoffs)
+        edges = [
+            {
+                "key": e["key"],
+                "sourceConfig": e["source"],
+                "targetConfig": e["target"],
+                "handoff": e.get("handoff", {}),
+            }
+            for e in graph_data.get("edges", [])
+        ]
+        if edges:
+            r = requests.patch(
+                f"{base}/{graph_key}",
+                headers=self.headers,
+                json={"rootConfigKey": root, "edges": edges},
+                timeout=30,
+            )
+            if r.status_code in (200, 201):
+                print(f"    ✓ Added {len(edges)} edge(s): " +
+                      ", ".join(f"{e['source']}→{e['target']}" for e in graph_data.get("edges", [])))
+                time.sleep(0.5)
+            else:
+                print(f"    ✗ Failed to add edges: {r.status_code} {r.text}")
+                return False
+
+        # 3. Enable the graph
+        r = requests.patch(
+            f"{base}/{graph_key}",
+            headers=self.headers,
+            json={"instructions": [{"kind": "turnTargetingOn"}]},
+            timeout=30,
+        )
+        if r.status_code in (200, 201):
+            print(f"    ✓ Agent graph '{graph_key}' enabled")
+        else:
+            print(f"    ⚠️  Could not enable graph (enable in UI): {r.status_code} {r.text}")
+        # Link to the graph in the UI.
+        print(
+            f"    🔗 View: {self.base_url}/projects/{project_key}/ai/graphs/{graph_key}"
+            f"?env=production&selected-env=production"
+        )
+        return True
+
+    def create_judge_config(self, project_key, judge_data, manifest):
+        """Create a judge-mode AI config + its rubric variation, then enable it.
+
+        A judge config generates its own evaluation metric (evaluationMetricKey, e.g.
+        $ld:ai:judge:gap-quality) — no separate custom metric. The harness invokes the
+        judge via the SDK and records the score with tracker.track_judge_result. Created
+        with the fallthrough at the disabled stub, so we repoint it at the rubric variation.
+        """
+        judge_key = judge_data["key"]
+        base = f"{self.base_url}/api/v2/projects/{project_key}/ai-configs"
+
+        # 1. Create the judge-mode config (idempotent)
+        created = False
+        check = requests.get(f"{base}/{judge_key}", headers=self.headers, timeout=30)
+        if check.status_code == 200:
+            print(f"  ℹ️  Judge config '{judge_key}' already exists")
+        else:
+            created = True
+            payload = {
+                "key": judge_key,
+                "name": judge_data.get("name", judge_key),
+                "mode": "judge",
+                "tags": ["ai", "judge"],
+                "evaluationMetricKey": judge_data["evaluationMetricKey"],
+                "isInverted": judge_data.get("isInverted", False),
+            }
+            print(f"  Creating judge config '{judge_key}' (metric: {judge_data['evaluationMetricKey']})...")
+            r = requests.post(base, headers=self.headers, json=payload, timeout=30)
+            if r.status_code in (200, 201):
+                print(f"    ✓ Judge config '{judge_key}' created")
+                time.sleep(1)
+            else:
+                print(f"    ✗ Failed to create judge config: {r.status_code} {r.text}")
+                return False
+
+        # 2. Create the rubric variation (the evaluation prompt + judge model)
+        provider = judge_data.get("provider", "anthropic")
+        model_id = judge_data.get("modelId", "claude-sonnet-4-5")
+        model_config_key = manifest.get("modelConfigKeys", {}).get(
+            f"{provider}.{model_id}", f"{provider.title()}.{model_id}"
+        )
+        var_payload = {
+            "key": "default",
+            "name": "Default",
+            "messages": [{"role": "system", "content": judge_data.get("instructions", "")}],
+            "modelConfigKey": model_config_key,
+            "model": {"modelName": model_id, "parameters": {"temperature": 0.0}},
+        }
+        r = requests.post(f"{base}/{judge_key}/variations", headers=self.headers, json=var_payload, timeout=30)
+        if r.status_code in (200, 201):
+            print(f"    ✓ Judge rubric variation 'default' created")
+            time.sleep(0.5)
+        elif r.status_code == 409:
+            # Already exists — PATCH the rubric so manifest edits propagate on re-runs.
+            patch = requests.patch(
+                f"{base}/{judge_key}/variations/default",
+                headers=self.headers,
+                json={"messages": var_payload["messages"], "model": var_payload["model"]},
+                timeout=30,
+            )
+            if patch.status_code == 200:
+                print(f"    ✓ Judge rubric variation 'default' updated from manifest")
+            else:
+                print(f"    ⚠️  Judge variation exists but update failed: {patch.status_code} {patch.text}")
+        else:
+            print(f"    ✗ Failed to create judge variation: {r.status_code} {r.text}")
+            return False
+
+        # 3. Enable: repoint the fallthrough at the rubric variation — but ONLY on first
+        # creation. On re-runs, leave the fallthrough alone so an operator's repoint to a
+        # custom rubric variation (e.g. scripts/launchdarkly/update_judge.py) isn't silently
+        # reverted; the 409-PATCH above still syncs the 'default' rubric from the manifest.
+        if created:
+            self.enable_config(project_key, judge_key, "default")
+        else:
+            print(f"    ℹ️  Judge fallthrough left as-is (re-run preserves any custom variation)")
+
+        # 4. Attach the judge to the node(s) whose output it scores. Attaching registers
+        #    the evaluation metric so it's selectable in the experiment.
+        for target in judge_data.get("attach", []):
+            self.attach_judge(
+                project_key, target["config"], target["variation"],
+                judge_key, target.get("samplingRate", 1.0),
+            )
+        return True
+
+    def attach_judge(self, project_key, config_key, variation_key, judge_key, sampling_rate=1.0):
+        """Attach a judge to a config variation (registers its evaluation metric).
+
+        Sends the variation's modelConfigKey/model along with judgeConfiguration so the
+        variation's model-config linkage — which pricing (Cost in AI Insights) is keyed
+        on — stays intact through the update.
+        """
+        url = f"{self.base_url}/api/v2/projects/{project_key}/ai-configs/{config_key}/variations/{variation_key}"
+        body = {"judgeConfiguration": {"judges": [{"judgeConfigKey": judge_key, "samplingRate": sampling_rate}]}}
+        current = requests.get(url, headers=self.headers, timeout=30)
+        if current.status_code == 200:
+            cur = current.json()
+            if isinstance(cur, list):
+                cur = cur[0] if cur else {}
+            if cur.get("modelConfigKey"):
+                body["modelConfigKey"] = cur["modelConfigKey"]
+            if cur.get("model"):
+                body["model"] = cur["model"]
+        else:
+            print(f"    ⚠️  Could not read {config_key}/{variation_key} before judge attach "
+                  f"({current.status_code}); attaching judge only. If Cost stops reporting for "
+                  f"this config, run scripts/launchdarkly/fix_pricing.py")
+        r = requests.patch(url, headers=self.headers, json=body, timeout=30)
+        if r.status_code == 200:
+            print(f"    ✓ Judge '{judge_key}' attached to {config_key}/{variation_key} ({int(sampling_rate*100)}% sampling)")
+            return r.json()
+        print(f"    ✗ Failed to attach judge: {r.status_code} {r.text}")
+        return None
 
 
 def main():
@@ -457,10 +502,10 @@ def main():
     print("║  AI Agent Orchestrator - LaunchDarkly Bootstrap       ║")
     print("╚═══════════════════════════════════════════════════════╝")
     print()
-    print("This script will create:")
-    print("  • 1 project (orchestrator-agents)")
-    print("  • Tools, AI agent configs, and variations from manifest")
-    print("  • Default targeting setup")
+    print("This script creates, in your existing project (set via LD_PROJECT_KEY):")
+    print("  • Tools + AI agent node configs from the manifest")
+    print("  • The agent graph (nodes + handoff edges)")
+    print("  • The orchestrator routing flag + the gap-quality judge")
     print()
 
     api_key = os.getenv("LD_API_KEY")
@@ -470,74 +515,35 @@ def main():
         print("   Then add it to your .env file")
         return
 
-    # Check for manifest file (support both research gap and paper impact)
-    # Look in config/ directory for manifest files
+    # Manifest: a path passed on the command line, else the default in config/.
     config_dir = Path(__file__).parent.parent.parent / "config"
-
-    manifest_options = [
-        ("research_gap_manifest.yaml", "Research Gap Analysis"),
-        ("research_gap_manifest_robust.yaml", "Research Gap Analysis (Robust)"),
-        ("paper_impact_manifest.yaml", "Paper Impact Prediction"),
-        ("medical_diagnosis_manifest.yaml", "Medical Diagnosis (legacy)")
-    ]
-
-    manifest_path = None
-    manifest_type = None
-
-    # Check for command line argument
-    if len(sys.argv) > 1:
-        arg_path = Path(sys.argv[1])
-        if arg_path.exists():
-            manifest_path = arg_path
-            manifest_type = f"Custom ({arg_path.name})"
-            print(f"Using manifest from command line: {manifest_path}")
-            print()
-
-    # Only show menu if no command line argument provided
-    if manifest_path is None:
-        print("Available manifests:")
-        for i, (filename, description) in enumerate(manifest_options, 1):
-            path = config_dir / filename
-            if path.exists():
-                print(f"  {i}. {description} ({filename})")
-                if manifest_path is None:
-                    manifest_path = path
-                    manifest_type = description
-
-        if manifest_path is None:
-            print()
-            print("❌ No manifest files found in config/ directory")
-            print("   Expected: research_gap_manifest.yaml or paper_impact_manifest.yaml")
-            return
-
-        print()
-        choice = input(f"Select manifest (1-{len([o for o in manifest_options if (config_dir / o[0]).exists()])}) or press Enter for default: ").strip()
-
-        if choice.isdigit():
-            idx = int(choice) - 1
-            existing_manifests = [(p, d) for p, d in manifest_options if (config_dir / p).exists()]
-            if 0 <= idx < len(existing_manifests):
-                manifest_path = config_dir / existing_manifests[idx][0]
-                manifest_type = existing_manifests[idx][1]
-
-        print(f"Using: {manifest_type}")
+    manifest_path = Path(sys.argv[1]) if len(sys.argv) > 1 else config_dir / "graph_experiment_manifest.yaml"
+    if not manifest_path.exists():
+        print(f"❌ Manifest not found: {manifest_path}")
+        return
+    print(f"Using manifest: {manifest_path}")
     print()
 
     with open(manifest_path) as f:
         manifest = yaml.safe_load(f)
 
-    project_key = manifest["project"]["key"]
-    bootstrap = MedicalDiagnosisBootstrap(api_key)
+    # LD_PROJECT_KEY (if set) overrides the manifest's project key, letting a user
+    # point the bootstrap at a different project without editing the manifest.
+    project_key = os.getenv("LD_PROJECT_KEY") or manifest["project"]["key"]
+    bootstrap = AgentGraphBootstrap(api_key)
 
     print(f"📦 Project: {project_key}")
     print(f"🌍 Environment: production")
     print()
 
-    # Step 0: Create project if it doesn't exist
-    print("📁 Creating project...")
-    if not bootstrap.create_project(project_key, "Paper Impact Prediction Orchestrator"):
+    # Step 0: Verify the supplied (preconfigured) project exists. The bootstrap does not
+    # create projects — set up the project first via the LaunchDarkly MCP server, a skill,
+    # or the UI, then pass its key via LD_PROJECT_KEY or the manifest's project.key.
+    print(f"📁 Using project '{project_key}'...")
+    if not bootstrap.verify_project(project_key):
         print()
-        print("❌ Failed to create project. Exiting.")
+        print(f"❌ Project '{project_key}' not found. Set it up first (LaunchDarkly MCP /")
+        print("   skill / UI), then set LD_PROJECT_KEY to its key. Exiting.")
         return
     print()
 
@@ -547,14 +553,8 @@ def main():
         bootstrap.create_tool(project_key, tool)
     print()
 
-    # Step 2: Create segments (required for targeting rules)
-    if "segment" in manifest["project"]:
-        print("📦 Creating segments for targeting rules...")
-        for segment in manifest["project"]["segment"]:
-            bootstrap.create_segment(project_key, segment)
-        print()
-
-    # Step 3: Create AI configs and variations
+    # Step 2: Create AI configs + variations, then enable each on its default variation
+    # (the agent graph reports disabled unless every node config is enabled).
     print("🤖 Creating AI agent configs...")
     for ai_config in manifest["project"]["ai_config"]:
         config_key = ai_config["key"]
@@ -563,30 +563,53 @@ def main():
             print(f"❌ Failed to create AI Config '{config_key}'. Continuing...")
             continue
 
-        # Create variations for this config
         print(f"🎨 Creating variations for '{config_key}'...")
         for variation in ai_config["variations"]:
             bootstrap.create_variation(project_key, config_key, variation, manifest)
 
-        # Update targeting
-        print(f"🎯 Updating targeting for '{config_key}'...")
-        if "targeting" in ai_config:
-            bootstrap.update_targeting(project_key, config_key, ai_config["targeting"])
+        if ai_config.get("variations"):
+            print(f"🟢 Enabling '{config_key}'...")
+            bootstrap.enable_config(project_key, config_key, ai_config["variations"][0]["key"])
+        print()
+
+    # Step 3: Create the agent graph (nodes + edges + enable), if the manifest defines one
+    graph_def = manifest["project"].get("agent_graph")
+    if graph_def:
+        print("🕸️  Creating agent graph (topology + handoff edges)...")
+        bootstrap.create_agent_graph(project_key, graph_def)
+        print()
+
+    # Step 4: Create experiment flags (e.g. the orchestrator routing flag)
+    for flag in manifest["project"].get("flag", []):
+        print("🚩 Creating experiment flag...")
+        bootstrap.create_flag(project_key, flag)
+        print()
+
+    # Step 5: Create the custom judge config (primary experiment metric)
+    judge_def = manifest["project"].get("judge")
+    if judge_def:
+        print("⚖️  Creating custom judge config...")
+        bootstrap.create_judge_config(project_key, judge_def, manifest)
         print()
 
     print("✨ Bootstrap complete!")
     print()
+    graph_key = (manifest["project"].get("agent_graph") or {}).get("key", "")
     print("📝 Next steps:")
-    print(f"   1. Verify in LaunchDarkly: {bootstrap.base_url}/default/{project_key}/production/ai-configs")
-    print(f"   2. Update your .env file:")
-    print(f"      LAUNCHDARKLY_PROJECT_KEY={project_key}")
-    print(f"      LD_API_KEY=your-api-key")
-    print(f"      LAUNCHDARKLY_SDK_KEY=your-sdk-key")
-    print(f"   3. Run your swarm: python -u strands/my_agent/swarm_example.py")
+    print(
+        f"   1. View the agent graph: {bootstrap.base_url}/projects/{project_key}"
+        f"/ai/graphs/{graph_key}?env=production&selected-env=production"
+    )
+    print(f"   2. Make sure your .env has:")
+    print(f"      LD_PROJECT_KEY={project_key}")
+    print(f"      LD_SDK_KEY=your-server-sdk-key")
+    print("   3. Create the experiment in the UI: treatment = the 'orchestrator' flag,")
+    print("      primary metric = the gap-quality judge, then start an iteration.")
+    print("   4. Drive traffic: python scripts/run_experiment.py")
     print()
     print("🔄 To make changes:")
-    print("   • Use LaunchDarkly UI to update instructions, models, etc.")
-    print("   • This manifest is for initial setup only")
+    print("   • Edit the configs / graph / flag in the LaunchDarkly UI (instructions, models, edges).")
+    print("   • This manifest is for initial setup only.")
 
 
 if __name__ == "__main__":

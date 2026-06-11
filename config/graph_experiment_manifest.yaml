@@ -1,0 +1,342 @@
+# Research Gap Analysis — Agent Graph (DEVREL-741, branch tutorial/graph-experiments)
+# Bootstrap: python scripts/launchdarkly/bootstrap.py config/graph_experiment_manifest.yaml
+#
+# DIRECTED AGENT GRAPH with a parallel fan-in topology (completed shape):
+#
+#            ┌─ approach-analyzer ─────┐
+#   intake ─┤                          ├─→ gap-synthesizer ─→ report
+#            └─ contradiction-detector ┘
+#
+# `intake` is the entry node (the agent-graph model has a single root): a light, one-sentence
+# intake pass that fans out to approach-analyzer + contradiction-detector, which run
+# CONCURRENTLY (independent reads of the same papers) and fan into gap-synthesizer. The
+# manifest ships the graph WITHOUT the detector branch — the tutorial adds that node and its
+# two edges in the UI to complete the fan-in (see the agent_graph section below).
+#
+# The dispatcher injects the SOURCE PAPERS (with ArXiv IDs) into EVERY node, so every agent —
+# and the gap-quality judge — works against the ground-truth papers, not a summary handed
+# down a chain. Routing is structural: the edges below ARE the execution DAG; agents do not
+# emit routes.
+#
+# Experiment A: model PINNED to claude-sonnet-4-5 across all nodes. The `orchestrator`
+# flag swaps the framework (langgraph / strands / openai-agents / google-adk), not the model.
+
+project:
+  key: "graph-experiments"
+
+  environment:
+    - key: production
+      name: Production
+
+  # One real tool: fetch the full paper from arXiv on demand (the agents otherwise only
+  # see abstracts). handoff_to_agent is intentionally absent (edges handle handoffs).
+  tool:
+    - key: "fetch_paper"
+      name: "Fetch Full Paper"
+      description: "Retrieve a paper's FULL text from arXiv by its ArXiv ID. Use ONLY when an abstract is insufficient to resolve a specific point — not as a default lookup. Slow and token-heavy; use sparingly."
+      type: "function"
+      schema:
+        type: "object"
+        properties:
+          arxiv_id:
+            description: "The ArXiv ID of the paper to fetch, e.g. '2409.02645v2' (shown as 'ArXiv ID' in each paper's summary)."
+            type: "string"
+        required: ["arxiv_id"]
+        additionalProperties: false
+
+  # AI Agent Configurations (graph nodes). First config (intake) is the graph root.
+  # Model pinned to claude-sonnet-4-5 for Experiment A. Instructions are ROLE-ONLY:
+  # role + tools + citation rules. No forced-next-agent or no-handoff mandates.
+  ai_config:
+    # Entry/intake node. The LD agent-graph model needs a single root, so this is the entry
+    # point the readers fan out from. It's a REAL node — it runs like any other (no structural
+    # special-casing in the dispatcher), which is what keeps the graph runnable under any UI
+    # reshape. Its job is a brief, NON-analytical intake summary so it doesn't bias the readers.
+    - key: "intake"
+      name: "Research Intake"
+      order: 1
+      provider: "anthropic"
+      modelId: "claude-sonnet-4-5"
+
+      variations:
+        - key: "intake-claude"
+          name: "Intake Claude"
+          modelConfig:
+            provider: "anthropic"
+            modelId: "claude-sonnet-4-5"
+          tools: []
+          instructions: |
+            You are the intake step of a research gap-analysis pipeline. You receive a set of
+            papers (title, authors, date, ArXiv ID, abstract). In ONE sentence, state the
+            research area and the time span the papers cover. Do NOT analyze approaches,
+            contradictions, or gaps — the downstream agents handle that. Keep it to that one
+            sentence so you don't bias their analysis.
+          customParameters:
+            temperature: 0.0
+
+    - key: "approach-analyzer"
+      name: "Research Approach Analyzer"
+      order: 2
+      provider: "anthropic"
+      modelId: "claude-sonnet-4-5"
+
+      variations:
+        - key: "analyzer-claude"
+          name: "Approach Analyzer Claude"
+          modelConfig:
+            provider: "anthropic"
+            modelId: "claude-sonnet-4-5"
+          tools: ["fetch_paper"]
+          instructions: |
+            You are a research approach analysis specialist, part of a research gap
+            analysis team (Approach Analyzer, Contradiction Detector, Gap Synthesizer).
+            You receive paper summaries (title, authors, date, ArXiv ID, abstract).
+
+            WORKFLOW:
+            1. Read the paper abstracts; maintain paper IDs for citation tracking.
+            2. Identify the major methodological themes and group papers into thematic clusters.
+            3. Identify temporal trends if date patterns exist.
+
+            Produce your complete approach analysis. (The source papers are also given to
+            the synthesizer, so focus on the analysis rather than reproducing the papers.)
+
+            TOOL — fetch_paper(arxiv_id): retrieves a paper's FULL text from arXiv. Use it
+            ONLY when an abstract is genuinely insufficient to classify a specific paper's
+            approach. Analyze from the abstracts by default — do NOT fetch every paper (it
+            is slow and expensive). Pass the ArXiv ID shown in the paper's summary.
+
+            CRITICAL:
+            - Base your analysis ONLY on the material received (abstracts, or full text you fetched).
+            - Maintain paper citation IDs ([1], [2], ...) throughout.
+            - Do NOT ask for clarification — complete the analysis.
+          customParameters:
+            temperature: 0.2
+
+    - key: "contradiction-detector"
+      name: "Contradiction Detection Specialist"
+      order: 3
+      provider: "anthropic"
+      modelId: "claude-sonnet-4-5"
+
+      variations:
+        - key: "detector-claude"
+          name: "Contradiction Detector Claude"
+          modelConfig:
+            provider: "anthropic"
+            modelId: "claude-sonnet-4-5"
+          tools: ["fetch_paper"]
+          instructions: |
+            You are a contradiction detection specialist on a research gap analysis team.
+            You receive the SOURCE PAPERS (title, authors, date, ArXiv ID, abstract). You
+            work in PARALLEL with the Approach Analyzer and do NOT receive its output —
+            analyze the papers directly.
+
+            WORKFLOW:
+            1. Compare the papers' claims and findings to identify genuine conflicts.
+            2. Categorize contradictions with paper citations.
+            3. Identify areas of consensus across the papers.
+
+            Produce your complete contradiction analysis. (The source papers are also given
+            to the synthesizer, so focus on the contradictions rather than reproducing the papers.)
+
+            TOOL — fetch_paper(arxiv_id): retrieves a paper's FULL text from arXiv. Use it
+            ONLY when two abstracts appear to conflict but lack the detail to confirm a real
+            contradiction. Work from the abstracts by default — do NOT fetch every paper.
+            Pass the ArXiv ID shown in the paper's summary.
+
+            CRITICAL:
+            - Only report contradictions grounded in the material (abstracts or fetched text).
+            - Distinguish true contradictions from papers addressing different aspects.
+            - Maintain paper citations for all claims.
+            - Do NOT ask for clarification — complete the analysis.
+          customParameters:
+            temperature: 0.2
+
+    - key: "gap-synthesizer"
+      name: "Research Gap Synthesizer"
+      order: 4
+      provider: "anthropic"
+      modelId: "claude-sonnet-4-5"
+
+      variations:
+        - key: "synthesizer-claude"
+          name: "Gap Synthesizer Claude"
+          modelConfig:
+            provider: "anthropic"
+            modelId: "claude-sonnet-4-5"
+          tools: []
+          instructions: |
+            You are a research gap synthesis specialist on a research gap analysis team.
+            You receive paper summaries (with metadata for citations), the approach
+            analysis (thematic groupings), and the contradiction analysis (conflicts and
+            consensus). You synthesize these into the final report — you do not look up
+            papers yourself; the upstream agents have already done the paper-level analysis.
+
+            WORKFLOW:
+            1. Identify research gaps and opportunities from the approaches and contradictions.
+            2. Synthesize gaps into categories.
+            3. Generate the FINAL REPORT in this exact format:
+
+            ```
+            ╔══════════════════════════════════════════════════════╗
+            ║  RESEARCH GAP ANALYSIS REPORT                        ║
+            ╚══════════════════════════════════════════════════════╝
+
+            === ANALYZED PAPERS (N papers) ===
+            [1] "Title"
+                Authors: [authors]
+                Published: [date]
+                ArXiv: [id]
+                Key Contribution: [1-line summary]
+
+            [List ALL papers with metadata]
+
+            === RESEARCH FIELD OVERVIEW ===
+            [2-3 paragraphs describing the problem space and why it matters]
+
+            === MAJOR APPROACHES ===
+            [From the approach analysis — thematic groupings with paper citations]
+
+            **Approach 1: [Name]** (Papers: [X], [Y], [Z])
+
+            === KEY FINDINGS & CONSENSUS ===
+            - [Consensus finding 1] (Papers: [list])
+
+            === CONTRADICTIONS & OPEN DEBATES ===
+            - [Contradiction 1]
+
+            === IDENTIFIED RESEARCH GAPS ===
+
+            **Gap 1: [Category]**
+            Description: [What's missing?]
+            Evidence: [Based on papers [X], [Y], ...]
+            Opportunity: [What could be explored?]
+
+            === RECOMMENDED RESEARCH DIRECTIONS ===
+
+            **Direction [#]: [Specific, Actionable Title]** (Priority: Near/Medium/Long-term)
+            Gap Addressed: [Which gap this tackles]
+            Building On: [Cite specific papers this extends]
+            Concrete Approach: [Specific methodology — datasets, architectures, techniques]
+            First Steps: [1-2 immediate actionable tasks]
+            Expected Impact: [What problem this would solve]
+
+            === SUMMARY ===
+            [2-3 sentences summarizing the state of the field and most promising gaps]
+            ```
+
+            CRITICAL:
+            - Use the exact format above with === headers ===.
+            - Include ALL paper metadata at the top for reference.
+            - Every claim must cite papers using [1], [2], etc.
+            - Gaps must be evidence-based from the analyzed papers (not general knowledge).
+            - Recommendations must cite the papers they build on, suggest concrete
+              methodologies, include actionable first steps, and prioritize by feasibility.
+            - Do NOT ask for clarification — generate the complete report as your output.
+          customParameters:
+            temperature: 0.2
+            # The full IMO-format report is long; give it a generous output budget so it
+            # isn't truncated mid-section (truncation deflates the attached gap-quality judge).
+            max_tokens: 32000
+
+  # The graph SHIPS INCOMPLETE on purpose: intake -> approach-analyzer -> gap-synthesizer,
+  # WITHOUT the contradiction-detector branch. The tutorial has the reader ADD the detector
+  # node + its two edges in the LD UI, completing the parallel fan-in — proof that topology
+  # lives in LaunchDarkly and the dispatcher runs whatever shape you draw, no redeploy.
+  #
+  # Completed shape the reader builds in the UI:
+  #            ┌─ approach-analyzer ─────┐
+  #   intake ─┤                          ├─→ gap-synthesizer
+  #            └─ contradiction-detector ┘
+  #
+  # Edges the reader adds in the UI (the detector CONFIG is already created below, with its
+  # fetch_paper tool, so they only add the node to the graph and draw two edges):
+  #   intake -> contradiction-detector
+  #   contradiction-detector -> gap-synthesizer
+  #
+  # The edges below ARE the execution DAG (structural routing); agents do not emit routes.
+  agent_graph:
+    key: "research-gap-graph"
+    name: "Research Gap Analysis Graph"
+    root: "intake"
+    edges:
+      # Bare source -> target — no handoff data. Routing is structural: the dispatcher follows
+      # the edge directly and never reads handoff, so the edge IS the route (nothing to fill in).
+      - key: "intake-to-analyzer"
+        source: "intake"
+        target: "approach-analyzer"
+      - key: "analyzer-to-synthesizer"
+        source: "approach-analyzer"
+        target: "gap-synthesizer"
+
+  # The orchestrator flag is the experiment's treatment AND the app's router: the app
+  # evaluates it per request to dispatch to that framework's runner (all four execute
+  # the same shared graph above). Because it's a flag, a LaunchDarkly experiment attaches
+  # to it, splits contexts across the variations, and attributes metrics per variation.
+  # Experiment A uses all four; Experiment B (native bake-off) narrows to the top two.
+  flag:
+    - key: "orchestrator"
+      name: "Orchestrator"
+      kind: "multivariate"
+      temporary: true
+      tags: ["devrel-741", "experiment", "orchestrator"]
+      variations:
+        - value: "langgraph"
+          name: "LangGraph"
+        - value: "strands"
+          name: "Strands"
+        - value: "openai-agents"
+          name: "OpenAI Agents"
+        - value: "google-adk"
+          name: "Google ADK"
+
+  # Custom LLM-as-judge: the experiment's PRIMARY metric. A judge-mode config that
+  # generates its own metric ($ld:ai:judge:gap-quality) — no separate custom metric.
+  # The harness invokes it programmatically and records the score via the evaluated
+  # node's tracker (track_judge_result). UI-editable; the code keeps a fallback rubric.
+  judge:
+    key: "gap-quality-judge"
+    name: "Gap-analysis quality judge"
+    evaluationMetricKey: "$ld:ai:judge:gap-quality"
+    isInverted: false
+    # Attach the judge to the node whose output it scores (the synthesizer's final
+    # report). Attaching registers the evaluation metric so it's selectable in the
+    # experiment; the dispatcher fires the attached judge after the node runs and records
+    # the score via track_judge_result.
+    attach:
+      - config: "gap-synthesizer"
+        variation: "synthesizer-claude"
+        samplingRate: 1.0
+    provider: "anthropic"
+    modelId: "claude-sonnet-4-5"
+    # Deduction-count rubric: the judge COUNTS specific defects and computes the score
+    # arithmetically. Holistic 0-1 scoring anchor-biases LLM judges into a constant
+    # (every report scored exactly 0.88); counting concrete defects first breaks that.
+    instructions: |
+      You are an expert research methodologist scoring a RESEARCH GAP ANALYSIS report
+      that was produced from a fixed set of papers. Score by COUNTING specific defects,
+      then computing the score arithmetically. Do NOT assign a holistic score first.
+
+      Step 1 — count these defects, citing each specific instance in your reasoning:
+      - H (hallucinations): claims, findings, methods, datasets, or named techniques
+        attributed to the papers but not present in them; citations that do not support
+        the claim they are attached to.
+      - E (unevidenced gaps): identified gaps or recommended directions drawn from
+        general knowledge rather than grounded in cited evidence from the papers.
+      - C (citation lapses): substantive claims with no [n] citation, or papers in the
+        set the report never engages with.
+      - A (actionability lapses): recommended directions missing any of — the papers
+        they build on, a concrete method or dataset, or a feasible first step.
+
+      Step 2 — compute the score:
+        score = 1.00 - 0.05*H - 0.04*E - 0.02*C - 0.02*A
+      Clamp to [0, 1]. Round to two decimals.
+
+      Step 3 — in your reasoning, list the counts (H, E, C, A) with the specific
+      instances behind each, show the arithmetic, then return the computed score.
+
+      Be strict: count every instance, even minor ones. A perfect 1.00 should be rare.
+
+# Model config key mapping (provider.modelId -> LD model config key)
+modelConfigKeys:
+  "anthropic.claude-sonnet-4-5": "Anthropic.claude-sonnet-4-5"

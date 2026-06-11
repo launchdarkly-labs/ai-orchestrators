@@ -1,132 +1,72 @@
-# AI Orchestrator Comparison
+# One Agent Graph, N Orchestrators
 
-Comparative evaluation of AI orchestrator frameworks for multi-agent research gap analysis.
+A research-gap-analysis workflow whose topology lives in **one shared LaunchDarkly agent graph** (`intake → [approach-analyzer ∥ contradiction-detector] → gap-synthesizer`). Four frameworks — LangGraph, Strands, OpenAI Agents, Google ADK — all execute that same graph via a generic dispatcher, selected per request by an `orchestrator` flag. A LaunchDarkly experiment ranks them on **end-to-end latency and tokens** with the model held constant, while an LLM-judge **quality guardrail** confirms no framework degrades the output.
 
-## Repository Structure
-
-- **orchestrators/** - Framework-specific implementations (Strands, LangGraph, AutoGen, OpenAI Swarm)
-- **shared/** - Code shared across all orchestrators (metadata, tools, prompts)
-- **config/** - Static configuration files (agent configs, YAML manifests)
-- **data/** - Input data (paper datasets)
-- **scripts/** - Executable scripts (bootstrap, download, PDF generation)
-- **results/** - Output files (reports, PDFs, metadata) organized by orchestrator
+Sequel to [*Framework-Agnostic AI Swarms*](https://launchdarkly.com/docs/tutorials/ai-orchestrators).
 
 ## Setup
 
-### 1. Install Dependencies
+With [uv](https://docs.astral.sh/uv/) (recommended — installs from the lockfile, no venv to activate):
 
 ```bash
-# Create and activate virtual environment
-python -m venv .venv
-source .venv/bin/activate  # or `.venv\Scripts\activate` on Windows
+uv sync
+cp .env.example .env   # fill in keys; set LD_PROJECT_KEY to your project
+```
 
-# Install all dependencies
+Then prefix the commands below with `uv run` (e.g. `uv run python orchestrators/verify_run.py langgraph`).
+
+Or with pip:
+
+```bash
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+cp .env.example .env
 ```
 
-### 2. Configure Environment
+With an activated venv, drop the `uv run` prefix and call `python` directly.
 
-Create `.env` file with your API keys:
+Needs Python 3.11+, a LaunchDarkly account with AgentControl, and `ANTHROPIC_API_KEY` (the pinned model). `OPENAI_API_KEY` / `GOOGLE_API_KEY` are only needed for the native-model bake-off.
+
+## Run
+
+1. **Create a LaunchDarkly project** (MCP / skill / UI) and set `LD_PROJECT_KEY` to its key.
+2. **Bootstrap** the node configs, agent graph, `orchestrator` flag, and judge:
+   ```bash
+   uv run python scripts/launchdarkly/bootstrap.py config/graph_experiment_manifest.yaml
+   ```
+3. **Create the experiment** in the LaunchDarkly UI: treatment = `orchestrator` flag, randomization unit = `request`, primary metric = end-to-end graph latency, secondaries = the gap-quality judge (guardrail) + graph total tokens (the cost ranking at a pinned model). Start an iteration.
+4. **Drive traffic.** Each run feeds a topic's **full** paper set through the graph (gap analysis needs every paper) and the judge scores the report. Two modes:
+   - **Matched head-to-head** (`uv run python scripts/run_experiment.py --all-frameworks`): every topic runs through all four orchestrators once — apples-to-apples, read the per-framework means in the harness summary. Best for a small, fixed topic set.
+   - **Randomized experiment** (default `uv run python scripts/run_experiment.py`): the `orchestrator` flag assigns each run one framework; the LD experiment attributes metrics per variation. Confidence bands tighten as you add **topics** (real traffic), so scale the query set for statistical power.
+   - Smoke test: `uv run python orchestrators/verify_run.py langgraph` (one framework) or `verify_run.py all` (all four, with a pass/fail summary).
+5. Read the per-variation winner in the UI (or the matched means in the harness output).
+
+## Papers (the query set)
+
+The experiment runs over the arXiv topic files in `data/` — auto-discovered, one file per
+topic. The shipped set is six **complete niche literatures** (every paper arXiv has on the
+topic in the last 3 years, no sampling):
+
+| Topic | Query | Papers |
+|---|---|---|
+| Length generalization | `ti:"length generalization"` | 49 |
+| Model collapse | `ti:"model collapse"` | 55 |
+| Reward hacking | `ti:"reward hacking"` | 67 |
+| Process reward models | `ti:"process reward model"` | 73 |
+| Sycophancy | `ti:"sycophancy"` | 94 |
+| Activation steering | `ti:"activation steering"` | 99 |
+
+**The dataset IS the topic.** Gap analysis only works on a topic's *full* literature — a
+capped sample of a broad query yields "gaps" that are artifacts of the sample. So never cap
+results; instead pick a **narrow query** (title-phrase `ti:"..."` searches work well) whose
+complete literature is run-sized (~10–100 papers). The downloader fetches all matches and
+warns if the query is too broad.
+
+To add or replace a topic (auto-discovered on the next run — no code change):
 
 ```bash
-# LaunchDarkly (required)
-LD_SDK_KEY=sdk-key-xxxxx        # Your LaunchDarkly SDK key
-LD_API_KEY=api-key-xxxxx        # Your LaunchDarkly API key
-LAUNCHDARKLY_PROJECT_KEY=orchestrator-agents
-
-# Model Provider API Keys (at least one required)
-ANTHROPIC_API_KEY=sk-ant-xxxxx  # For Claude models via Anthropic
-OPENAI_API_KEY=sk-xxxxx         # For GPT models via OpenAI
-
-# AWS (optional - for Bedrock models)
-AWS_PROFILE=your-profile
-AWS_REGION=us-east-1
+uv run python scripts/download_papers.py --query 'ti:"your niche topic"'
 ```
 
-### 3. Bootstrap LaunchDarkly Agents
-
-```bash
-# Create AI agent configs in LaunchDarkly
-python scripts/launchdarkly/bootstrap.py config/research_gap_manifest_robust.yaml
-```
-
-After bootstrapping, enable all 4 agents in the LaunchDarkly UI:
-- paper-reader
-- approach-analyzer
-- contradiction-detector
-- gap-synthesizer
-
-### 4. Setup Metrics Dashboard (Optional)
-
-```bash
-# Configure LaunchDarkly metrics for monitoring
-python scripts/launchdarkly/setup_metrics.py
-```
-
-### 5. Download Papers (Optional)
-
-```bash
-# Download papers from arXiv for analysis
-python scripts/download_papers.py
-
-# Or use the included test paper
-# test_paper.json is already provided for quick testing
-```
-
-## Running Gap Analysis
-
-All orchestrator runners accept **only** `--papers-json` as input and load all agents/tools from LaunchDarkly.
-
-### With Strands
-
-```bash
-python orchestrators/strands/run_gap_analysis.py --papers-json data/gap_analysis_papers.json
-```
-
-### With LangGraph
-
-```bash
-python orchestrators/langgraph/run_swarm.py --papers-json data/gap_analysis_papers.json
-```
-
-### With AutoGen
-
-```bash
-python orchestrators/autogen/run_gap_analysis.py --papers-json data/gap_analysis_papers.json
-```
-
-### With OpenAI Swarm
-
-```bash
-python orchestrators/openai_swarm/run_gap_analysis.py --papers-json data/gap_analysis_papers.json
-```
-
-## Output Format
-
-Each orchestrator generates:
-- Text report: `results/<orchestrator>/YYYYMMDD_HHMMSS_gap_analysis_report.txt`
-- Metadata JSON: `results/<orchestrator>/YYYYMMDD_HHMMSS_metadata.json`
-
-### Converting Reports
-
-Generate markdown from reports:
-```bash
-python scripts/convert_to_markdown.py
-```
-
-## Agent Architecture
-
-All orchestrators use the same 4-agent pipeline:
-
-1. **Paper Reading Specialist** - Reads abstracts from all papers
-2. **Research Approach Analyzer** - Identifies methodological themes
-3. **Contradiction Detection Specialist** - Finds conflicting findings
-4. **Research Gap Synthesizer** - Synthesizes gaps and generates report
-
-## Comparing Orchestrators
-
-To compare different orchestration frameworks:
-
-1. Run gap analysis with each orchestrator
-2. Compare metadata JSON files (execution time, iterations, configurations)
-3. Compare report quality (completeness, citation accuracy, gap identification)
+The agents analyze abstracts; the `fetch_paper` tool pulls a paper's full text on demand when
+an abstract isn't enough.

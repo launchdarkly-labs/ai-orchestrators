@@ -1,0 +1,492 @@
+[
+  {
+    "id": "2506.03085v2",
+    "title": "Non-Asymptotic Length Generalization",
+    "authors": "Thomas Chen, Tengyu Ma, Zhiyuan Li",
+    "published": "2025-06-03",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2506.03085v2",
+    "pdf_url": "https://arxiv.org/pdf/2506.03085v2",
+    "abstract": "Length generalization is the ability of a learning algorithm to learn a hypothesis which generalizes to longer inputs than the inputs in the training set. In this paper, we provide provable guarantees of length generalization for various classes of functions in an idealized setting. First, we formalize the framework of non-asymptotic length generalization, which requires a computable upper bound for the minimum input length that guarantees length generalization, as a function of the complexity of ground-truth function under some given complexity measure. We refer to this minimum input length to length generalize as length complexity. We show the Minimum-Complexity Interpolator learning algorithm achieves optimal length complexity. We further show that whether a function class admits non-asymptotic length generalization is equivalent to the decidability of its language equivalence problem, which implies that there is no computable upper bound for the length complexity of Context-Free Grammars. On the positive side, we show that the length complexity of Deterministic Finite Automata is $2n - 2$ where $n$ is the number of states of the ground-truth automaton. Our main results are upper bounds of length complexity for a subset of a transformer-related function class called C-RASP (Yang & Chiang, 2024). We show that the length complexity of 1-layer C-RASP functions is $O(T^2)$ when the ground-truth function has precision $T$, and that the length complexity of 2-layer C-RASP functions is $O(T^{O(K)})$ when the ground-truth function has precision $T$ and $K$ heads."
+  },
+  {
+    "id": "2306.15400v1",
+    "title": "Length Generalization in Arithmetic Transformers",
+    "authors": "Samy Jelassi, St\u00e9phane d'Ascoli, Carles Domingo-Enrich, Yuhuai Wu, Yuanzhi Li, Fran\u00e7ois Charton",
+    "published": "2023-06-27",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2306.15400v1",
+    "pdf_url": "https://arxiv.org/pdf/2306.15400v1",
+    "abstract": "We examine how transformers cope with two challenges: learning basic integer arithmetic, and generalizing to longer sequences than seen during training. We find that relative position embeddings enable length generalization for simple tasks, such as addition: models trained on $5$-digit numbers can perform $15$-digit sums. However, this method fails for multiplication, and we propose train set priming: adding a few ($10$ to $50$) long sequences to the training set. We show that priming allows models trained on $5$-digit $\\times$ $3$-digit multiplications to generalize to $35\\times 3$ examples. We also show that models can be primed for different generalization lengths, and that the priming sample size scales as the logarithm of the training set size. Finally, we discuss potential applications of priming beyond arithmetic."
+  },
+  {
+    "id": "2409.15647v5",
+    "title": "Looped Transformers for Length Generalization",
+    "authors": "Ying Fan, Yilun Du, Kannan Ramchandran, Kangwook Lee",
+    "published": "2024-09-24",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2409.15647v5",
+    "pdf_url": "https://arxiv.org/pdf/2409.15647v5",
+    "abstract": "Recent work has shown that Transformers trained from scratch can successfully solve various arithmetic and algorithmic tasks, such as adding numbers and computing parity. While these Transformers generalize well on unseen inputs of the same length, they struggle with length generalization, i.e., handling inputs of unseen lengths. In this work, we demonstrate that looped Transformers with an adaptive number of steps significantly improve length generalization. We focus on tasks with a known iterative solution, involving multiple iterations of a RASP-L operation - a length-generalizable operation that can be expressed by a finite-sized Transformer. We train looped Transformers using our proposed learning algorithm and observe that they learn highly length-generalizable solutions for various tasks."
+  },
+  {
+    "id": "2603.02238v2",
+    "title": "Length Generalization Bounds for Transformers",
+    "authors": "Andy Yang, Pascal Bergstr\u00e4\u00dfer, Georg Zetzsche, David Chiang, Anthony W. Lin",
+    "published": "2026-02-13",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2603.02238v2",
+    "pdf_url": "https://arxiv.org/pdf/2603.02238v2",
+    "abstract": "Length generalization is a key property of a learning algorithm that enables it to make correct predictions on inputs of any length, given finite training data. To provide such a guarantee, one needs to be able to compute a length generalization bound, beyond which the model is guaranteed to generalize. This paper concerns the open problem of the computability of such generalization bounds for C-RASP, a class of languages which is closely linked to transformers. A positive partial result was recently shown by Chen et al. for C-RASP with only one layer and, under some restrictions, also with two layers. We provide complete answers to the above open problem. Our main result is the non-existence of computable length generalization bounds for C-RASP (already with two layers) and hence for transformers. To complement this, we provide a computable bound for the positive fragment of C-RASP, which we show equivalent to fixed-precision transformers. For both positive C-RASP and fixed-precision transformers, we show that the length complexity is exponential, and prove optimality of the bounds."
+  },
+  {
+    "id": "2407.03310v1",
+    "title": "Universal Length Generalization with Turing Programs",
+    "authors": "Kaiying Hou, David Brandfonbrener, Sham Kakade, Samy Jelassi, Eran Malach",
+    "published": "2024-07-03",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2407.03310v1",
+    "pdf_url": "https://arxiv.org/pdf/2407.03310v1",
+    "abstract": "Length generalization refers to the ability to extrapolate from short training sequences to long test sequences and is a challenge for current large language models. While prior work has proposed some architecture or data format changes to achieve length generalization, these proposals typically apply to a limited set of tasks. Building on prior scratchpad and Chain-of-Thought (CoT) techniques, we propose Turing Programs, a novel CoT strategy that decomposes an algorithmic task into steps mimicking the computation of a Turing Machine. This framework is both universal, as it can accommodate any algorithmic task, and simple, requiring only copying text from the context with small modifications. We show that by using Turing Programs, we obtain robust length generalization on a range of algorithmic tasks: addition, multiplication and in-context SGD. We then demonstrate that transformers achieve length generalization on random Turing Programs, suggesting that length generalization is possible for any algorithmic task. Finally, we theoretically prove that transformers can implement Turing Programs, constructing a simple RASP (Weiss et al.) program that simulates an arbitrary Turing machine."
+  },
+  {
+    "id": "2504.02827v1",
+    "title": "On Vanishing Variance in Transformer Length Generalization",
+    "authors": "Ruining Li, Gabrijel Boduljak,  Jensen,  Zhou",
+    "published": "2025-04-03",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2504.02827v1",
+    "pdf_url": "https://arxiv.org/pdf/2504.02827v1",
+    "abstract": "It is a widely known issue that Transformers, when trained on shorter sequences, fail to generalize robustly to longer ones at test time. This raises the question of whether Transformer models are real reasoning engines, despite their impressive abilities in mathematical problem solving and code synthesis. In this paper, we offer a vanishing variance perspective on this issue. To the best of our knowledge, we are the first to demonstrate that even for today's frontier models, a longer sequence length results in a decrease in variance in the output of the multi-head attention modules. On the argmax retrieval and dictionary lookup tasks, our experiments show that applying layer normalization after the attention outputs leads to significantly better length generalization. Our analyses attribute this improvement to a reduction-though not a complete elimination-of the distribution shift caused by vanishing variance."
+  },
+  {
+    "id": "2510.27015v1",
+    "title": "Quantitative Bounds for Length Generalization in Transformers",
+    "authors": "Zachary Izzo, Eshaan Nichani, Jason D. Lee",
+    "published": "2025-10-30",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2510.27015v1",
+    "pdf_url": "https://arxiv.org/pdf/2510.27015v1",
+    "abstract": "We study the problem of length generalization (LG) in transformers: the ability of a model trained on shorter sequences to maintain performance when evaluated on much longer, previously unseen inputs. Prior work by Huang et al. (2025) established that transformers eventually achieve length generalization once the training sequence length exceeds some finite threshold, but left open the question of how large it must be. In this work, we provide the first quantitative bounds on the required training length for length generalization to occur. Motivated by previous empirical and theoretical work, we analyze LG in several distinct problem settings: $\\ell_\\infty$ error control vs. average error control over an input distribution, infinite-precision softmax attention vs. finite-precision attention (which reduces to an argmax) in the transformer, and one- vs. two-layer transformers. In all scenarios, we prove that LG occurs when the internal behavior of the transformer on longer sequences can be \"simulated\" by its behavior on shorter sequences seen during training. Our bounds give qualitative estimates for the length of training data required for a transformer to generalize, and we verify these insights empirically. These results sharpen our theoretical understanding of the mechanisms underlying extrapolation in transformers, and formalize the intuition that richer training data is required for generalization on more complex tasks."
+  },
+  {
+    "id": "2605.26035v1",
+    "title": "Length Generalization with Log-Depth Recurrent Units",
+    "authors": "Charles Pert, Dalal Alrajeh, Alessandra Russo",
+    "published": "2026-05-25",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2605.26035v1",
+    "pdf_url": "https://arxiv.org/pdf/2605.26035v1",
+    "abstract": "Length generalization remains a persistent challenge for neural networks: recurrent models tend to suffer from positional biases, while transformers are constrained by fixed computational depth. Regular languages provide a frequently used testbed for evaluating length generalization, as label prediction can be checked for any sequence length. We propose MLP-LDRU, a type of Log-Depth Recurrent Unit, which captures a class of associativity-biased operators designed to approximate recurrence through parallel reduction. We evaluate MLP-LDRU on 21 regular-language tasks, consisting of standard benchmarks and new prefix languages, where it achieves 100% out-of-distribution accuracy on 18 tasks and at least 99.9% on the remaining 3 when increasing max training length, outperforming comparable recurrent and attention-based models. We further evaluate MLP-LDRU beyond regular languages on ListOps and NLP classification benchmarks, where it performs competitively."
+  },
+  {
+    "id": "2506.06697v1",
+    "title": "Exploring Length Generalization For Transformer-based Speech Enhancement",
+    "authors": "Qiquan Zhang, Hongxu Zhu, Xinyuan Qian, Eliathamby Ambikairajah, Haizhou Li",
+    "published": "2025-06-07",
+    "category": "eess.AS",
+    "arxiv_url": "http://arxiv.org/abs/2506.06697v1",
+    "pdf_url": "https://arxiv.org/pdf/2506.06697v1",
+    "abstract": "Transformer network architecture has proven effective in speech enhancement. However, as its core module, self-attention suffers from quadratic complexity, making it infeasible for training on long speech utterances. In practical scenarios, speech enhancement models are often required to perform on noisy speech at run-time that is substantially longer than the training utterances. It remains a challenge how a Transformer-based speech enhancement model can generalize to long speech utterances. In this paper, extensive empirical studies are conducted to explore the model's length generalization ability. In particular, we conduct speech enhancement experiments on four training objectives and evaluate with five metrics. Our studies establish that positional encoding is an effective instrument to dampen the effect of utterance length on speech enhancement. We first explore several existing positional encoding methods, and the results show that relative positional encoding methods exhibit a better length generalization property than absolute positional encoding methods. Additionally, we also explore a simpler and more effective positional encoding scheme, i.e. LearnLin, that uses only one trainable parameter for each attention head to scale the real relative position between time frames, which learns the different preferences on short- or long-term dependencies of these heads. The results demonstrate that our proposal exhibits excellent length generalization ability with comparable or superior performance than other state-of-the-art positional encoding strategies."
+  },
+  {
+    "id": "2402.09371v1",
+    "title": "Transformers Can Achieve Length Generalization But Not Robustly",
+    "authors": "Yongchao Zhou, Uri Alon, Xinyun Chen, Xuezhi Wang, Rishabh Agarwal, Denny Zhou",
+    "published": "2024-02-14",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2402.09371v1",
+    "pdf_url": "https://arxiv.org/pdf/2402.09371v1",
+    "abstract": "Length generalization, defined as the ability to extrapolate from shorter training sequences to longer test ones, is a significant challenge for language models. This issue persists even with large-scale Transformers handling relatively straightforward tasks. In this paper, we test the Transformer's ability of length generalization using the task of addition of two integers. We show that the success of length generalization is intricately linked to the data format and the type of position encoding. Using the right combination of data format and position encodings, we show for the first time that standard Transformers can extrapolate to a sequence length that is 2.5x the input length. Nevertheless, unlike in-distribution generalization, length generalization remains fragile, significantly influenced by factors like random weight initialization and training data order, leading to large variances across different random seeds."
+  },
+  {
+    "id": "2311.16173v2",
+    "title": "Conditions for Length Generalization in Learning Reasoning Skills",
+    "authors": "Changnan Xiao, Bing Liu",
+    "published": "2023-11-22",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2311.16173v2",
+    "pdf_url": "https://arxiv.org/pdf/2311.16173v2",
+    "abstract": "Reasoning is a fundamental capability of AI agents. Recently, large language models (LLMs) have shown remarkable abilities to perform reasoning tasks. However, numerous evaluations of the reasoning capabilities of LLMs have also showed some limitations. An outstanding limitation is length generalization, meaning that when trained on reasoning problems of smaller lengths or sizes, the resulting models struggle with problems of larger sizes or lengths. This potentially indicates some theoretical limitations of generalization in learning reasoning skills. These evaluations and their observations motivated us to perform a theoretical study of the length generalization problem. This work focuses on reasoning tasks that can be formulated as Markov dynamic processes (MDPs) and/or directed acyclic graphs (DAGs). It identifies and proves conditions that decide whether the length generalization problem can be solved or not for a reasoning task in a particular representation. Experiments are also conducted to verify the theoretical results."
+  },
+  {
+    "id": "2603.12499v1",
+    "title": "Probing Length Generalization in Mamba via Image Reconstruction",
+    "authors": "Jan Rathjens, Robin Schiewer, Laurenz Wiskott, Anand Subramoney",
+    "published": "2026-03-12",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2603.12499v1",
+    "pdf_url": "https://arxiv.org/pdf/2603.12499v1",
+    "abstract": "Mamba has attracted widespread interest as a general-purpose sequence model due to its low computational complexity and competitive performance relative to transformers. However, its performance can degrade when inference sequence lengths exceed those seen during training. We study this phenomenon using a controlled vision task in which Mamba reconstructs images from sequences of image patches. By analyzing reconstructions at different stages of sequence processing, we reveal that Mamba qualitatively adapts its behavior to the distribution of sequence lengths encountered during training, resulting in strategies that fail to generalize beyond this range. To support our analysis, we introduce a length-adaptive variant of Mamba that improves performance across training sequence lengths. Our results provide an intuitive perspective on length generalization in Mamba and suggest directions for improving the architecture."
+  },
+  {
+    "id": "2507.02782v2",
+    "title": "Understanding and Improving Length Generalization in Recurrent Models",
+    "authors": "Ricardo Buitrago Ruiz, Albert Gu",
+    "published": "2025-07-03",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2507.02782v2",
+    "pdf_url": "https://arxiv.org/pdf/2507.02782v2",
+    "abstract": "Recently, recurrent models such as state space models and linear attention have become popular due to their linear complexity in the sequence length. Thanks to their recurrent nature, in principle they can process arbitrarily long sequences, but their performance sometimes drops considerably beyond their training context lengths-i.e. they fail to length generalize. In this work, we provide comprehensive empirical and theoretical analysis to support the unexplored states hypothesis, which posits that models fail to length generalize when during training they are only exposed to a limited subset of the distribution of all attainable states (i.e. states that would be attained if the recurrence was applied to long sequences). Furthermore, we investigate simple training interventions that aim to increase the coverage of the states that the model is trained on, e.g. by initializing the state with Gaussian noise or with the final state of a different input sequence. With only 500 post-training steps ($\\sim 0.1\\%$ of the pre-training budget), these interventions enable length generalization for sequences that are orders of magnitude longer than the training context (e.g. $2k\\longrightarrow 128k$) and show improved performance in long context tasks, thus presenting a simple and efficient way to enable robust length generalization in general recurrent models."
+  },
+  {
+    "id": "2310.00726v1",
+    "title": "Improving Length-Generalization in Transformers via Task Hinting",
+    "authors": "Pranjal Awasthi, Anupam Gupta",
+    "published": "2023-10-01",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2310.00726v1",
+    "pdf_url": "https://arxiv.org/pdf/2310.00726v1",
+    "abstract": "It has been observed in recent years that transformers have problems with length generalization for certain types of reasoning and arithmetic tasks. In particular, the performance of a transformer model trained on tasks (say addition) up to a certain length (e.g., 5 digit numbers) drops sharply when applied to longer instances of the same problem. This work proposes an approach based on task hinting towards addressing length generalization. Our key idea is that while training the model on task-specific data, it is helpful to simultaneously train the model to solve a simpler but related auxiliary task as well.\n  We study the classical sorting problem as a canonical example to evaluate our approach. We design a multitask training framework and show that task hinting significantly improve length generalization. For sorting we show that it is possible to train models on data consisting of sequences having length at most $20$, and improve the test accuracy on sequences of length $100$ from less than 1% (for standard training) to more than 92% (via task hinting).\n  Our study uncovers several interesting aspects of length generalization. We observe that while several auxiliary tasks may seem natural a priori, their effectiveness in improving length generalization differs dramatically. We further use probing and visualization-based techniques to understand the internal mechanisms via which the model performs the task, and propose a theoretical construction consistent with the observed learning behaviors of the model. Based on our construction, we show that introducing a small number of length dependent parameters into the training procedure can further boost the performance on unseen lengths. Finally, we also show the efficacy of our task hinting based approach beyond sorting, giving hope that these techniques will be applicable in broader contexts."
+  },
+  {
+    "id": "2404.12224v2",
+    "title": "Length Generalization of Causal Transformers without Position Encoding",
+    "authors": "Jie Wang, Tao Ji, Yuanbin Wu, Hang Yan, Tao Gui, Qi Zhang, Xuanjing Huang, Xiaoling Wang",
+    "published": "2024-04-18",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2404.12224v2",
+    "pdf_url": "https://arxiv.org/pdf/2404.12224v2",
+    "abstract": "Generalizing to longer sentences is important for recent Transformer-based language models. Besides algorithms manipulating explicit position features, the success of Transformers without position encodings (NoPE) provides a new way to overcome the challenge. In this paper, we study the length generalization property of NoPE. We find that although NoPE can extend to longer sequences than the commonly used explicit position encodings, it still has a limited context length. We identify a connection between the failure of NoPE's generalization and the distraction of attention distributions. We propose a parameter-efficient tuning for searching attention heads' best temperature hyper-parameters, which substantially expands NoPE's context size. Experiments on long sequence language modeling, the synthetic passkey retrieval task and real-world long context tasks show that NoPE can achieve competitive performances with state-of-the-art length generalization algorithms. The source code is publicly accessible"
+  },
+  {
+    "id": "2506.09251v2",
+    "title": "Extrapolation by Association: Length Generalization Transfer in Transformers",
+    "authors": "Ziyang Cai, Nayoung Lee, Avi Schwarzschild, Samet Oymak, Dimitris Papailiopoulos",
+    "published": "2025-06-10",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2506.09251v2",
+    "pdf_url": "https://arxiv.org/pdf/2506.09251v2",
+    "abstract": "Transformer language models have demonstrated impressive generalization capabilities in natural language domains, yet we lack a fine-grained understanding of how such generalization arises. In this paper, we investigate length generalization--the ability to extrapolate from shorter to longer inputs--through the lens of \\textit{task association}. We find that length generalization can be \\textit{transferred} across related tasks. That is, training a model with a longer and related auxiliary task can lead it to generalize to unseen and longer inputs from some other target task. We demonstrate this length generalization transfer across diverse algorithmic tasks, including arithmetic operations, string transformations, and maze navigation. Our results show that transformer models can inherit generalization capabilities from similar tasks when trained jointly. Moreover, we observe similar transfer effects in pretrained language models, suggesting that pretraining equips models with reusable computational scaffolding that facilitates extrapolation in downstream settings. Finally, we provide initial mechanistic evidence that length generalization transfer correlates with the re-use of the same attention heads between the tasks. Together, our findings deepen our understanding of how transformers generalize to out-of-distribution inputs and highlight the compositional reuse of inductive structure across tasks."
+  },
+  {
+    "id": "2509.19633v3",
+    "title": "Mamba Modulation: On the Length Generalization of Mamba",
+    "authors": "Peng Lu, Jerry Huang, Qiuhao Zeng, Xinyu Wang, Boxing Chen, Philippe Langlais, Yufei Cui",
+    "published": "2025-09-23",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2509.19633v3",
+    "pdf_url": "https://arxiv.org/pdf/2509.19633v3",
+    "abstract": "The quadratic complexity of the attention mechanism in Transformer models has motivated the development of alternative architectures with sub-quadratic scaling, such as state-space models. Among these, Mamba has emerged as a leading architecture, achieving state-of-the-art results across a range of language modeling tasks. However, Mamba's performance significantly deteriorates when applied to contexts longer than those seen during pre-training, revealing a sharp sensitivity to context length extension. Through detailed analysis, we attribute this limitation to the out-of-distribution behaviour of its state-space dynamics, particularly within the parameterization of the state transition matrix $\\mathbf{A}$. Unlike recent works which attribute this sensitivity to the vanished accumulation of discretization time steps, $\\exp(-\\sum_{t=1}^N\u0394_t)$, we establish a connection between state convergence behavior as the input length approaches infinity and the spectrum of the transition matrix $\\mathbf{A}$, offering a well-founded explanation of its role in length extension. Next, to overcome this challenge, we propose an approach that applies spectrum scaling to pre-trained Mamba models to enable robust long-context generalization by selectively modulating the spectrum of $\\mathbf{A}$ matrices in each layer. We show that this can significantly improve performance in settings where simply modulating $\u0394_t$ fails, validating our insights and providing avenues for better length generalization of state-space models with structured transition matrices."
+  },
+  {
+    "id": "2404.00560v1",
+    "title": "A Theory for Length Generalization in Learning to Reason",
+    "authors": "Changnan Xiao, Bing Liu",
+    "published": "2024-03-31",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2404.00560v1",
+    "pdf_url": "https://arxiv.org/pdf/2404.00560v1",
+    "abstract": "Length generalization (LG) is a challenging problem in learning to reason. It refers to the phenomenon that when trained on reasoning problems of smaller lengths or sizes, the resulting model struggles with problems of larger sizes or lengths. Although LG has been studied by many researchers, the challenge remains. This paper proposes a theoretical study of LG for problems whose reasoning processes can be modeled as DAGs (directed acyclic graphs). The paper first identifies and proves the conditions under which LG can be achieved in learning to reason. It then designs problem representations based on the theory to learn to solve challenging reasoning problems like parity, addition, and multiplication, using a Transformer to achieve perfect LG."
+  },
+  {
+    "id": "2411.01035v1",
+    "title": "Provable Length Generalization in Sequence Prediction via Spectral Filtering",
+    "authors": "Annie Marsden, Evan Dogariu, Naman Agarwal, Xinyi Chen, Daniel Suo, Elad Hazan",
+    "published": "2024-11-01",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2411.01035v1",
+    "pdf_url": "https://arxiv.org/pdf/2411.01035v1",
+    "abstract": "We consider the problem of length generalization in sequence prediction. We define a new metric of performance in this setting -- the Asymmetric-Regret -- which measures regret against a benchmark predictor with longer context length than available to the learner. We continue by studying this concept through the lens of the spectral filtering algorithm. We present a gradient-based learning algorithm that provably achieves length generalization for linear dynamical systems. We conclude with proof-of-concept experiments which are consistent with our theory."
+  },
+  {
+    "id": "2406.00075v2",
+    "title": "Arbitrary-Length Generalization for Addition in a Tiny Transformer",
+    "authors": "Alexandre Galvao Patriota",
+    "published": "2024-05-31",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2406.00075v2",
+    "pdf_url": "https://arxiv.org/pdf/2406.00075v2",
+    "abstract": "This paper introduces a novel training methodology that enables a Transformer model to generalize the addition of two-digit numbers to numbers with unseen lengths of digits. The proposed approach employs an autoregressive generation technique, processing from right to left, which mimics a common manual method for adding large numbers. To the best of my knowledge, this methodology has not been previously explored in the literature. All results are reproducible, and the corresponding R code is available at github.com/AGPatriota/ALGA-R/."
+  },
+  {
+    "id": "2502.16792v1",
+    "title": "The Role of Sparsity for Length Generalization in Transformers",
+    "authors": "Noah Golowich, Samy Jelassi, David Brandfonbrener, Sham M. Kakade, Eran Malach",
+    "published": "2025-02-24",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2502.16792v1",
+    "pdf_url": "https://arxiv.org/pdf/2502.16792v1",
+    "abstract": "Training large language models to predict beyond their training context lengths has drawn much attention in recent years, yet the principles driving such behavior of length generalization remain underexplored. We propose a new theoretical framework to study length generalization for the next-token prediction task, as performed by decoder-only transformers. Conceptually, we show that length generalization occurs as long as each predicted token depends on a small (fixed) number of previous tokens. We formalize such tasks via a notion we call $k$-sparse planted correlation distributions, and show that an idealized model of transformers which generalize attention heads successfully length-generalize on such tasks. As a bonus, our theoretical model justifies certain techniques to modify positional embeddings which have been introduced to improve length generalization, such as position coupling.\n  We support our theoretical results with experiments on synthetic tasks and natural language, which confirm that a key factor driving length generalization is a ``sparse'' dependency structure of each token on the previous ones. Inspired by our theory, we introduce Predictive Position Coupling, which trains the transformer to predict the position IDs used in a positional coupling approach. Predictive Position Coupling thereby allows us to broaden the array of tasks to which position coupling can successfully be applied to achieve length generalization."
+  },
+  {
+    "id": "2410.02140v3",
+    "title": "A Formal Framework for Understanding Length Generalization in Transformers",
+    "authors": "Xinting Huang, Andy Yang, Satwik Bhattamishra, Yash Sarrof, Andreas Krebs, Hattie Zhou, Preetum Nakkiran, Michael Hahn",
+    "published": "2024-10-03",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2410.02140v3",
+    "pdf_url": "https://arxiv.org/pdf/2410.02140v3",
+    "abstract": "A major challenge for transformers is generalizing to sequences longer than those observed during training. While previous works have empirically shown that transformers can either succeed or fail at length generalization depending on the task, theoretical understanding of this phenomenon remains limited. In this work, we introduce a rigorous theoretical framework to analyze length generalization in causal transformers with learnable absolute positional encodings. In particular, we characterize those functions that are identifiable in the limit from sufficiently long inputs with absolute positional encodings under an idealized inference scheme using a norm-based regularizer. This enables us to prove the possibility of length generalization for a rich family of problems. We experimentally validate the theory as a predictor of success and failure of length generalization across a range of algorithmic and formal language tasks. Our theory not only explains a broad set of empirical observations but also opens the way to provably predicting length generalization capabilities in transformers."
+  },
+  {
+    "id": "2403.00071v2",
+    "title": "Resonance RoPE: Improving Context Length Generalization of Large Language Models",
+    "authors": "Suyuchen Wang, Ivan Kobyzev, Peng Lu, Mehdi Rezagholizadeh, Bang Liu",
+    "published": "2024-02-29",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2403.00071v2",
+    "pdf_url": "https://arxiv.org/pdf/2403.00071v2",
+    "abstract": "This paper addresses the challenge of train-short-test-long (TSTL) scenarios in Large Language Models (LLMs) equipped with Rotary Position Embedding (RoPE), where models pre-trained on shorter sequences face difficulty with out-of-distribution (OOD) token positions in longer sequences. We introduce Resonance RoPE, a novel approach designed to narrow the generalization gap in TSTL scenarios by refining the interpolation of RoPE features for OOD positions, significantly improving the model performance without additional online computational costs. Furthermore, we present PosGen, a new synthetic benchmark specifically designed for fine-grained behavior analysis in TSTL scenarios, aiming to isolate the constantly increasing difficulty of token generation on long contexts from the challenges of recognizing new token positions. Our experiments on synthetic tasks show that after applying Resonance RoPE, Transformers recognize OOD position better and more robustly. Our extensive LLM experiments also show superior performance after applying Resonance RoPE to the current state-of-the-art RoPE scaling method, YaRN, on both upstream language modeling tasks and a variety of downstream long-text applications."
+  },
+  {
+    "id": "2310.11984v3",
+    "title": "From Interpolation to Extrapolation: Complete Length Generalization for Arithmetic Transformers",
+    "authors": "Shaoxiong Duan, Yining Shi, Wei Xu",
+    "published": "2023-10-18",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2310.11984v3",
+    "pdf_url": "https://arxiv.org/pdf/2310.11984v3",
+    "abstract": "In this paper, we investigate the inherent capabilities of transformer models in learning arithmetic algorithms, such as addition and parity. Through experiments and attention analysis, we identify a number of crucial factors for achieving optimal length generalization. We show that transformer models are able to generalize to long lengths with the help of targeted attention biasing. In particular, our solution solves the Parity task, a well-known and theoretically proven failure mode for Transformers. We then introduce Attention Bias Calibration (ABC), a calibration stage that enables the model to automatically learn the proper attention biases, which we show to be connected to mechanisms in relative position encoding. We demonstrate that using ABC, the transformer model can achieve unprecedented near-perfect length generalization on certain arithmetic tasks. In addition, we show that ABC bears remarkable similarities to RPE and LoRA, which may indicate the potential for applications to more complex tasks."
+  },
+  {
+    "id": "2310.16028v1",
+    "title": "What Algorithms can Transformers Learn? A Study in Length Generalization",
+    "authors": "Hattie Zhou, Arwen Bradley, Etai Littwin, Noam Razin, Omid Saremi, Josh Susskind, Samy Bengio, Preetum Nakkiran",
+    "published": "2023-10-24",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2310.16028v1",
+    "pdf_url": "https://arxiv.org/pdf/2310.16028v1",
+    "abstract": "Large language models exhibit surprising emergent generalization properties, yet also struggle on many simple reasoning tasks such as arithmetic and parity. This raises the question of if and when Transformer models can learn the true algorithm for solving a task. We study the scope of Transformers' abilities in the specific setting of length generalization on algorithmic tasks. Here, we propose a unifying framework to understand when and how Transformers can exhibit strong length generalization on a given task. Specifically, we leverage RASP (Weiss et al., 2021) -- a programming language designed for the computational model of a Transformer -- and introduce the RASP-Generalization Conjecture: Transformers tend to length generalize on a task if the task can be solved by a short RASP program which works for all input lengths. This simple conjecture remarkably captures most known instances of length generalization on algorithmic tasks. Moreover, we leverage our insights to drastically improve generalization performance on traditionally hard tasks (such as parity and addition). On the theoretical side, we give a simple example where the \"min-degree-interpolator\" model of learning from Abbe et al. (2023) does not correctly predict Transformers' out-of-distribution behavior, but our conjecture does. Overall, our work provides a novel perspective on the mechanisms of compositional generalization and the algorithmic capabilities of Transformers."
+  },
+  {
+    "id": "2412.17739v4",
+    "title": "Fourier Position Embedding: Enhancing Attention's Periodic Extension for Length Generalization",
+    "authors": "Ermo Hua, Che Jiang, Xingtai Lv, Kaiyan Zhang, Youbang Sun, Yuchen Fan, Xuekai Zhu, Biqing Qi, Ning Ding, Bowen Zhou",
+    "published": "2024-12-23",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2412.17739v4",
+    "pdf_url": "https://arxiv.org/pdf/2412.17739v4",
+    "abstract": "Extending the context length of Language Models (LMs) by improving Rotary Position Embedding (RoPE) has become a trend. While prior works mainly address RoPE's limitations within attention, this paper uncovers the adverse effects on length generalization from nearly all parts of LMs. Using Discrete Signal Processing theory, we show that RoPE enables periodic attention by implicitly achieving Non-Uniform Discrete Fourier Transform. However, this periodicity is undermined by the spectrum damage caused by: 1) linear layers and activation functions; 2) insufficiently trained frequency components brought by time-domain truncation. Building on our observations, we propose Fourier Position Embedding (FoPE), which enhances attention's frequency-domain properties to improve both its periodic extension and length generalization. FoPE constructs \\textit{Fourier Series} and zero-outs the destructive frequency components, increasing model robustness against the spectrum damage. Experiments across various model scales and benchmarks show that, within varying context windows, FoPE maintains a more stable performance compared to other baselines. Several analyses and ablations bring further support to our method and theoretical modeling."
+  },
+  {
+    "id": "2502.11525v2",
+    "title": "Beyond Single-Task: Robust Multi-Task Length Generalization for LLMs",
+    "authors": "Yi Hu, Shijia Kang, Haotong Yang, Haotian Xu, Muhan Zhang",
+    "published": "2025-02-17",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2502.11525v2",
+    "pdf_url": "https://arxiv.org/pdf/2502.11525v2",
+    "abstract": "Length generalization, the ability to solve problems longer than those seen during training, remains a critical challenge for large language models (LLMs). Previous work modifies positional encodings (PEs) and data formats to improve length generalization on specific symbolic tasks such as addition and sorting. However, these approaches are fundamentally limited to special tasks, often degrading general language performance. Furthermore, they are typically evaluated on small transformers trained from scratch on single tasks and can cause performance drop when applied during post-training stage of practical LLMs with general capabilities. Hu et al., (2024) proposed Rule-Following Fine-Tuning (RFFT) to improve length generalization in the post-training stage of LLMs. Despite its compatibility with practical models and strong performance, RFFT is proposed for single tasks too, requiring re-training for each individual task with extensive examples. In this paper, we study length generalization in multi-task settings and propose Meta Rule-Following Fine-Tuning (Meta-RFFT), the first framework enabling robust cross-task length generalization. As our first contribution, we construct a large length generalization dataset containing 86 tasks spanning code execution, number processing, symbolic and logical reasoning tasks, beyond the common addition or multiplication tasks. Secondly, we show that cross-task length generalization is possible with Meta-RFFT. After training on a large number of tasks and instances, the models achieve remarkable length generalization ability on unseen tasks with minimal fine-tuning or one-shot prompting. For example, after fine-tuning on 1 to 5 digit addition, our 32B model achieves 95% accuracy on 30 digit addition, significantly outperforming the state-of-the-art reasoning models (DeepSeek-R1-671B: 72%), despite never seeing this task during RF-pretraining."
+  },
+  {
+    "id": "2406.11401v1",
+    "title": "An Exploration of Length Generalization in Transformer-Based Speech Enhancement",
+    "authors": "Qiquan Zhang, Hongxu Zhu, Xinyuan Qian, Eliathamby Ambikairajah, Haizhou Li",
+    "published": "2024-06-17",
+    "category": "eess.AS",
+    "arxiv_url": "http://arxiv.org/abs/2406.11401v1",
+    "pdf_url": "https://arxiv.org/pdf/2406.11401v1",
+    "abstract": "The use of Transformer architectures has facilitated remarkable progress in speech enhancement. Training Transformers using substantially long speech utterances is often infeasible as self-attention suffers from quadratic complexity. It is a critical and unexplored challenge for a Transformer-based speech enhancement model to learn from short speech utterances and generalize to longer ones. In this paper, we conduct comprehensive experiments to explore the length generalization problem in speech enhancement with Transformer. Our findings first establish that position embedding provides an effective instrument to alleviate the impact of utterance length on Transformer-based speech enhancement. Specifically, we explore four different position embedding schemes to enable length generalization. The results confirm the superiority of relative position embeddings (RPEs) over absolute PE (APEs) in length generalization."
+  },
+  {
+    "id": "2510.17196v3",
+    "title": "Understanding and Improving Length Generalization in Hierarchical Sparse Attention Models",
+    "authors": "Jiaqi Leng, Xiang Hu, Junxiong Wang, Jianguo Li, Wei Wu, Yucheng Lu",
+    "published": "2025-10-20",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2510.17196v3",
+    "pdf_url": "https://arxiv.org/pdf/2510.17196v3",
+    "abstract": "Effectively processing long contexts is a critical challenge for language models. While standard Transformers are limited by quadratic complexity and poor length extrapolation, alternative architectures like sliding window attention and state space models sacrifice the ability to effectively utilize the full context due to their fixed-size memory. Chunk-based sparse attention has emerged as a promising paradigm for extreme length generalization, yet the key architectural principles underpinning its success are not yet fully understood. In this work, we present a systematic dissection of these models to identify the core components driving their performance. Through a unified framework and comprehensive ablation studies, we demonstrate that a combination of three design principles is critical: (1) an expressive, non-linear Chunk Encoder with a dedicated CLS token to produce representations for retrieval; (2) a Bypassing Residual Path to stably integrate retrieved global information without it being overridden by the local residual stream; and (3) enforced selection sparsity during pre-training to bridge the train-test distribution gap. We provide a theoretical motivation for intra-chunk information processing and landmark generation. By combining these principles, we establish a new state-of-the-art for training-free length extrapolation, successfully generalizing models trained on a 4K context to 32 million tokens on RULER and BABILong. Our findings provide a clear and empirically-grounded set of design principles for developing future, highly-capable long-context language models."
+  },
+  {
+    "id": "2510.00258v1",
+    "title": "Delayed Attention Training Improves Length Generalization in Transformer--RNN Hybrids",
+    "authors": "Buu Phan, Reza Ebrahimi, Sanjay Haresh, Roland Memisevic",
+    "published": "2025-09-30",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2510.00258v1",
+    "pdf_url": "https://arxiv.org/pdf/2510.00258v1",
+    "abstract": "We study length generalization in sequence models on a composite problem involving both state tracking and associative recall. Prior work finds that recurrent networks handle state tracking well but struggle with recall, whereas Transformers excel at recall yet fail to extend state-tracking capabilities to longer sequences. Motivated by the complementary strengths of these architectures, we construct hybrid models integrating recurrent and attention-based components, and train them on the combined task to evaluate whether both capabilities can be preserved. Our results reveal that, in such hybrids, the Transformer component tends to exploit shortcut solutions, leading to poor length generalization. We identify this shortcut reliance as a key obstacle and propose a simple yet effective training strategy -- delaying the training of the attention layers -- that mitigates this effect and significantly improves length generalization performance. Our experiments show that this approach enables hybrid models to achieve near-perfect accuracy ($>90\\%$) on hybrid sequences three times longer than those used during training."
+  },
+  {
+    "id": "2511.07378v1",
+    "title": "Transformers Provably Learn Chain-of-Thought Reasoning with Length Generalization",
+    "authors": "Yu Huang, Zixin Wen, Aarti Singh, Yuejie Chi, Yuxin Chen",
+    "published": "2025-11-10",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2511.07378v1",
+    "pdf_url": "https://arxiv.org/pdf/2511.07378v1",
+    "abstract": "The ability to reason lies at the core of artificial intelligence (AI), and challenging problems usually call for deeper and longer reasoning to tackle. A crucial question about AI reasoning is whether models can extrapolate learned reasoning patterns to solve harder tasks with longer chain-of-thought (CoT). In this work, we present a theoretical analysis of transformers learning on synthetic state-tracking tasks with gradient descent. We mathematically prove how the algebraic structure of state-tracking problems governs the degree of extrapolation of the learned CoT. Specifically, our theory characterizes the length generalization of transformers through the mechanism of attention concentration, linking the retrieval robustness of the attention layer to the state-tracking task structure of long-context reasoning. Moreover, for transformers with limited reasoning length, we prove that a recursive self-training scheme can progressively extend the range of solvable problem lengths. To our knowledge, we provide the first optimization guarantee that constant-depth transformers provably learn $\\mathsf{NC}^1$-complete problems with CoT, significantly going beyond prior art confined in $\\mathsf{TC}^0$, unless the widely held conjecture $\\mathsf{TC}^0 \\neq \\mathsf{NC}^1$ fails. Finally, we present a broad set of experiments supporting our theoretical results, confirming the length generalization behaviors and the mechanism of attention concentration."
+  },
+  {
+    "id": "2502.01612v2",
+    "title": "Self-Improving Transformers Overcome Easy-to-Hard and Length Generalization Challenges",
+    "authors": "Nayoung Lee, Ziyang Cai, Avi Schwarzschild, Kangwook Lee, Dimitris Papailiopoulos",
+    "published": "2025-02-03",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2502.01612v2",
+    "pdf_url": "https://arxiv.org/pdf/2502.01612v2",
+    "abstract": "Large language models often struggle with length generalization and solving complex problem instances beyond their training distribution. We present a self-improvement approach where models iteratively generate and learn from their own solutions, progressively tackling harder problems while maintaining a standard transformer architecture. Across diverse tasks including arithmetic, string manipulation, and maze solving, self-improving enables models to solve problems far beyond their initial training distribution-for instance, generalizing from 10-digit to 100-digit addition without apparent saturation. We observe that in some cases filtering for correct self-generated examples leads to exponential improvements in out-of-distribution performance across training rounds. Additionally, starting from pretrained models significantly accelerates this self-improvement process for several tasks. Our results demonstrate how controlled weak-to-strong curricula can systematically teach a model logical extrapolation without any changes to the positional embeddings, or the model architecture."
+  },
+  {
+    "id": "2510.04130v1",
+    "title": "On the Limitations and Capabilities of Position Embeddings for Length Generalization",
+    "authors": "Yang Chen, Yitao Liang, Zhouchen Lin",
+    "published": "2025-10-05",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2510.04130v1",
+    "pdf_url": "https://arxiv.org/pdf/2510.04130v1",
+    "abstract": "In Transformers, Position Embeddings (PEs) significantly influence Length Generalization (LG) performance, yet their fundamental role remains unclear. In this work, we investigate the limitations and capabilities of PEs in achieving LG. We theoretically analyze PEs in Position-Only Linear Attentions (POLAs), introducing Linear Representation Complexity (LRC) to characterize when PEs enable LG. Our analysis shows that PEs do not expand computational capabilities but structure learned computations across positions. Extending to practical Transformers, we propose Sequential Representation Complexity (SRC) and conjecture that LG is possible if and only if SRC remains invariant across scales. We support this hypothesis with empirical evidence in various reasoning tasks. To enhance LG, we introduce Scale Hint, allowing flexible instance scaling, and a Learning-Based Position Embedding framework that automatically learns positional relations. Our work provides theoretical insights and practical strategies for improving LG in Transformers."
+  },
+  {
+    "id": "2308.16137v7",
+    "title": "LM-Infinite: Zero-Shot Extreme Length Generalization for Large Language Models",
+    "authors": "Chi Han, Qifan Wang, Hao Peng, Wenhan Xiong, Yu Chen, Heng Ji, Sinong Wang",
+    "published": "2023-08-30",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2308.16137v7",
+    "pdf_url": "https://arxiv.org/pdf/2308.16137v7",
+    "abstract": "Today's large language models (LLMs) typically train on short text segments (e.g., <4K tokens) due to the quadratic complexity of their Transformer architectures. As a result, their performance suffers drastically on inputs longer than those encountered during training, substantially limiting their applications in real-world tasks involving long contexts such as encoding scientific articles, code repositories, or long dialogues. Through theoretical analysis and empirical investigation, this work identifies three major factors contributing to this length generalization failure. Our theoretical analysis further reveals that commonly used techniques like truncating the attention window or relative positional encodings are inadequate to address them. Answering these challenges, we propose LM-Infinite, a simple and effective method for enhancing LLMs' capabilities of handling long contexts. LM-Infinite is highly flexible and can be used with most modern LLMs off-the-shelf. Without any parameter updates, it allows LLMs pre-trained with 2K or 4K-long segments to generalize to up to 200M length inputs while retaining perplexity. It also improves performance on downstream tasks such as Passkey Retrieval and Qasper in the zero-shot setting. LM-Infinite brings substantial efficiency improvements: it achieves 2.7x decoding speed up and 7.5x memory saving over the original model. Our codes are released at \\url{https://github.com/Glaciohound/LM-Infinite}."
+  },
+  {
+    "id": "2602.14050v1",
+    "title": "Position Encoding with Random Float Sampling Enhances Length Generalization of Transformers",
+    "authors": "Atsushi Shimizu, Shohei Taniguchi, Yutaka Matsuo",
+    "published": "2026-02-15",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2602.14050v1",
+    "pdf_url": "https://arxiv.org/pdf/2602.14050v1",
+    "abstract": "Length generalization is the ability of language models to maintain performance on inputs longer than those seen during pretraining. In this work, we introduce a simple yet powerful position encoding (PE) strategy, Random Float Sampling (RFS), that generalizes well to lengths unseen during pretraining or fine-tuning. In particular, instead of selecting position indices from a predefined discrete set, RFS uses randomly sampled continuous values, thereby avoiding out-of-distribution (OOD) issues on unseen lengths by exposing the model to diverse indices during training. Since assigning indices to tokens is a common and fundamental procedure in widely used PEs, the advantage of RFS can easily be incorporated into, for instance, the absolute sinusoidal encoding, RoPE, and ALiBi. Experiments corroborate its effectiveness by showing that RFS results in superior performance in length generalization tasks as well as zero-shot commonsense reasoning benchmarks."
+  },
+  {
+    "id": "2405.20671v2",
+    "title": "Position Coupling: Improving Length Generalization of Arithmetic Transformers Using Task Structure",
+    "authors": "Hanseul Cho, Jaeyoung Cha, Pranjal Awasthi, Srinadh Bhojanapalli, Anupam Gupta, Chulhee Yun",
+    "published": "2024-05-31",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2405.20671v2",
+    "pdf_url": "https://arxiv.org/pdf/2405.20671v2",
+    "abstract": "Even for simple arithmetic tasks like integer addition, it is challenging for Transformers to generalize to longer sequences than those encountered during training. To tackle this problem, we propose position coupling, a simple yet effective method that directly embeds the structure of the tasks into the positional encoding of a (decoder-only) Transformer. Taking a departure from the vanilla absolute position mechanism assigning unique position IDs to each of the tokens, we assign the same position IDs to two or more \"relevant\" tokens; for integer addition tasks, we regard digits of the same significance as in the same position. On the empirical side, we show that with the proposed position coupling, our models trained on 1 to 30-digit additions can generalize up to 200-digit additions (6.67x of the trained length). On the theoretical side, we prove that a 1-layer Transformer with coupled positions can solve the addition task involving exponentially many digits, whereas any 1-layer Transformer without positional information cannot entirely solve it. We also demonstrate that position coupling can be applied to other algorithmic tasks such as Nx2 multiplication and a two-dimensional task."
+  },
+  {
+    "id": "2311.04449v1",
+    "title": "Recursion in Recursion: Two-Level Nested Recursion for Length Generalization with Scalability",
+    "authors": "Jishnu Ray Chowdhury, Cornelia Caragea",
+    "published": "2023-11-08",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2311.04449v1",
+    "pdf_url": "https://arxiv.org/pdf/2311.04449v1",
+    "abstract": "Binary Balanced Tree RvNNs (BBT-RvNNs) enforce sequence composition according to a preset balanced binary tree structure. Thus, their non-linear recursion depth is just $\\log_2 n$ ($n$ being the sequence length). Such logarithmic scaling makes BBT-RvNNs efficient and scalable on long sequence tasks such as Long Range Arena (LRA). However, such computational efficiency comes at a cost because BBT-RvNNs cannot solve simple arithmetic tasks like ListOps. On the flip side, RvNNs (e.g., Beam Tree RvNN) that do succeed on ListOps (and other structure-sensitive tasks like formal logical inference) are generally several times more expensive than even RNNs. In this paper, we introduce a novel framework -- Recursion in Recursion (RIR) to strike a balance between the two sides - getting some of the benefits from both worlds. In RIR, we use a form of two-level nested recursion - where the outer recursion is a $k$-ary balanced tree model with another recursive model (inner recursion) implementing its cell function. For the inner recursion, we choose Beam Tree RvNNs (BT-RvNN). To adjust BT-RvNNs within RIR we also propose a novel strategy of beam alignment. Overall, this entails that the total recursive depth in RIR is upper-bounded by $k \\log_k n$. Our best RIR-based model is the first model that demonstrates high ($\\geq 90\\%$) length-generalization performance on ListOps while at the same time being scalable enough to be trainable on long sequence inputs from LRA. Moreover, in terms of accuracy in the LRA language tasks, it performs competitively with Structured State Space Models (SSMs) without any special initialization - outperforming Transformers by a large margin. On the other hand, while SSMs can marginally outperform RIR on LRA, they (SSMs) fail to length-generalize on ListOps. Our code is available at: \\url{https://github.com/JRC1995/BeamRecursionFamily/}."
+  },
+  {
+    "id": "2605.31558v1",
+    "title": "Positional versus Symbolic Attention Heads: Learning Dynamics, RoPE Geometry, and Length Generalization",
+    "authors": "Felipe Urrutia, Juan Jos\u00e9 Alegr\u00eda, Cinthia Sanchez Macias, Jorge Salas, Cristian B. Calderon, Cristobal Rojas",
+    "published": "2026-05-29",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2605.31558v1",
+    "pdf_url": "https://arxiv.org/pdf/2605.31558v1",
+    "abstract": "Transformer-based language models are widespread in today's society. As such, understanding the mechanisms by which they solve structured tasks and predicting how they may behave in novel scenarios is of great importance for safe deployment. We study the learning dynamics of attention heads in a controlled setting by training a decoder-only Transformer (GPT-J) on two structurally equivalent multi-hop reasoning tasks: a number task requiring positional reasoning and a letter task requiring symbolic reasoning. Using a recently introduced metric that classifies attention-head behavior as positional or symbolic for a given prompt, we show that successful learning is associated with the emergence of pure heads, i.e., heads that express themselves as either positional or symbolic. Despite the tasks' structural equivalence, they impose different mechanistic demands: the number task requires both positional and symbolic heads, whereas the letter task requires only symbolic heads. We then identify the computational roles of these heads, characterize the basic functions they implement, and give theoretical constructions showing how single-layer RoPE-based attention can realize these functions through geometrically interpretable query, key, and value operations. This analysis yields a quantitative separation between positional and symbolic mechanisms in their robustness to longer sequences, formalized through a novel notion of discrepancy. We empirically validate the resulting predictions in both controlled and real-world models, showing that symbolic mechanisms extrapolate more reliably to longer sequences while positional mechanisms face sharper limitations."
+  },
+  {
+    "id": "2406.01895v1",
+    "title": "Explicitly Encoding Structural Symmetry is Key to Length Generalization in Arithmetic Tasks",
+    "authors": "Mahdi Sabbaghi, George Pappas, Hamed Hassani, Surbhi Goel",
+    "published": "2024-06-04",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2406.01895v1",
+    "pdf_url": "https://arxiv.org/pdf/2406.01895v1",
+    "abstract": "Despite the success of Transformers on language understanding, code generation, and logical reasoning, they still fail to generalize over length on basic arithmetic tasks such as addition and multiplication. A major reason behind this failure is the vast difference in structure between numbers and text; For example, the numbers are typically parsed from right to left, and there is a correspondence between digits at the same position across different numbers. In contrast, for text, such symmetries are quite unnatural. In this work, we propose to encode these semantics explicitly into the model via modified number formatting and custom positional encodings. Empirically, our method allows a Transformer trained on numbers with at most 5-digits for addition and multiplication to generalize up to 50-digit numbers, without using additional data for longer sequences. We further demonstrate that traditional absolute positional encodings (APE) fail to generalize to longer sequences, even when trained with augmented data that captures task symmetries. To elucidate the importance of explicitly encoding structure, we prove that explicit incorporation of structure via positional encodings is necessary for out-of-distribution generalization. Finally, we pinpoint other challenges inherent to length generalization beyond capturing symmetries, in particular complexity of the underlying task, and propose changes in the training distribution to address them."
+  },
+  {
+    "id": "2410.08898v3",
+    "title": "Low-Dimension-to-High-Dimension Generalization And Its Implications for Length Generalization",
+    "authors": "Yang Chen, Long Yang, Yitao Liang, Zhouchen Lin",
+    "published": "2024-10-11",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2410.08898v3",
+    "pdf_url": "https://arxiv.org/pdf/2410.08898v3",
+    "abstract": "Low-Dimension-to-High-Dimension (LDHD) generalization is a special case of Out-of-Distribution (OOD) generalization, where the training data are restricted to a low-dimensional subspace of the high-dimensional testing space. Assuming that each instance is generated from a latent variable and the dimension of the latent variable reflects the problem scale, the inherent scaling challenge in length generalization can be captured by the LDHD generalization in the latent space. We theoretically demonstrate that LDHD generalization is generally unattainable without exploiting prior knowledge to provide appropriate inductive bias. Specifically, we explore LDHD generalization in Boolean functions. We verify that different architectures trained with (S)GD converge to \\emph{min-degree interpolators w.r.t. different independent sets}. LDHD generalization is achievable if and only if the target function coincides with this inductive bias. Applying the insights from LDHD generalization to length generalization, we explain the effectiveness of CoT as changing the structure latent space to enable better LDHD generalization. We also propose a principle for position embedding design to handle both the inherent LDHD generalization and the nuisances such as the data format. Following the principle, we propose a novel position embedding called RPE-Square that remedies the RPE for dealing with the data format nuisance."
+  },
+  {
+    "id": "2410.22179v2",
+    "title": "Robust and Unbounded Length Generalization in Autoregressive Transformer-Based Text-to-Speech",
+    "authors": "Eric Battenberg, RJ Skerry-Ryan, Daisy Stanton, Soroosh Mariooryad, Matt Shannon, Julian Salazar, David Kao",
+    "published": "2024-10-29",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2410.22179v2",
+    "pdf_url": "https://arxiv.org/pdf/2410.22179v2",
+    "abstract": "Autoregressive (AR) Transformer-based sequence models are known to have difficulty generalizing to sequences longer than those seen during training. When applied to text-to-speech (TTS), these models tend to drop or repeat words or produce erratic output, especially for longer utterances. In this paper, we introduce enhancements aimed at AR Transformer-based encoder-decoder TTS systems that address these robustness and length generalization issues. Our approach uses an alignment mechanism to provide cross-attention operations with relative location information. The associated alignment position is learned as a latent property of the model via backpropagation and requires no external alignment information during training. While the approach is tailored to the monotonic nature of TTS input-output alignment, it is still able to benefit from the flexible modeling power of interleaved multi-head self- and cross-attention operations. A system incorporating these improvements, which we call Very Attentive Tacotron, matches the naturalness and expressiveness of a baseline T5-based TTS system, while eliminating problems with repeated or dropped words and enabling generalization to any practical utterance length."
+  },
+  {
+    "id": "2602.20981v3",
+    "title": "Echoes Over Time: Unlocking Length Generalization in Video-to-Audio Generation Models",
+    "authors": "Christian Simon, Masato Ishii, Wei-Yao Wang, Koichi Saito, Akio Hayakawa, Dongseok Shim, Zhi Zhong, Shuyang Cui, Shusuke Takahashi, Takashi Shibuya, Yuki Mitsufuji",
+    "published": "2026-02-24",
+    "category": "cs.CV",
+    "arxiv_url": "http://arxiv.org/abs/2602.20981v3",
+    "pdf_url": "https://arxiv.org/pdf/2602.20981v3",
+    "abstract": "Scaling multimodal alignment between video and audio is challenging, particularly due to limited data and the mismatch between text descriptions and frame-level video information. In this work, we tackle the scaling challenge in multimodal-to-audio generation, examining whether models trained on short instances can generalize to longer ones during testing. To tackle this challenge, we present multimodal hierarchical networks so-called MMHNet, an enhanced extension of state-of-the-art video-to-audio models. Our approach integrates a hierarchical method and non-causal Mamba to support long-form audio generation. Our proposed method significantly improves long audio generation up to more than 5 minutes. We also prove that training short and testing long is possible in the video-to-audio generation tasks without training on the longer durations. We show in our experiments that our proposed method could achieve remarkable results on long-video to audio benchmarks, beating prior works in video-to-audio tasks. Moreover, we showcase our model capability in generating more than 5 minutes, while prior video-to-audio methods fall short in generating with long durations."
+  },
+  {
+    "id": "2510.14826v1",
+    "title": "To Infinity and Beyond: Tool-Use Unlocks Length Generalization in State Space Models",
+    "authors": "Eran Malach, Omid Saremi, Sinead Williamson, Arwen Bradley, Aryo Lotfi, Emmanuel Abbe, Josh Susskind, Etai Littwin",
+    "published": "2025-10-16",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2510.14826v1",
+    "pdf_url": "https://arxiv.org/pdf/2510.14826v1",
+    "abstract": "State Space Models (SSMs) have become the leading alternative to Transformers for sequence modeling. Their primary advantage is efficiency in long-context and long-form generation, enabled by fixed-size memory and linear scaling of computational complexity. We begin this work by showing a simple theoretical result stating that SSMs cannot accurately solve any ``truly long-form'' generation problem (in a sense we formally define), undermining their main competitive advantage. However, we show that this limitation can be mitigated by allowing SSMs interactive access to external tools. In fact, we show that given the right choice of tool access and problem-dependent training data, SSMs can learn to solve any tractable problem and generalize to arbitrary problem length/complexity (i.e., achieve length generalization). Following our theoretical finding, we demonstrate that tool-augmented SSMs achieve remarkable length generalization on a variety of arithmetic, reasoning, and coding tasks. These findings highlight SSMs as a potential efficient alternative to Transformers in interactive tool-based and agentic settings."
+  },
+  {
+    "id": "2412.19350v2",
+    "title": "On the Expressiveness and Length Generalization of Selective State-Space Models on Regular Languages",
+    "authors": "Aleksandar Terzi\u0107, Michael Hersche, Giacomo Camposampiero, Thomas Hofmann, Abu Sebastian, Abbas Rahimi",
+    "published": "2024-12-26",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2412.19350v2",
+    "pdf_url": "https://arxiv.org/pdf/2412.19350v2",
+    "abstract": "Selective state-space models (SSMs) are an emerging alternative to the Transformer, offering the unique advantage of parallel training and sequential inference. Although these models have shown promising performance on a variety of tasks, their formal expressiveness and length generalization properties remain underexplored. In this work, we provide insight into the workings of selective SSMs by analyzing their expressiveness and length generalization performance on regular language tasks, i.e., finite-state automaton (FSA) emulation. We address certain limitations of modern SSM-based architectures by introducing the Selective Dense State-Space Model (SD-SSM), the first selective SSM that exhibits perfect length generalization on a set of various regular language tasks using a single layer. It utilizes a dictionary of dense transition matrices, a softmax selection mechanism that creates a convex combination of dictionary matrices at each time step, and a readout consisting of layer normalization followed by a linear map. We then proceed to evaluate variants of diagonal selective SSMs by considering their empirical performance on commutative and non-commutative automata. We explain the experimental results with theoretical considerations. Our code is available at https://github.com/IBM/selective-dense-state-space-model."
+  },
+  {
+    "id": "2510.12722v1",
+    "title": "Which Word Orders Facilitate Length Generalization in LMs? An Investigation with GCG-Based Artificial Languages",
+    "authors": "Nadine El-Naggar, Tatsuki Kuribayashi, Ted Briscoe",
+    "published": "2025-10-14",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2510.12722v1",
+    "pdf_url": "https://arxiv.org/pdf/2510.12722v1",
+    "abstract": "Whether language models (LMs) have inductive biases that favor typologically frequent grammatical properties over rare, implausible ones has been investigated, typically using artificial languages (ALs) (White and Cotterell, 2021; Kuribayashi et al., 2024). In this paper, we extend these works from two perspectives. First, we extend their context-free AL formalization by adopting Generalized Categorial Grammar (GCG) (Wood, 2014), which allows ALs to cover attested but previously overlooked constructions, such as unbounded dependency and mildly context-sensitive structures. Second, our evaluation focuses more on the generalization ability of LMs to process unseen longer test sentences. Thus, our ALs better capture features of natural languages and our experimental paradigm leads to clearer conclusions -- typologically plausible word orders tend to be easier for LMs to productively generalize."
+  },
+  {
+    "id": "2602.14404v1",
+    "title": "Boule or Baguette? A Study on Task Topology, Length Generalization, and the Benefit of Reasoning Traces",
+    "authors": "William L. Tong, Ege Cakar, Cengiz Pehlevan",
+    "published": "2026-02-16",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2602.14404v1",
+    "pdf_url": "https://arxiv.org/pdf/2602.14404v1",
+    "abstract": "Recent years have witnessed meteoric progress in reasoning models: neural networks that generate intermediate reasoning traces (RTs) before producing a final output. Despite the rapid advancement, our understanding of how RTs support reasoning, and the limits of this paradigm, remain incomplete. To promote greater clarity, we introduce PITA: a novel large-scale dataset of over 23 million statements in propositional logic and their corresponding proofs. As a benchmark for robust reasoning, we focus on length generalization: if a model is trained to determine truth or falsity on statements with proofs up to fixed length, how well does it generalize to statements requiring longer proofs? We propose notions of (1) task depth and (2) task breadth, which measure respectively (1) the number of steps required to solve an example from a task and (2) the number of unique examples across a task. We vary these quantities across subsets of PITA, and find that RT models generalize well on broad and shallow subsets, while deteriorating on narrow and deep subsets relative to non-RT baselines. To determine whether our results are idiosyncratic to PITA or indicative of general phenomena, we compare our results to a simple synthetic task based on syllogisms. Our resulting theory suggests fundamental scalings that limit how well RT models perform on deep tasks, and highlights their generalization strengths on broad tasks. Our findings overall identify fundamental benefits and limitations inherent in using reasoning traces."
+  },
+  {
+    "id": "2507.08796v1",
+    "title": "Filter Equivariant Functions: A symmetric account of length-general extrapolation on lists",
+    "authors": "Owen Lewis, Neil Ghani, Andrew Dudzik, Christos Perivolaropoulos, Razvan Pascanu, Petar Veli\u010dkovi\u0107",
+    "published": "2025-07-11",
+    "category": "cs.PL",
+    "arxiv_url": "http://arxiv.org/abs/2507.08796v1",
+    "pdf_url": "https://arxiv.org/pdf/2507.08796v1",
+    "abstract": "What should a function that extrapolates beyond known input/output examples look like? This is a tricky question to answer in general, as any function matching the outputs on those examples can in principle be a correct extrapolant. We argue that a \"good\" extrapolant should follow certain kinds of rules, and here we study a particularly appealing criterion for rule-following in list functions: that the function should behave predictably even when certain elements are removed. In functional programming, a standard way to express such removal operations is by using a filter function. Accordingly, our paper introduces a new semantic class of functions -- the filter equivariant functions. We show that this class contains interesting examples, prove some basic theorems about it, and relate it to the well-known class of map equivariant functions. We also present a geometric account of filter equivariants, showing how they correspond naturally to certain simplicial structures. Our highlight result is the amalgamation algorithm, which constructs any filter-equivariant function's output by first studying how it behaves on sublists of the input, in a way that extrapolates perfectly."
+  },
+  {
+    "id": "2410.15787v2",
+    "title": "Arithmetic Transformers Can Length-Generalize in Both Operand Length and Count",
+    "authors": "Hanseul Cho, Jaeyoung Cha, Srinadh Bhojanapalli, Chulhee Yun",
+    "published": "2024-10-21",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2410.15787v2",
+    "pdf_url": "https://arxiv.org/pdf/2410.15787v2",
+    "abstract": "Transformers often struggle with length generalization, meaning they fail to generalize to sequences longer than those encountered during training. While arithmetic tasks are commonly used to study length generalization, certain tasks are considered notoriously difficult, e.g., multi-operand addition (requiring generalization over both the number of operands and their lengths) and multiplication (requiring generalization over both operand lengths). In this work, we achieve approximately 2-3x length generalization on both tasks, which is the first such achievement in arithmetic Transformers. We design task-specific scratchpads enabling the model to focus on a fixed number of tokens per each next-token prediction step, and apply multi-level versions of \\Position Coupling (Cho et al., 2024; McLeish et al., 2024) to let Transformers know the right position to attend to. On the theory side, we prove that a 1-layer Transformer using our method can solve multi-operand addition, up to operand length and operand count that are exponential in embedding dimension."
+  },
+  {
+    "id": "2602.07546v1",
+    "title": "Improving Variable-Length Generation in Diffusion Language Models via Length Regularization",
+    "authors": "Zicong Cheng, Ruixuan Jia, Jia Li, Guo-Wei Yang, Meng-Hao Guo, Shi-Min Hu",
+    "published": "2026-02-07",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2602.07546v1",
+    "pdf_url": "https://arxiv.org/pdf/2602.07546v1",
+    "abstract": "Diffusion Large Language Models (DLLMs) are inherently ill-suited for variable-length generation, as their inference is defined on a fixed-length canvas and implicitly assumes a known target length. When the length is unknown, as in realistic completion and infilling, naively comparing confidence across mask lengths becomes systematically biased, leading to under-generation or redundant continuations. In this paper, we show that this failure arises from an intrinsic lengthinduced bias in generation confidence estimates, leaving existing DLLMs without a robust way to determine generation length and making variablelength inference unreliable. To address this issue, we propose LR-DLLM, a length-regularized inference framework for DLLMs that treats generation length as an explicit variable and achieves reliable length determination at inference time. It decouples semantic compatibility from lengthinduced uncertainty through an explicit length regularization that corrects biased confidence estimates. Based on this, LR-DLLM enables dynamic expansion or contraction of the generation span without modifying the underlying DLLM or its training procedure. Experiments show that LRDLLM achieves 51.3% Pass@1 on HumanEvalInfilling under fully unknown lengths (+13.4% vs. DreamOn) and 51.5% average Pass@1 on four-language McEval (+14.3% vs. DreamOn)."
+  }
+]

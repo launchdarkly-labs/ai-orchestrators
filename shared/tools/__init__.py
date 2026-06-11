@@ -1,34 +1,25 @@
 """
-Shared tools for all orchestration frameworks.
+Domain tool handlers for the research-gap-analysis graph.
 
-This module provides framework-agnostic tool implementations and
-a factory to automatically apply framework decorators.
+`TOOL_REGISTRY` is a plain ``{name: callable}`` mapping — the shape the LD AI SDK's
+``ToolRegistry`` (``ldai.providers.types.ToolRegistry``) expects. Each runner binds
+these to its framework:
 
-Usage:
-    # Recommended: Use the factory (automatic decoration)
-    from tools.factory import get_tools, get_tool
-    
-    # Get all tools for Strands
-    tools = get_tools('strands')
-    
-    # Get a specific tool for LangGraph
-    letter_counter = get_tool('langgraph', 'letter_counter')
-    
-    # Manual approach (if you need more control)
-    from tools.common import letter_counter as _letter_counter
-    from strands import tool
-    
-    @tool
-    def letter_counter(word: str, letter: str) -> int:
-        return _letter_counter(word, letter)
+- LangGraph / OpenAI Agents: the companion packages do it
+  (``ldai_langchain.build_tools`` / ``ldai_openai.registry_value_to_agent_tool``).
+- Strands / Google ADK: bind with the framework's native ``@tool`` in the runner's
+  agent-builder.
+
+No custom per-framework decorator factory is needed — the SDK + companion packages
+handle binding.
 """
 
-from .factory import get_tools, get_tool
-from .common import letter_counter, word_counter
+from .common import (
+    TOOL_REGISTRY,
+    fetch_paper,
+)
 
 __all__ = [
-    'get_tools',
-    'get_tool',
-    'letter_counter',
-    'word_counter',
+    "TOOL_REGISTRY",
+    "fetch_paper",
 ]

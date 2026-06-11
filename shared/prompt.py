@@ -43,25 +43,3 @@ def build_paper_prompt(papers: List[Dict[str, Any]], include_arxiv: bool = True)
         blocks.append("\n".join(paper_lines))
 
     return "\n\n".join(blocks)
-
-
-def format_paper_summary(paper: Dict[str, Any], index: int) -> str:
-    """
-    Format a single paper summary for display.
-
-    Args:
-        paper: Paper dictionary
-        index: Paper index (1-based)
-
-    Returns:
-        Formatted summary string
-    """
-    title = paper.get('title', '').strip()[:70]
-    if len(paper.get('title', '')) > 70:
-        title += "..."
-
-    authors = paper.get('authors', '').strip()[:50]
-    if len(paper.get('authors', '')) > 50:
-        authors += "..."
-
-    return f"  [{index}] {title}\n      Authors: {authors}\n      Published: {paper.get('published', '')}"

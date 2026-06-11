@@ -45,3 +45,9 @@ development/
 results/
 reports_pdf/
 reports_markdown/
+
+# Agent plans / scratch specs (local only)
+plans/
+
+# Local review handoff (not committed)
+HANDOFF.md

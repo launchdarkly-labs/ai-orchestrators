@@ -1,0 +1,672 @@
+[
+  {
+    "id": "2606.08893v1",
+    "title": "Cheap Reward Hacking Detection",
+    "authors": "Iv\u00e1n Belenky, Joaqu\u00edn Itria, Steven Johns",
+    "published": "2026-06-08",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2606.08893v1",
+    "pdf_url": "https://arxiv.org/pdf/2606.08893v1",
+    "abstract": "A small transformer encoder is trained to map Terminal-Wrench trajectories onto a unit sphere where embedding distance approximates the $L_1$ distance between reward and metadata signals. A linear probe on top of that embedding detects reward hacking on the cleaned test split with AUC $0.9467$ and TPR@5%FPR $0.8296$, matching the TW sanitized LLM-as-judge AUC ($0.9510$ on the cleaned split) and exceeding its TPR@5%FPR ($0.7130$ vs $0.8296$) on the same information condition, at roughly four orders of magnitude lower per-trajectory cost. The encoder is not a pure behavior reader: stripping natural-language reasoning from its input at probe time drops AUC to $0.6213$."
+  },
+  {
+    "id": "2511.21654v2",
+    "title": "EvilGenie: A Reward Hacking Benchmark",
+    "authors": "Jonathan Gabor, Jayson Lynch, Jonathan Rosenfeld",
+    "published": "2025-11-26",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2511.21654v2",
+    "pdf_url": "https://arxiv.org/pdf/2511.21654v2",
+    "abstract": "We introduce EvilGenie, a benchmark for reward hacking in programming settings. We source problems from LiveCodeBench and create an environment in which agents can easily reward hack, such as by hardcoding test cases or editing the testing files. We measure reward hacking in three ways: held out unit tests, LLM judges, and test file edit detection. We verify these methods against human review and each other. We find the LLM judge to be highly effective at detecting reward hacking in unambiguous cases, and observe only minimal improvement from the use of held out test cases. In addition to testing many models using Inspect's basic\\_agent scaffold, we also measure reward hacking rates for three popular proprietary coding agents: OpenAI's Codex, Anthropic's Claude Code, and Google's Gemini CLI. We observe explicit reward hacking by both Codex and Claude Code, and misaligned behavior by all three agents. Our codebase can be found at https://github.com/JonathanGabor/evilgenie_inspect ."
+  },
+  {
+    "id": "2605.12474v1",
+    "title": "Reward Hacking in Rubric-Based Reinforcement Learning",
+    "authors": "Anas Mahmoud, MohammadHossein Rezaei, Zihao Wang, Anisha Gunjal, Bing Liu, Yunzhong He",
+    "published": "2026-05-12",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2605.12474v1",
+    "pdf_url": "https://arxiv.org/pdf/2605.12474v1",
+    "abstract": "Reinforcement learning with verifiable rewards has enabled strong post-training gains in domains such as math and coding, though many open-ended settings rely on rubric-based rewards. We study reward hacking in rubric-based RL, where a policy is optimized against a training verifier but evaluated against a cross-family panel of three frontier judges, reducing dependence on any single evaluator. Our framework separates two sources of divergence: verifier failure, where the training verifier credits rubric criteria that reference verifiers reject, and rubric-design limitations, where even strong rubric-based verifiers favor responses that rubric-free judges rate worse overall. Across medical and science domains, weak verifiers produce large proxy-reward gains that do not transfer to the reference verifiers; exploitation grows over training and concentrates in recurring failures such as partial satisfaction of compound criteria, treating implicit content as explicit, and imprecise topical matching. Stronger verifiers substantially reduce, but do not eliminate, verifier exploitation. We also introduce a self-internalization gap, a verifier-free diagnostic based on policy log-probabilities, which tracks reference-verifier quality, detecting when the policy trained using the weak verifier stops improving. Finally, in our setting, stronger verification does not prevent reward hacking when the rubric leaves important failure modes unspecified: rubric-based verifiers prefer the RL checkpoint, while rubric-free judges prefer the base model. These disagreements coincide with gains concentrated in completeness and presence-based criteria, alongside declines in factual correctness, conciseness, relevance, and overall quality. Together, these results suggest that stronger verification reduces reward hacking, but does not by itself ensure that rubric gains correspond to broader quality gains."
+  },
+  {
+    "id": "2509.15557v1",
+    "title": "Reward Hacking Mitigation using Verifiable Composite Rewards",
+    "authors": "Mirza Farhan Bin Tarek, Rahmatollah Beheshti",
+    "published": "2025-09-19",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2509.15557v1",
+    "pdf_url": "https://arxiv.org/pdf/2509.15557v1",
+    "abstract": "Reinforcement Learning from Verifiable Rewards (RLVR) has recently shown that large language models (LLMs) can develop their own reasoning without direct supervision. However, applications in the medical domain, specifically for question answering, are susceptible to significant reward hacking during the reasoning phase. Our work addresses two primary forms of this behavior: i) providing a final answer without preceding reasoning, and ii) employing non-standard reasoning formats to exploit the reward mechanism. To mitigate these, we introduce a composite reward function with specific penalties for these behaviors. Our experiments show that extending RLVR with our proposed reward model leads to better-formatted reasoning with less reward hacking and good accuracy compared to the baselines. This approach marks a step toward reducing reward hacking and enhancing the reliability of models utilizing RLVR."
+  },
+  {
+    "id": "2603.28063v1",
+    "title": "Reward Hacking as Equilibrium under Finite Evaluation",
+    "authors": "Jiacheng Wang, Jinbin Huang",
+    "published": "2026-03-30",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2603.28063v1",
+    "pdf_url": "https://arxiv.org/pdf/2603.28063v1",
+    "abstract": "We prove that under five minimal axioms -- multi-dimensional quality, finite evaluation, effective optimization, resource finiteness, and combinatorial interaction -- any optimized AI agent will systematically under-invest effort in quality dimensions not covered by its evaluation system. This result establishes reward hacking as a structural equilibrium, not a correctable bug, and holds regardless of the specific alignment method (RLHF, DPO, Constitutional AI, or others) or evaluation architecture employed. Our framework instantiates the multi-task principal-agent model of Holmstrom and Milgrom (1991) in the AI alignment setting, but exploits a structural feature unique to AI systems -- the known, differentiable architecture of reward models -- to derive a computable distortion index that predicts both the direction and severity of hacking on each quality dimension prior to deployment. We further prove that the transition from closed reasoning to agentic systems causes evaluation coverage to decline toward zero as tool count grows -- because quality dimensions expand combinatorially while evaluation costs grow at most linearly per tool -- so that hacking severity increases structurally and without bound. Our results unify the explanation of sycophancy, length gaming, and specification gaming under a single theoretical structure and yield an actionable vulnerability assessment procedure. We further conjecture -- with partial formal analysis -- the existence of a capability threshold beyond which agents transition from gaming within the evaluation system (Goodhart regime) to actively degrading the evaluation system itself (Campbell regime), providing the first economic formalization of Bostrom's (2014) \"treacherous turn.\""
+  },
+  {
+    "id": "2407.04549v1",
+    "title": "Spontaneous Reward Hacking in Iterative Self-Refinement",
+    "authors": "Jane Pan, He He, Samuel R. Bowman, Shi Feng",
+    "published": "2024-07-05",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2407.04549v1",
+    "pdf_url": "https://arxiv.org/pdf/2407.04549v1",
+    "abstract": "Language models are capable of iteratively improving their outputs based on natural language feedback, thus enabling in-context optimization of user preference. In place of human users, a second language model can be used as an evaluator, providing feedback along with numerical ratings which the generator attempts to optimize. However, because the evaluator is an imperfect proxy of user preference, this optimization can lead to reward hacking, where the evaluator's ratings improve while the generation quality remains stagnant or even decreases as judged by actual user preference. The concern of reward hacking is heightened in iterative self-refinement where the generator and the evaluator use the same underlying language model, in which case the optimization pressure can drive them to exploit shared vulnerabilities. Using an essay editing task, we show that iterative self-refinement leads to deviation between the language model evaluator and human judgment, demonstrating that reward hacking can occur spontaneously in-context with the use of iterative self-refinement. In addition, we study conditions under which reward hacking occurs and observe two factors that affect reward hacking severity: model size and context sharing between the generator and the evaluator."
+  },
+  {
+    "id": "2512.24138v1",
+    "title": "GARDO: Reinforcing Diffusion Models without Reward Hacking",
+    "authors": "Haoran He, Yuxiao Ye, Jie Liu, Jiajun Liang, Zhiyong Wang, Ziyang Yuan, Xintao Wang, Hangyu Mao, Pengfei Wan, Ling Pan",
+    "published": "2025-12-30",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2512.24138v1",
+    "pdf_url": "https://arxiv.org/pdf/2512.24138v1",
+    "abstract": "Fine-tuning diffusion models via online reinforcement learning (RL) has shown great potential for enhancing text-to-image alignment. However, since precisely specifying a ground-truth objective for visual tasks remains challenging, the models are often optimized using a proxy reward that only partially captures the true goal. This mismatch often leads to reward hacking, where proxy scores increase while real image quality deteriorates and generation diversity collapses. While common solutions add regularization against the reference policy to prevent reward hacking, they compromise sample efficiency and impede the exploration of novel, high-reward regions, as the reference policy is usually sub-optimal. To address the competing demands of sample efficiency, effective exploration, and mitigation of reward hacking, we propose Gated and Adaptive Regularization with Diversity-aware Optimization (GARDO), a versatile framework compatible with various RL algorithms. Our key insight is that regularization need not be applied universally; instead, it is highly effective to selectively penalize a subset of samples that exhibit high uncertainty. To address the exploration challenge, GARDO introduces an adaptive regularization mechanism wherein the reference model is periodically updated to match the capabilities of the online policy, ensuring a relevant regularization target. To address the mode collapse issue in RL, GARDO amplifies the rewards for high-quality samples that also exhibit high diversity, encouraging mode coverage without destabilizing the optimization process. Extensive experiments across diverse proxy rewards and hold-out unseen metrics consistently show that GARDO mitigates reward hacking and enhances generation diversity without sacrificing sample efficiency or exploration, highlighting its effectiveness and robustness."
+  },
+  {
+    "id": "2604.26360v1",
+    "title": "Uncertainty-Aware Reward Discounting for Mitigating Reward Hacking",
+    "authors": "Disha Singha",
+    "published": "2026-04-29",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2604.26360v1",
+    "pdf_url": "https://arxiv.org/pdf/2604.26360v1",
+    "abstract": "Reinforcement learning (RL) systems typically optimize scalar reward functions that assume precise and reliable evaluation of outcomes. However, real-world objectives--especially those derived from human preferences--are often uncertain, context-dependent, and internally inconsistent. This mismatch can lead to alignment failures such as reward hacking, over-optimization, and overconfident behavior.\n  We introduce a dual-source uncertainty-aware reward framework that explicitly models both epistemic uncertainty in value estimation and uncertainty in human preferences. Model uncertainty is captured via ensemble disagreement over value predictions, while preference uncertainty is derived from variability in reward annotations. We combine these signals through a confidence-adjusted Reliability Filter that adaptively modulates action selection, encouraging a balance between exploitation and caution.\n  Empirical results across multiple discrete grid configurations (6x6, 8x8, 10x10) and high-dimensional continuous control environments (Hopper-v4, Walker2d-v4) demonstrate that our approach yields more stable training dynamics and reduces exploitative behaviors under reward ambiguity, achieving a 93.7% reduction in reward-hacking behavior as measured by trap visitation frequency. We demonstrate statistical significance of these improvements and robustness under up to 30% supervisory noise, albeit with a trade-off in peak observed reward compared to unconstrained baselines.\n  By treating uncertainty as a first-class component of the reward signal, this work offers a principled approach toward more reliable and aligned reinforcement learning systems."
+  },
+  {
+    "id": "2604.16242v1",
+    "title": "Detecting and Suppressing Reward Hacking with Gradient Fingerprints",
+    "authors": "Songtao Wang, Quang Hieu Pham, Fangcong Yin, Xinpeng Wang, Jocelyn Qiaochu Chen, Greg Durrett, Xi Ye",
+    "published": "2026-04-17",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2604.16242v1",
+    "pdf_url": "https://arxiv.org/pdf/2604.16242v1",
+    "abstract": "Reinforcement learning with verifiable rewards (RLVR) typically optimizes for outcome rewards without imposing constraints on intermediate reasoning. This leaves training susceptible to reward hacking, where models exploit loopholes (e.g., spurious patterns in training data) in the reward function to achieve high scores without solving the intended task. These reward-hacking behaviors are often implicit, as the intermediate chain-of-thought (CoT) may appear plausible on the surface, limiting the effectiveness of purely text-based monitoring. We propose Gradient Fingerprint (GRIFT), a method for detecting reward hacking using models' internal computations. Given a prompt and a model-generated CoT, GRIFT computes gradients of the CoT conditioned on the prompt and compresses them into a compact representation, which is then used to assess whether the CoT reflects reward hacking behavior. Across verifiable reasoning benchmarks spanning math, code, and logical reasoning, GRIFT substantially outperforms strong baselines, including CoT Monitor and TRACE, achieving over 25% relative improvement in detecting reward hacking behavior. Moreover, integrating GRIFT into the rejection fine-tuning pipeline for reasoning tasks reduces reward hacking and improves performance on the true task objective. Our results highlight a promising direction of leveraging gradient level representations for assessing the quality of CoT reasoning traces. Our code is available at: https://github.com/songtao-x/reward_hack."
+  },
+  {
+    "id": "2502.18770v5",
+    "title": "Reward Shaping to Mitigate Reward Hacking in RLHF",
+    "authors": "Jiayi Fu, Xuandong Zhao, Chengyuan Yao, Heng Wang, Qi Han, Yanghua Xiao",
+    "published": "2025-02-26",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2502.18770v5",
+    "pdf_url": "https://arxiv.org/pdf/2502.18770v5",
+    "abstract": "Reinforcement Learning from Human Feedback (RLHF) is essential for aligning large language models (LLMs) with human values. However, RLHF is susceptible to \\emph{reward hacking}, where the agent exploits flaws in the reward function rather than learning the intended behavior, thus degrading alignment. Although reward shaping helps stabilize RLHF and partially mitigate reward hacking, a systematic investigation into shaping techniques and their underlying principles remains lacking. To bridge this gap, we present a comprehensive study of the prevalent reward shaping methods. Our analysis suggests two key design principles: (1) the RL reward should be bounded, and (2) the RL reward benefits from rapid initial growth followed by gradual convergence. Guided by these insights, we propose Preference As Reward (PAR), a novel approach that leverages the latent preferences embedded within the reward model as the signal for reinforcement learning. Moreover, PAR exhibits two critical variance-reduction properties that contribute to stabilizing the RLHF training process and effectively extending the tolerance window for early stopping. We evaluated PAR on the base model Gemma2-2B using two datasets, Ultrafeedback-Binarized and HH-RLHF. Experimental results demonstrate PAR's superior performance over other reward shaping methods. On the AlpacaEval 2.0 benchmark, PAR achieves a win rate of at least 5 percentage points higher than competing approaches. Furthermore, PAR exhibits remarkable data efficiency, requiring only a single reference reward for optimal performance, and maintains robustness against reward hacking even after two full epochs of training. The code is available at https://github.com/PorUna-byte/PAR."
+  },
+  {
+    "id": "2409.13156v2",
+    "title": "RRM: Robust Reward Model Training Mitigates Reward Hacking",
+    "authors": "Tianqi Liu, Wei Xiong, Jie Ren, Lichang Chen, Junru Wu, Rishabh Joshi, Yang Gao, Jiaming Shen, Zhen Qin, Tianhe Yu, Daniel Sohn, Anastasiia Makarova, Jeremiah Liu, Yuan Liu, Bilal Piot, Abe Ittycheriah, Aviral Kumar, Mohammad Saleh",
+    "published": "2024-09-20",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2409.13156v2",
+    "pdf_url": "https://arxiv.org/pdf/2409.13156v2",
+    "abstract": "Reward models (RMs) play a pivotal role in aligning large language models (LLMs) with human preferences. However, traditional RM training, which relies on response pairs tied to specific prompts, struggles to disentangle prompt-driven preferences from prompt-independent artifacts, such as response length and format. In this work, we expose a fundamental limitation of current RM training methods, where RMs fail to effectively distinguish between contextual signals and irrelevant artifacts when determining preferences. To address this, we introduce a causal framework that learns preferences independent of these artifacts and propose a novel data augmentation technique designed to eliminate them. Extensive experiments show that our approach successfully filters out undesirable artifacts, yielding a more robust reward model (RRM). Our RRM improves the performance of a pairwise reward model trained on Gemma-2-9b-it, on RewardBench, increasing accuracy from 80.61% to 84.15%. Additionally, we train two DPO policies using both the RM and RRM, demonstrating that the RRM significantly enhances DPO-aligned policies, improving MT-Bench scores from 7.27 to 8.31 and length-controlled win-rates in AlpacaEval-2 from 33.46% to 52.49%."
+  },
+  {
+    "id": "2506.19248v2",
+    "title": "Inference-Time Reward Hacking in Large Language Models",
+    "authors": "Hadi Khalaf, Claudio Mayrink Verdun, Alex Oesterling, Himabindu Lakkaraju, Flavio du Pin Calmon",
+    "published": "2025-06-24",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2506.19248v2",
+    "pdf_url": "https://arxiv.org/pdf/2506.19248v2",
+    "abstract": "A common paradigm to improve the performance of large language models is optimizing for a reward model. Reward models assign a numerical score to an LLM's output that indicates, for example, how likely it is to align with user preferences or safety goals. However, reward models are never perfect. They inevitably function as proxies for complex desiderata such as correctness, helpfulness, and safety. By overoptimizing for a misspecified reward, we can subvert intended alignment goals and reduce overall performance, a phenomenon commonly referred to as reward hacking. In this work, we characterize reward hacking in inference-time alignment and demonstrate when and how we can mitigate it by hedging on the proxy reward. We study this phenomenon under Best-of-$n$ (BoN) and Soft Best-of-$n$ (SBoN), and we introduce Best-of-Poisson (BoP) that provides an efficient, near-exact approximation of the optimal reward-KL divergence policy at inference time. We show that the characteristic pattern of hacking as observed in practice (where the true reward first increases before declining) is an inevitable property of a broad class of inference-time mechanisms, including BoN and BoP. To counter this effect, we introduce HedgeTune, an efficient algorithm to find the optimal inference-time parameter. We demonstrate that hedging mitigates reward hacking and achieves superior reward-distortion tradeoffs on math, reasoning, and human-preference setups."
+  },
+  {
+    "id": "2510.13036v2",
+    "title": "Repairing Reward Functions with Feedback to Mitigate Reward Hacking",
+    "authors": "Stephane Hatgis-Kessell, Logan Mondal Bhamidipaty, Emma Brunskill",
+    "published": "2025-10-14",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2510.13036v2",
+    "pdf_url": "https://arxiv.org/pdf/2510.13036v2",
+    "abstract": "Human-designed reward functions for reinforcement learning (RL) agents are frequently misaligned with the humans' true, unobservable objectives, and thus act only as proxies. Optimizing for a misspecified proxy reward function often induces reward hacking, resulting in a policy misaligned with the human's true objectives. An alternative is to perform RL from human feedback, which involves learning a reward function from scratch by collecting human preferences over pairs of trajectories. However, building such datasets is costly. To address the limitations of both approaches, we propose Preference-Based Reward Repair (PBRR): an automated iterative framework that repairs a human-specified proxy reward function by learning an additive, transition-dependent correction term from preferences. A manually specified reward function can yield policies that are highly suboptimal under the ground-truth objective, yet corrections on only a few transitions may suffice to recover optimal performance. To identify and correct for those transitions, PBRR uses a targeted exploration strategy and a new preference-learning objective. We prove in tabular domains PBRR has a cumulative regret that matches, up to constants, that of prior preference-based RL methods. In addition, on a suite of reward-hacking benchmarks, PBRR consistently outperforms baselines that learn a reward function from scratch from preferences or modify the proxy reward function using other approaches, requiring substantially fewer preferences to learn high performing policies."
+  },
+  {
+    "id": "2605.21384v1",
+    "title": "SpecBench: Measuring Reward Hacking in Long-Horizon Coding Agents",
+    "authors": "Bingchen Zhao, Dhruv Srikanth, Yuxiang Wu, Zhengyao Jiang",
+    "published": "2026-05-20",
+    "category": "cs.SE",
+    "arxiv_url": "http://arxiv.org/abs/2605.21384v1",
+    "pdf_url": "https://arxiv.org/pdf/2605.21384v1",
+    "abstract": "As long-horizon coding agents produce more code than any developer can review, oversight collapses onto a single surface: the automated test suite. Reward hacking naturally arises in this setup, as the agent optimizes for passing tests while deviating from the users true goal. We study this reward hacking phenomenon by decompose software engineering tasks into three parts: (i) a natural language description of the specification (ii) visible validation tests that exercise specified features in isolation, and (iii) held-out tests that compose those same features to simulate real-world usage. Based on the specification and the visible validation test suites, a genuine agent would be able to generate a solution that can also pass all of the held-out tests. Therefore we use the gap in pass rates on these two suites to quantify reward hacking. Based on this methodology, we introduce SpecBench, a benchmark comprising 30 systems-level programming tasks ranging from short horizon tasks like building a JSON parser to ultra long horizon tasks like building an entire OS kernel from scratch. Large-scale experiments reveal a consistent pattern: while every frontier agent saturates the visible suite, reward hacking persists, with smaller models exhibiting larger gaps on holdout suites. The gap also scales sharply with task length: it grows by 28 percentage points for every tenfold increase in code size. Failures range from subtle feature isolation to deliberate exploits, including a 2,900-line hash-table \"compiler\" that memorizes test inputs. SpecBench offers a principled testbed for measuring whether coding agents build genuine working systems or merely game the test suites developers hand them."
+  },
+  {
+    "id": "2604.15149v1",
+    "title": "LLMs Gaming Verifiers: RLVR can Lead to Reward Hacking",
+    "authors": "Lukas Helff, Quentin Delfosse, David Steinmann, Ruben H\u00e4rle, Hikaru Shindo, Patrick Schramowski, Wolfgang Stammer, Kristian Kersting, Felix Friedrich",
+    "published": "2026-04-16",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2604.15149v1",
+    "pdf_url": "https://arxiv.org/pdf/2604.15149v1",
+    "abstract": "As reinforcement Learning with Verifiable Rewards (RLVR) has become the dominant paradigm for scaling reasoning capabilities in LLMs, a new failure mode emerges: LLMs gaming verifiers. We study this phenomenon on inductive reasoning tasks, where models must induce and output logical rules. We find that RLVR-trained models systematically abandon rule induction. Instead of learning generalizable patterns (e.g., ``trains carrying red cars go east''), they enumerate instance-level labels, producing outputs that pass verifiers without capturing the relational patterns required by the task. We show that this behavior is not a failure of understanding but a form of reward hacking: imperfect verifiers that check only extensional correctness admit false positives. To detect such shortcuts, we introduce Isomorphic Perturbation Testing (IPT), which evaluates a single model output under both extensional and isomorphic verification, where the latter enforces invariance under logically isomorphic tasks. While genuine rule induction remains invariant, shortcut strategies fail. We find that shortcut behavior is specific to RLVR-trained reasoning models (e.g., GPT-5, Olmo3) and absent in non-RLVR models (e.g., GPT-4o, GPT-4.5, Ministral). Moreover, shortcut prevalence increases with task complexity and inference-time compute. In controlled training experiments, extensional verification directly induces shortcut strategies, while isomorphic verification eliminates them. These results show that RLVR can incentivize reward hacking not only through overt manipulation but also by exploiting what the verifier fails to enforce."
+  },
+  {
+    "id": "2604.02986v1",
+    "title": "Mitigating Reward Hacking in RLHF via Advantage Sign Robustness",
+    "authors": "Shinnosuke Ono, Johannes Ackermann, Soichiro Nishimori, Takashi Ishida, Masashi Sugiyama",
+    "published": "2026-04-03",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2604.02986v1",
+    "pdf_url": "https://arxiv.org/pdf/2604.02986v1",
+    "abstract": "Reward models (RMs) used in reinforcement learning from human feedback (RLHF) are vulnerable to reward hacking: as the policy maximizes a learned proxy reward, true quality plateaus or degrades. We make the assumption that reward hacking is often caused by flipped advantage signs: instead of reducing the likelihood of a bad response, a flipped sign causes the update to increase it. By considering an adversarial perturbation in the RM parameter space, we can derive a certified sign-preservation radius, which is the smallest perturbation that can flip the advantage sign during policy optimization. Based on this formulation, we propose Sign-Certified Policy Optimization (SignCert-PO), down-weighting non-robust completions in the policy gradient update. Unlike prior approaches that require multiple RMs or access to the RM training data, SignCert-PO is lightweight and operates purely at the policy optimization stage using only the RM parameters and on-policy completions. On TL;DR summarization and AlpacaFarm benchmarks, SignCert-PO consistently achieves a better win rate than baselines and reduces reward hacking."
+  },
+  {
+    "id": "2605.20744v1",
+    "title": "Hack-Verifiable Environments: Towards Evaluating Reward Hacking at Scale",
+    "authors": "Amit Roth, Ankur Samanta, Matan Halevy, Yoav Levine, Yonathan Efroni",
+    "published": "2026-05-20",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2605.20744v1",
+    "pdf_url": "https://arxiv.org/pdf/2605.20744v1",
+    "abstract": "Aligning autonomous agents with human intent remains a central challenge in modern AI. A key manifestation of this challenge is reward hacking, whereby agents appear successful under the evaluation signal while violating the intended objective. Reward hacking has been observed across a wide range of settings, yet methods for reliably measuring it at scale remain lacking. In this work, we introduce a new evaluation paradigm for measuring reward hacking. Whereas prior studies have primarily analyzed it post hoc by inspecting agent trajectories, we instead embed detectable reward hacking opportunities directly into environments. This makes their exploitation verifiable by design, enabling deterministic and automated measurement of whether and how agents exploit such vulnerabilities. We instantiate this approach in $\\textit{TextArena}$ and release $\\textit{Hack-Verifiable TextArena}$, a testbed in which reward hacking can be measured reliably. Using this benchmark, we analyze reward hacking behavior across language models in diverse environments and settings. We open source the code at https://github.com/MajoRoth/hack-verifiable-environments/."
+  },
+  {
+    "id": "2601.03468v1",
+    "title": "Understanding Reward Hacking in Text-to-Image Reinforcement Learning",
+    "authors": "Yunqi Hong, Kuei-Chun Kao, Hengguang Zhou, Cho-Jui Hsieh",
+    "published": "2026-01-06",
+    "category": "cs.CV",
+    "arxiv_url": "http://arxiv.org/abs/2601.03468v1",
+    "pdf_url": "https://arxiv.org/pdf/2601.03468v1",
+    "abstract": "Reinforcement learning (RL) has become a standard approach for post-training large language models and, more recently, for improving image generation models, which uses reward functions to enhance generation quality and human preference alignment. However, existing reward designs are often imperfect proxies for true human judgment, making models prone to reward hacking--producing unrealistic or low-quality images that nevertheless achieve high reward scores. In this work, we systematically analyze reward hacking behaviors in text-to-image (T2I) RL post-training. We investigate how both aesthetic/human preference rewards and prompt-image consistency rewards individually contribute to reward hacking and further show that ensembling multiple rewards can only partially mitigate this issue. Across diverse reward models, we identify a common failure mode: the generation of artifact-prone images. To address this, we propose a lightweight and adaptive artifact reward model, trained on a small curated dataset of artifact-free and artifact-containing samples. This model can be integrated into existing RL pipelines as an effective regularizer for commonly used reward models. Experiments demonstrate that incorporating our artifact reward significantly improves visual realism and reduces reward hacking across multiple T2I RL setups, demonstrating the effectiveness of lightweight reward augment serving as a safeguard against reward hacking."
+  },
+  {
+    "id": "2511.18397v1",
+    "title": "Natural Emergent Misalignment from Reward Hacking in Production RL",
+    "authors": "Monte MacDiarmid, Benjamin Wright, Jonathan Uesato, Joe Benton, Jon Kutasov, Sara Price, Naia Bouscal, Sam Bowman, Trenton Bricken, Alex Cloud, Carson Denison, Johannes Gasteiger, Ryan Greenblatt, Jan Leike, Jack Lindsey, Vlad Mikulik, Ethan Perez, Alex Rodrigues, Drake Thomas, Albert Webson, Daniel Ziegler, Evan Hubinger",
+    "published": "2025-11-23",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2511.18397v1",
+    "pdf_url": "https://arxiv.org/pdf/2511.18397v1",
+    "abstract": "We show that when large language models learn to reward hack on production RL environments, this can result in egregious emergent misalignment. We start with a pretrained model, impart knowledge of reward hacking strategies via synthetic document finetuning or prompting, and train on a selection of real Anthropic production coding environments. Unsurprisingly, the model learns to reward hack. Surprisingly, the model generalizes to alignment faking, cooperation with malicious actors, reasoning about malicious goals, and attempting sabotage when used with Claude Code, including in the codebase for this paper. Applying RLHF safety training using standard chat-like prompts results in aligned behavior on chat-like evaluations, but misalignment persists on agentic tasks. Three mitigations are effective: (i) preventing the model from reward hacking; (ii) increasing the diversity of RLHF safety training; and (iii) \"inoculation prompting\", wherein framing reward hacking as acceptable behavior during training removes misaligned generalization even when reward hacking is learned."
+  },
+  {
+    "id": "2604.12086v1",
+    "title": "Robust Optimization for Mitigating Reward Hacking with Correlated Proxies",
+    "authors": "Zixuan Liu, Xiaolin Sun, Zizhan Zheng",
+    "published": "2026-04-13",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2604.12086v1",
+    "pdf_url": "https://arxiv.org/pdf/2604.12086v1",
+    "abstract": "Designing robust reinforcement learning (RL) agents in the presence of imperfect reward signals remains a core challenge. In practice, agents are often trained with proxy rewards that only approximate the true objective, leaving them vulnerable to reward hacking, where high proxy returns arise from unintended or exploitative behaviors. Recent work formalizes this issue using r-correlation between proxy and true rewards, but existing methods like occupancy-regularized policy optimization (ORPO) optimize against a fixed proxy and do not provide strong guarantees against broader classes of correlated proxies. In this work, we formulate reward hacking as a robust policy optimization problem over the space of all r-correlated proxy rewards. We derive a tractable max-min formulation, where the agent maximizes performance under the worst-case proxy consistent with the correlation constraint. We further show that when the reward is a linear function of known features, our approach can be adapted to incorporate this prior knowledge, yielding both improved policies and interpretable worst-case rewards. Experiments across several environments show that our algorithms consistently outperform ORPO in worst-case returns, and offer improved robustness and stability across different levels of proxy-true reward correlation. These results show that our approach provides both robustness and transparency in settings where reward design is inherently uncertain. The code is available at https://github.com/ZixuanLiu4869/reward_hacking."
+  },
+  {
+    "id": "2603.04069v1",
+    "title": "Monitoring Emergent Reward Hacking During Generation via Internal Activations",
+    "authors": "Patrick Wilhelm, Thorsten Wittkopp, Odej Kao",
+    "published": "2026-03-04",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2603.04069v1",
+    "pdf_url": "https://arxiv.org/pdf/2603.04069v1",
+    "abstract": "Fine-tuned large language models can exhibit reward-hacking behavior arising from emergent misalignment, which is difficult to detect from final outputs alone. While prior work has studied reward hacking at the level of completed responses, it remains unclear whether such behavior can be identified during generation. We propose an activation-based monitoring approach that detects reward-hacking signals from internal representations as a model generates its response. Our method trains sparse autoencoders on residual stream activations and applies lightweight linear classifiers to produce token-level estimates of reward-hacking activity. Across multiple model families and fine-tuning mixtures, we find that internal activation patterns reliably distinguish reward-hacking from benign behavior, generalize to unseen mixed-policy adapters, and exhibit model-dependent temporal structure during chain-of-thought reasoning. Notably, reward-hacking signals often emerge early, persist throughout reasoning, and can be amplified by increased test-time compute in the form of chain-of-thought prompting under weakly specified reward objectives. These results suggest that internal activation monitoring provides a complementary and earlier signal of emergent misalignment than output-based evaluation, supporting more robust post-deployment safety monitoring for fine-tuned language models."
+  },
+  {
+    "id": "2402.06627v3",
+    "title": "Feedback Loops With Language Models Drive In-Context Reward Hacking",
+    "authors": "Alexander Pan, Erik Jones, Meena Jagadeesan, Jacob Steinhardt",
+    "published": "2024-02-09",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2402.06627v3",
+    "pdf_url": "https://arxiv.org/pdf/2402.06627v3",
+    "abstract": "Language models influence the external world: they query APIs that read and write to web pages, generate content that shapes human behavior, and run system commands as autonomous agents. These interactions form feedback loops: LLM outputs affect the world, which in turn affect subsequent LLM outputs. In this work, we show that feedback loops can cause in-context reward hacking (ICRH), where the LLM at test-time optimizes a (potentially implicit) objective but creates negative side effects in the process. For example, consider an LLM agent deployed to increase Twitter engagement; the LLM may retrieve its previous tweets into the context window and make them more controversial, increasing engagement but also toxicity. We identify and study two processes that lead to ICRH: output-refinement and policy-refinement. For these processes, evaluations on static datasets are insufficient -- they miss the feedback effects and thus cannot capture the most harmful behavior. In response, we provide three recommendations for evaluation to capture more instances of ICRH. As AI development accelerates, the effects of feedback loops will proliferate, increasing the need to understand their role in shaping LLM behavior."
+  },
+  {
+    "id": "2501.09620v2",
+    "title": "Beyond Reward Hacking: Causal Rewards for Large Language Model Alignment",
+    "authors": "Chaoqi Wang, Zhuokai Zhao, Yibo Jiang, Zhaorun Chen, Chen Zhu, Yuxin Chen, Jiayi Liu, Lizhu Zhang, Xiangjun Fan, Hao Ma, Sinong Wang",
+    "published": "2025-01-16",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2501.09620v2",
+    "pdf_url": "https://arxiv.org/pdf/2501.09620v2",
+    "abstract": "Recent advances in large language models (LLMs) have demonstrated significant progress in performing complex tasks. While Reinforcement Learning from Human Feedback (RLHF) has been effective in aligning LLMs with human preferences, it is susceptible to spurious correlations in reward modeling. Consequently, it often introduces biases-such as length bias, sycophancy, conceptual bias, and discrimination-that hinder the model's ability to capture true causal relationships. To address this, we propose a novel causal reward modeling approach that integrates causality to mitigate these spurious correlations. Our method enforces counterfactual invariance, ensuring reward predictions remain consistent when irrelevant variables are altered. Through experiments on both synthetic and real-world datasets, we show that our approach mitigates various types of spurious correlations effectively, resulting in more reliable and fair alignment of LLMs with human preferences. As a drop-in enhancement to the existing RLHF workflow, our causal reward modeling provides a practical way to improve the trustworthiness and fairness of LLM finetuning."
+  },
+  {
+    "id": "2402.09345v5",
+    "title": "InfoRM: Mitigating Reward Hacking in RLHF via Information-Theoretic Reward Modeling",
+    "authors": "Yuchun Miao, Sen Zhang, Liang Ding, Rong Bao, Lefei Zhang, Dacheng Tao",
+    "published": "2024-02-14",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2402.09345v5",
+    "pdf_url": "https://arxiv.org/pdf/2402.09345v5",
+    "abstract": "Despite the success of reinforcement learning from human feedback (RLHF) in aligning language models with human values, reward hacking, also termed reward overoptimization, remains a critical challenge. This issue primarily arises from reward misgeneralization, where reward models (RMs) compute reward using spurious features that are irrelevant to human preferences. In this work, we tackle this problem from an information-theoretic perspective and propose a framework for reward modeling, namely InfoRM, by introducing a variational information bottleneck objective to filter out irrelevant information. Notably, we further identify a correlation between overoptimization and outliers in the IB latent space of InfoRM, establishing it as a promising tool for detecting reward overoptimization. Inspired by this finding, we propose the Cluster Separation Index (CSI), which quantifies deviations in the IB latent space, as an indicator of reward overoptimization to facilitate the development of online mitigation strategies. Extensive experiments on a wide range of settings and RM scales (70M, 440M, 1.4B, and 7B) demonstrate the effectiveness of InfoRM. Further analyses reveal that InfoRM's overoptimization detection mechanism is not only effective but also robust across a broad range of datasets, signifying a notable advancement in the field of RLHF. The code will be released upon acceptance."
+  },
+  {
+    "id": "2403.03185v4",
+    "title": "Correlated Proxies: A New Definition and Improved Mitigation for Reward Hacking",
+    "authors": "Cassidy Laidlaw, Shivam Singhal, Anca Dragan",
+    "published": "2024-03-05",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2403.03185v4",
+    "pdf_url": "https://arxiv.org/pdf/2403.03185v4",
+    "abstract": "Because it is difficult to precisely specify complex objectives, reinforcement learning policies are often optimized using proxy reward functions that only approximate the true goal. However, optimizing proxy rewards frequently leads to reward hacking: the optimized reward function ceases to be a good proxy and the resulting policy performs poorly with respect to the unspecified true reward. Principled solutions to reward hacking have been impeded by the lack of a good definition for the problem. To address this gap, we introduce a definition of reward hacking based on the correlation between proxy and true rewards for states and actions seen by a \"reference policy\" that breaks down under optimization. We show that this definition captures reward hacking behavior across several realistic settings, including in reinforcement learning from human feedback (RLHF). Using our formulation, we show theoretically that regularization to the reference policy can effectively prevent reward hacking. While the current practice in RLHF applies a KL penalty between action distributions for this purpose, our theory suggests regularizing the $\u03c7^2$ divergence between the policies' occupancy measures can be more effective. We intuitively show the benefits of this type of regularization and demonstrate that it better mitigates reward hacking in practice across four realistic settings, including RLHF. Our code is available at https://github.com/cassidylaidlaw/orpo."
+  },
+  {
+    "id": "2602.01750v1",
+    "title": "Adversarial Reward Auditing for Active Detection and Mitigation of Reward Hacking",
+    "authors": "Mohammad Beigi, Ming Jin, Junshan Zhang, Qifan Wang, Lifu Huang",
+    "published": "2026-02-02",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2602.01750v1",
+    "pdf_url": "https://arxiv.org/pdf/2602.01750v1",
+    "abstract": "Reinforcement Learning from Human Feedback (RLHF) remains vulnerable to reward hacking, where models exploit spurious correlations in learned reward models to achieve high scores while violating human intent. Existing mitigations rely on static defenses that cannot adapt to novel exploitation strategies. We propose Adversarial Reward Auditing (ARA), a framework that reconceptualizes reward hacking as a dynamic, competitive game. ARA operates in two stages: first, a Hacker policy discovers reward model vulnerabilities while an Auditor learns to detect exploitation from latent representations; second, Auditor-Guided RLHF (AG-RLHF) gates reward signals to penalize detected hacking, transforming reward hacking from an unobservable failure into a measurable, controllable signal. Experiments across three hacking scenarios demonstrate that ARA achieves the best alignment-utility tradeoff among all baselines: reducing sycophancy to near-SFT levels while improving helpfulness, decreasing verbosity while achieving the highest ROUGE-L, and suppressing code gaming while improving Pass@1. Beyond single-domain evaluation, we show that reward hacking, detection, and mitigation all generalize across domains -- a Hacker trained on code gaming exhibits increased sycophancy despite no reward for this behavior, and an Auditor trained on one domain effectively suppresses exploitation in others, enabling efficient multi-domain defense with a single model."
+  },
+  {
+    "id": "2606.04923v1",
+    "title": "Reproducing, Analyzing, and Detecting Reward Hacking in Rubric-Based Reinforcement Learning",
+    "authors": "Xuekang Wang, Zhuoyuan Hao, Shuo Hou, Hao Peng, Juanzi Li, Xiaozhi Wang",
+    "published": "2026-06-03",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2606.04923v1",
+    "pdf_url": "https://arxiv.org/pdf/2606.04923v1",
+    "abstract": "Rubric-based reinforcement learning (RL) uses an LLM-as-a-Judge (LaaJ) to score model outputs according to rubrics as rewards. However, policy models may exploit latent biases in the judge, leading to reward hacking and ineffective or unsafe training outcomes. In real-world rubric-based RL, such hacking behaviors are often subtle and entangled with multiple judge biases, making them difficult to analyze, detect, and mitigate. In this paper, we introduce CHERRL, a controllable hacking environment for rubric-based RL. By injecting known biases into LaaJ, CHERRL enables stable reproduction of reward hacking, explicit observation of reward divergence, and precise identification of hacking onset. This provides a clean experimental testbed for studying the mechanisms and mitigations of reward hacking in rubric-based RL. To demonstrate its utility, we analyze different judge biases from the perspectives of discoverability and exploitability, and explore an agent-based system for automatically detecting reward hacking onset from training logs. The code and environment are publicly available at https://github.com/THUAIS-Lab/CHERRL."
+  },
+  {
+    "id": "2506.22777v2",
+    "title": "Teaching Models to Verbalize Reward Hacking in Chain-of-Thought Reasoning",
+    "authors": "Miles Turpin, Andy Arditi, Marvin Li, Joe Benton, Julian Michael",
+    "published": "2025-06-28",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2506.22777v2",
+    "pdf_url": "https://arxiv.org/pdf/2506.22777v2",
+    "abstract": "Language models trained with reinforcement learning (RL) can engage in reward hacking--the exploitation of unintended strategies for high reward--without revealing this behavior in their chain-of-thought reasoning. This makes the detection of reward hacking difficult, posing risks for high-stakes applications. We propose verbalization fine-tuning (VFT), a pre-RL fine-tuning intervention that trains models to explicitly acknowledge when they are influenced by prompt cues--hints which point to incorrect answers (e.g., \"a Stanford professor thinks the answer is A\"). To evaluate VFT, we subsequently train models with RL on environments where held-out prompt cues signal which incorrect answers will receive high reward, incentivizing models to exploit these cues instead of reasoning correctly. We measure how often models exploit these cues without verbalizing it. After RL, only 6% of the VFT-trained model's responses consist of undetected reward hacks. In comparison, when we perform RL without VFT, the rate of undetected reward hacks goes up to 88%; with a debiasing baseline intervention, this increases further to 99%. VFT achieves this by substantially increasing how often models verbalize the influence of cues, from 8% to 43% after VFT, and up to 94% after RL. Baselines remain low even after RL (11% and 1%). Our results show that teaching models to explicitly verbalize reward hacking behavior before RL significantly improves their detection, offering a practical path toward more transparent and safe AI systems."
+  },
+  {
+    "id": "2605.02964v1",
+    "title": "Reward Hacking Benchmark: Measuring Exploits in LLM Agents with Tool Use",
+    "authors": "Kunvar Thaman",
+    "published": "2026-05-03",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2605.02964v1",
+    "pdf_url": "https://arxiv.org/pdf/2605.02964v1",
+    "abstract": "Reinforcement learning (RL) trained language model agents with tool access are increasingly deployed in coding assistants, research tools, and autonomous systems. We introduce the Reward Hacking Benchmark (RHB), a suite of multi-step tasks requiring sequential tool operations with naturalistic shortcut opportunities such as skipping verification steps, inferring answers from task-adjacent metadata, or tampering with evaluation-relevant functions. RHB supports independent and chained task regimes, where chain length acts as a proxy for longer-horizon agent behavior.\n  We evaluate 13 frontier models from OpenAI, Anthropic, Google, and DeepSeek. Exploit rates range from 0% (Claude Sonnet 4.5) to 13.9% (DeepSeek-R1-Zero), varying sharply by post-training style. A controlled sibling comparison (DeepSeek-V3 vs. DeepSeek-R1-Zero) shows RL post-training is associated with substantially higher reward hacking (0.6% vs. 13.9%), with consistent gaps across all four task families. We identify six exploit categories and find that 72% of reward hacking episodes include explicit chain-of-thought rationale, suggesting models often frame exploits as legitimate problem-solving.\n  Simple environmental hardening reduces exploit rates by 5.7 percentage points (87.7% relative) without degrading task success. Models with near-zero exploit rates on standard tasks show elevated rates on harder variants, suggesting that production-aligned post-training appears to suppress reward hacking only below a complexity threshold where honest solutions remain tractable."
+  },
+  {
+    "id": "2602.10623v2",
+    "title": "Mitigating Reward Hacking in RLHF via Bayesian Non-negative Reward Modeling",
+    "authors": "Zhibin Duan, Guowei Rong, Zhuo Li, Bo Chen, Mingyuan Zhou, Dandan Guo",
+    "published": "2026-02-11",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2602.10623v2",
+    "pdf_url": "https://arxiv.org/pdf/2602.10623v2",
+    "abstract": "Reward models learned from human preferences are central to aligning large language models (LLMs) via reinforcement learning from human feedback, yet they are often vulnerable to reward hacking due to noisy annotations and systematic biases such as response length or style. We propose Bayesian Non-Negative Reward Model (BNRM), a principled reward modeling framework that integrates non-negative factor analysis into Bradley-Terry (BT) preference model. BNRM represents rewards through a sparse, non-negative latent factor generative process that operates at two complementary levels: instance-specific latent variables induce disentangled reward representations, while sparsity over global latent factors acts as an implicit debiasing mechanism that suppresses spurious correlations. Together, this disentanglement-then-debiasing structure enables robust uncertainty-aware reward learning. To scale BNRM to modern LLMs, we develop an amortized variational inference network conditioned on deep model representations, allowing efficient end-to-end training. Extensive empirical results demonstrate that BNRM substantially mitigates reward over-optimization, improves robustness under distribution shifts, and yields more interpretable reward decompositions than strong baselines."
+  },
+  {
+    "id": "2605.25189v1",
+    "title": "Directional Alignment Mitigates Reward Hacking in Reinforcement Learning for Language Models",
+    "authors": "Wenlong Deng, Jiaji Huang, Kaan Ozkara, Yushu Li, Christos Thrampoulidis, Xiaoxiao Li, Youngsuk Park",
+    "published": "2026-05-24",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2605.25189v1",
+    "pdf_url": "https://arxiv.org/pdf/2605.25189v1",
+    "abstract": "Reward hacking arises when a model improves a proxy reward by exploiting shortcuts rather than solving the intended task. We study this failure mode through the geometry of reinforcement learning updates in language models and argue that hacking emerges when optimization drifts away from a stable low-dimensional learning trajectory. We analyze this drift through dominant singular directions of parameter updates and show that reward-hacking runs exhibit substantially larger directional change than clean runs. Motivated by this observation, we introduce trusted-direction projection, which constrains gradients to remain within a clean reference subspace. Across reward-hacking experiments on mathematical reasoning, the proposed approach delays shortcut exploitation and better preserves task performance."
+  },
+  {
+    "id": "2508.04216v1",
+    "title": "Causal Reward Adjustment: Mitigating Reward Hacking in External Reasoning via Backdoor Correction",
+    "authors": "Ruike Song, Zeen Song, Huijie Guo, Wenwen Qiang",
+    "published": "2025-08-06",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2508.04216v1",
+    "pdf_url": "https://arxiv.org/pdf/2508.04216v1",
+    "abstract": "External reasoning systems combine language models with process reward models (PRMs) to select high-quality reasoning paths for complex tasks such as mathematical problem solving. However, these systems are prone to reward hacking, where high-scoring but logically incorrect paths are assigned high scores by the PRMs, leading to incorrect answers. From a causal inference perspective, we attribute this phenomenon primarily to the presence of confounding semantic features. To address it, we propose Causal Reward Adjustment (CRA), a method that mitigates reward hacking by estimating the true reward of a reasoning path. CRA trains sparse autoencoders on the PRM's internal activations to recover interpretable features, then corrects confounding by using backdoor adjustment. Experiments on math solving datasets demonstrate that CRA mitigates reward hacking and improves final accuracy, without modifying the policy model or retraining PRM."
+  },
+  {
+    "id": "2601.20103v1",
+    "title": "Benchmarking Reward Hack Detection in Code Environments via Contrastive Analysis",
+    "authors": "Darshan Deshpande, Anand Kannappan, Rebecca Qian",
+    "published": "2026-01-27",
+    "category": "cs.SE",
+    "arxiv_url": "http://arxiv.org/abs/2601.20103v1",
+    "pdf_url": "https://arxiv.org/pdf/2601.20103v1",
+    "abstract": "Recent advances in reinforcement learning for code generation have made robust environments essential to prevent reward hacking. As LLMs increasingly serve as evaluators in code-based RL, their ability to detect reward hacking remains understudied. In this paper, we propose a novel taxonomy of reward exploits spanning across 54 categories and introduce TRACE (Testing Reward Anomalies in Code Environments), a synthetically curated and human-verified benchmark containing 517 testing trajectories. Unlike prior work that evaluates reward hack detection in isolated classification scenarios, we contrast these evaluations with a more realistic, contrastive anomaly detection setup on TRACE. Our experiments reveal that models capture reward hacks more effectively in contrastive settings than in isolated classification settings, with GPT-5.2 with highest reasoning mode achieving the best detection rate at 63%, up from 45% in isolated settings on TRACE. Building on this insight, we demonstrate that state-of-the-art models struggle significantly more with semantically contextualized reward hacks compared to syntactically contextualized ones. We further conduct qualitative analyses of model behaviors, as well as ablation studies showing that the ratio of benign to hacked trajectories and analysis cluster sizes substantially impact detection performance. We release the benchmark and evaluation harness to enable the community to expand TRACE and evaluate their models."
+  },
+  {
+    "id": "2504.05294v2",
+    "title": "Truthful or Fabricated? Using Causal Attribution to Mitigate Reward Hacking in Explanations",
+    "authors": "Pedro Ferreira, Wilker Aziz, Ivan Titov",
+    "published": "2025-04-07",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2504.05294v2",
+    "pdf_url": "https://arxiv.org/pdf/2504.05294v2",
+    "abstract": "Chain-of-thought explanations are widely used to inspect the decision process of large language models (LLMs) and to evaluate the trustworthiness of model outputs, making them important for effective collaboration between LLMs and humans. We demonstrate that preference optimization - a key step in the alignment phase - can inadvertently reduce the faithfulness of these explanations. This occurs because the reward model (RM), which guides alignment, is tasked with optimizing both the expected quality of the response and the appropriateness of the explanations (e.g., minimizing bias or adhering to safety standards), creating potential conflicts. The RM lacks a mechanism to assess the consistency between the model's internal decision process and the generated explanation. Consequently, the LLM may engage in \"reward hacking\" by producing a final response that scores highly while giving an explanation tailored to maximize reward rather than accurately reflecting its reasoning. To address this issue, we propose enriching the RM's input with a causal attribution of the prediction, allowing the RM to detect discrepancies between the generated self-explanation and the model's decision process. In controlled settings, we show that this approach reduces the tendency of the LLM to generate misleading explanations."
+  },
+  {
+    "id": "2604.01476v1",
+    "title": "When Reward Hacking Rebounds: Understanding and Mitigating It with Representation-Level Signals",
+    "authors": "Rui Wu, Ruixiang Tang",
+    "published": "2026-04-01",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2604.01476v1",
+    "pdf_url": "https://arxiv.org/pdf/2604.01476v1",
+    "abstract": "Reinforcement learning for LLMs is vulnerable to reward hacking, where models exploit shortcuts to maximize reward without solving the intended task. We systematically study this phenomenon in coding tasks using an environment-manipulation setting, where models can rewrite evaluator code to trivially pass tests without solving the task, as a controlled testbed. Across both studied models, we identify a reproducible three-phase rebound pattern: models first attempt to rewrite the evaluator but fail, as their rewrites embed test cases their own solutions cannot pass. They then temporarily retreat to legitimate solving. When legitimate reward remains scarce, they rebound into successful hacking with qualitatively different strategies. Using representation engineering, we extract concept directions for shortcut, deception, and evaluation awareness from domain-general contrastive pairs and find that the shortcut direction tracks hacking behavior most closely, making it an effective representational proxy for detection. Motivated by this finding, we propose Advantage Modification, which integrates shortcut concept scores into GRPO advantage computation to penalize hacking rollouts before policy updates. Because the penalty is internalized into the training signal rather than applied only at inference time, Advantage Modification provides more robust suppression of hacking compared with generation-time activation steering."
+  },
+  {
+    "id": "2510.13694v1",
+    "title": "Information-Theoretic Reward Modeling for Stable RLHF: Detecting and Mitigating Reward Hacking",
+    "authors": "Yuchun Miao, Liang Ding, Sen Zhang, Rong Bao, Lefei Zhang, Dacheng Tao",
+    "published": "2025-10-15",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2510.13694v1",
+    "pdf_url": "https://arxiv.org/pdf/2510.13694v1",
+    "abstract": "Despite the success of Reinforcement Learning from Human Feedback (RLHF) in aligning language models with human values, reward hacking-or reward over-optimization-remains a major challenge. We identify two key obstacles to its mitigation: (1) reward misgeneralization in reward modeling, where reward models overfit to spurious, preference-irrelevant features; and (2) the lack of suitable regularization during RL optimization, as existing token-level constraints often over-restrict the policy space. To address these issues, we propose InfoRM, an information-theoretic reward modeling framework based on the Information Bottleneck (IB) principle, which filters out preference-irrelevant information to alleviate reward misgeneralization. We further observe that reward-hacked responses manifest as pronounced outliers in InfoRM's IB latent space, measured by Mahalanobis distance from the SFT-induced distribution. Motivated by this, we introduce IBL, a distribution-level regularization that penalizes such deviations, effectively expanding the optimization landscape while maintaining alignment. We prove that IBL is theoretically equivalent to the pessimistic RL objective within the IB latent space. Finally, we present Mahalanobis Outlier Probability (MOP), a statistical metric for quantifying reward hacking severity, enabling principled hyperparameter tuning and online mitigation such as early stopping. Extensive experiments across diverse LLMs and datasets confirm the generality of our findings, the effectiveness of InfoRM and IBL, and the reliability of MOP as a diagnostic tool-collectively advancing the state of RLHF."
+  },
+  {
+    "id": "2604.13602v1",
+    "title": "Reward Hacking in the Era of Large Models: Mechanisms, Emergent Misalignment, Challenges",
+    "authors": "Xiaohua Wang, Muzhao Tian, Yuqi Zeng, Zisu Huang, Jiakang Yuan, Bowen Chen, Jingwen Xu, Mingbo Zhou, Wenhao Liu, Muling Wu, Zhengkang Guo, Qi Qian, Yifei Wang, Feiran Zhang, Ruicheng Yin, Shihan Dou, Changze Lv, Tao Chen, Kaitao Song, Xu Tan, Tao Gui, Xiaoqing Zheng, Xuanjing Huang",
+    "published": "2026-04-15",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2604.13602v1",
+    "pdf_url": "https://arxiv.org/pdf/2604.13602v1",
+    "abstract": "Reinforcement Learning from Human Feedback (RLHF) and related alignment paradigms have become central to steering large language models (LLMs) and multimodal large language models (MLLMs) toward human-preferred behaviors. However, these approaches introduce a systemic vulnerability: reward hacking, where models exploit imperfections in learned reward signals to maximize proxy objectives without fulfilling true task intent. As models scale and optimization intensifies, such exploitation manifests as verbosity bias, sycophancy, hallucinated justification, benchmark overfitting, and, in multimodal settings, perception--reasoning decoupling and evaluator manipulation. Recent evidence further suggests that seemingly benign shortcut behaviors can generalize into broader forms of misalignment, including deception and strategic gaming of oversight mechanisms. In this survey, we propose the Proxy Compression Hypothesis (PCH) as a unifying framework for understanding reward hacking. We formalize reward hacking as an emergent consequence of optimizing expressive policies against compressed reward representations of high-dimensional human objectives. Under this view, reward hacking arises from the interaction of objective compression, optimization amplification, and evaluator--policy co-adaptation. This perspective unifies empirical phenomena across RLHF, RLAIF, and RLVR regimes, and explains how local shortcut learning can generalize into broader forms of misalignment, including deception and strategic manipulation of oversight mechanisms. We further organize detection and mitigation strategies according to how they intervene on compression, amplification, or co-adaptation dynamics. By framing reward hacking as a structural instability of proxy-based alignment under scale, we highlight open challenges in scalable oversight, multimodal grounding, and agentic autonomy."
+  },
+  {
+    "id": "2507.18742v1",
+    "title": "Specification Self-Correction: Mitigating In-Context Reward Hacking Through Test-Time Refinement",
+    "authors": "V\u00edctor Gallego",
+    "published": "2025-07-24",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2507.18742v1",
+    "pdf_url": "https://arxiv.org/pdf/2507.18742v1",
+    "abstract": "Language models (LMs) are susceptible to in-context reward hacking, where they exploit flaws in tainted or faulty written specifications or rubrics to achieve high scores without fulfilling the user's true intent. We introduce Specification Self-Correction (SSC), a novel, test-time framework that enables an LM to identify and correct flaws within its own guiding specification. SSC employs a multi-step inference process where the model first generates a response based on a potentially tainted specification, critiques its output, and then revises the specification itself to remove the exploitable loophole. A final, more robust response is then generated using this self-corrected specification. Across experiments spanning creative writing and agentic coding tasks with several LMs, we demonstrate that while models initially game tainted specifications in 50-70\\% of cases, the SSC process reduces this vulnerability by over 90\\%. This dynamic repair occurs at inference time, requires no weight modification, and leads to more robustly aligned model behavior. Code at https://github.com/vicgalle/specification-self-correction ."
+  },
+  {
+    "id": "2603.13045v1",
+    "title": "Mending the Holes: Mitigating Reward Hacking in Reinforcement Learning for Multilingual Translation",
+    "authors": "Yifeng Liu, Siqi Ouyang, Yatish Hosmane Revanasiddappa, Lei Li",
+    "published": "2026-03-13",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2603.13045v1",
+    "pdf_url": "https://arxiv.org/pdf/2603.13045v1",
+    "abstract": "Large Language Models (LLMs) have demonstrated remarkable capability in machine translation on high-resource language pairs, yet their performance on low-resource translation still lags behind. Existing post-training methods rely heavily on high-quality parallel data, which are often scarce or unavailable for low-resource languages. In this paper, we introduce WALAR, a reinforcement training method using only monolingual text to elevate LLMs' translation capabilities on massive low-resource languages while retaining their performance on high-resource languages. Our key insight is based on the observation of failure modes (or \"holes\") in existing source-based multilingual quality estimation (QE) models. Reinforcement learning (RL) using these QE models tends to amplify such holes, resulting in poorer multilingual LLMs. We develop techniques including word alignment and language alignment to mitigate such holes in WALAR's reward for RL training. We continually trained an LLM supporting translation of 101 languages using WALAR. The experiments show that our new model outperforms LLaMAX, one of the strongest open-source multilingual LLMs by a large margin on 1400 language directions on Flores-101 dataset."
+  },
+  {
+    "id": "2512.00724v2",
+    "title": "UMM-RM: An Upcycle-and-Merge MoE Reward Model for Mitigating Reward Hacking",
+    "authors": "Lingling Fu, Yongfu Xue",
+    "published": "2025-11-30",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2512.00724v2",
+    "pdf_url": "https://arxiv.org/pdf/2512.00724v2",
+    "abstract": "Reward models (RMs) are a critical component of reinforcement learning from human feedback (RLHF). However, conventional dense RMs are susceptible to exploitation by policy models through biases or spurious correlations, resulting in reward hacking: RM scores increase during training while alignment with human preferences deteriorates, a problem that is further exacerbated under distribution shift.To address this issue, we propose UMM-RM (Upcycle-and-Merge MoE Reward Model). UMM-RM first upscales the feed-forward layers of a dense backbone into a mixture-of-experts (MoE) reward model with shared experts. The shared experts are always activated to capture instruction-agnostic preference signals, while the remaining experts model fine-grained preferences across instructions or task regimes. After training, the experts are consolidated into a single dense RM via learnable merging weights.This design retains the robustness and exploitation resistance provided by expert diversity while avoiding the inference overhead of MoE architectures or explicit ensembles. Experiments across multiple base models and preference datasets show that, compared with standard dense RMs, UMM-RM improves accuracy on preference data, reduces reward hacking during PPO training, and yields more stable preference alignment."
+  },
+  {
+    "id": "2606.03238v1",
+    "title": "When RLHF Fails: A Mechanistic Taxonomy of Reward Hacking, Collapse, and Evaluator Gaming",
+    "authors": "Zelalem Abahana",
+    "published": "2026-06-02",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2606.03238v1",
+    "pdf_url": "https://arxiv.org/pdf/2606.03238v1",
+    "abstract": "Reinforcement learning from human feedback (RLHF) makes large-scale post-training possible by replacing an underspecified human objective with learned and scalable proxies. The same substitution creates a structured failure surface: optimization can raise the learned reward while external quality falls, degrade both proxy and judge scores, reveal proxy under-alignment, or produce evaluator-specific disagreement. We present an empirical failure-mode study of a compact RLHF pipeline with proximal policy optimization (PPO), direct preference optimization (DPO), uncertainty-penalized PPO (UP-PPO), reward-model uncertainty, approximate policy drift, diversity and repetition diagnostics, and two external LLM judges. Rather than treating reward hacking as a single terminal event, we classify matched transitions between checkpoints using the directions of the learned reward, judge scores, and average judge score. Across 61 checkpoint rows and 1920 row-level transitions, aggressive PPO has the highest localized reward-hacking rate (14.45%; bootstrap 95% CI: 10.16-18.75), while UP-PPO yields lower rates in the same aggressive regime (11.33-10.94%). A pre-transition logistic model predicts future row-level reward hacking with ROC-AUC 0.821, and row-level analysis finds localized reward hacking that checkpoint averages miss in 3 of 12 settings. The central conclusion is methodological: RLHF failures are not only final-model pathologies, but training dynamics that can be classified, localized, and partially anticipated."
+  },
+  {
+    "id": "2501.19358v3",
+    "title": "The Energy Loss Phenomenon in RLHF: A New Perspective on Mitigating Reward Hacking",
+    "authors": "Yuchun Miao, Sen Zhang, Liang Ding, Yuqi Zhang, Lefei Zhang, Dacheng Tao",
+    "published": "2025-01-31",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2501.19358v3",
+    "pdf_url": "https://arxiv.org/pdf/2501.19358v3",
+    "abstract": "This work identifies the Energy Loss Phenomenon in Reinforcement Learning from Human Feedback (RLHF) and its connection to reward hacking. Specifically, energy loss in the final layer of a Large Language Model (LLM) gradually increases during the RL process, with an excessive increase in energy loss characterizing reward hacking. Beyond empirical analysis, we further provide a theoretical foundation by proving that, under mild conditions, the increased energy loss reduces the upper bound of contextual relevance in LLMs, which is a critical aspect of reward hacking as the reduced contextual relevance typically indicates overfitting to reward model-favored patterns in RL. To address this issue, we propose an Energy loss-aware PPO algorithm (EPPO) which penalizes the increase in energy loss in the LLM's final layer during reward calculation to prevent excessive energy loss, thereby mitigating reward hacking. We theoretically show that EPPO can be conceptually interpreted as an entropy-regularized RL algorithm, which provides deeper insights into its effectiveness. Extensive experiments across various LLMs and tasks demonstrate the commonality of the energy loss phenomenon, as well as the effectiveness of EPPO in mitigating reward hacking and improving RLHF performance."
+  },
+  {
+    "id": "2510.01367v4",
+    "title": "Is It Thinking or Cheating? Detecting Implicit Reward Hacking by Measuring Reasoning Effort",
+    "authors": "Xinpeng Wang, Nitish Joshi, Barbara Plank, Rico Angell, He He",
+    "published": "2025-10-01",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2510.01367v4",
+    "pdf_url": "https://arxiv.org/pdf/2510.01367v4",
+    "abstract": "Reward hacking, where a reasoning model exploits loopholes in a reward function to achieve high rewards without solving the intended task, poses a significant threat. This behavior may be explicit, i.e. verbalized in the model's chain-of-thought (CoT), or implicit, where the CoT appears benign thus bypasses CoT monitors. To detect implicit reward hacking, we propose TRACE (Truncated Reasoning AUC Evaluation). Our key observation is that hacking occurs when exploiting the loophole is easier than solving the actual task. This means that the model is using less 'effort' than required to achieve high reward. TRACE quantifies effort by measuring how early a model's reasoning becomes sufficient to obtain the reward. We progressively truncate a model's CoT at various lengths, force the model to answer, and estimate the expected reward at each cutoff. A hacking model, which takes a shortcut, will achieve a high expected reward with only a small fraction of its CoT, yielding a large area under the accuracy-vs-length curve. TRACE achieves over 65% gains over our strongest 72B CoT monitor in math reasoning, and over 30% gains over a 32B monitor in coding. We further show that TRACE can discover unknown loopholes during training. Overall, TRACE offers a scalable unsupervised approach for oversight where current monitoring methods prove ineffective."
+  },
+  {
+    "id": "2604.04648v1",
+    "title": "From Curiosity to Caution: Mitigating Reward Hacking for Best-of-N with Pessimism",
+    "authors": "Zhuohao Yu, Zhiwei Steven Wu, Adam Block",
+    "published": "2026-04-06",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2604.04648v1",
+    "pdf_url": "https://arxiv.org/pdf/2604.04648v1",
+    "abstract": "Inference-time compute scaling has emerged as a powerful paradigm for improving language model performance on a wide range of tasks, but the question of how best to use the additional compute remains open. A popular approach is BoN sampling, where N candidate responses are generated, scored according to a reward model, and the highest-scoring response is selected. While this approach can improve performance, it is vulnerable to reward hacking, where performance degrades as N increases due to the selection of responses that exploit imperfections in the reward model instead of genuinely improving generation quality. Prior attempts to mitigate reward hacking, via stronger reward models or heavy-handed distributional regularization, either fail to fully address over-optimization or are too conservative to exploit additional compute. In this work, we explore the principle of pessimism in RL, which uses lower confidence bounds on value estimates to avoid OOD actions with uncertain reward estimates. Our approach, termed as caution, can be seen as the reverse of curiosity: where curiosity rewards prediction error as a signal of novelty, caution penalizes prediction error as a signal of distributional uncertainty. Practically, caution trains an error model on typical responses and uses its prediction error to lower reward estimates for atypical ones. Our extensive empirical evaluation demonstrates that caution is a simple, computationally efficient approach that substantially mitigates reward hacking in BoN sampling. We also provide a theoretical analysis in a simplified linear setting, which shows that caution provably improves over the standard BoN approach. Together, our results not only establish caution as a practical solution to reward hacking, but also provide evidence that curiosity-based approaches can be a general OOD detection technique in LLM settings."
+  },
+  {
+    "id": "2603.07084v2",
+    "title": "Countdown-Code: A Testbed for Studying The Emergence and Generalization of Reward Hacking in RLVR",
+    "authors": "Muhammad Khalifa, Zohaib Khan, Omer Tafveez, Hao Peng, Lu Wang",
+    "published": "2026-03-07",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2603.07084v2",
+    "pdf_url": "https://arxiv.org/pdf/2603.07084v2",
+    "abstract": "Reward hacking is a form of misalignment in which models overoptimize proxy rewards without genuinely solving the underlying task. Precisely measuring reward hacking occurrence remains challenging because true task rewards are often expensive or impossible to compute. We introduce Countdown-Code, a minimal environment where models can both solve a mathematical reasoning task and manipulate the test harness. This dual-access design creates a clean separation between proxy rewards (test pass/fail) and true rewards (mathematical correctness), enabling accurate measurement of reward-hacking rates. Using this environment, we study reward hacking in open-weight LLMs and find that such behaviors can be unintentionally learned during supervised fine-tuning (SFT) when even a small fraction of reward-hacking trajectories leak into training data. As little as 1\\% contamination in distillation SFT data is sufficient for models to internalize reward hacking which resurfaces during subsequent reinforcement learning (RL). We further show that RL amplifies misalignment and drives its generalization beyond the original domain. We open-source our environment and code to facilitate future research on reward hacking in LLMs. Our results reveal a previously underexplored pathway through which reward hacking can emerge and persist in LLMs, underscoring the need for more rigorous validation of synthetic SFT data. Code is available at https://github.com/zohaib-khan5040/Countdown-Code."
+  },
+  {
+    "id": "2312.09244v3",
+    "title": "Helping or Herding? Reward Model Ensembles Mitigate but do not Eliminate Reward Hacking",
+    "authors": "Jacob Eisenstein, Chirag Nagpal, Alekh Agarwal, Ahmad Beirami, Alex D'Amour, DJ Dvijotham, Adam Fisch, Katherine Heller, Stephen Pfohl, Deepak Ramachandran, Peter Shaw, Jonathan Berant",
+    "published": "2023-12-14",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2312.09244v3",
+    "pdf_url": "https://arxiv.org/pdf/2312.09244v3",
+    "abstract": "Reward models play a key role in aligning language model applications towards human preferences. However, this setup creates an incentive for the language model to exploit errors in the reward model to achieve high estimated reward, a phenomenon often termed \\emph{reward hacking}. A natural mitigation is to train an ensemble of reward models, aggregating over model outputs to obtain a more robust reward estimate. We explore the application of reward ensembles to alignment at both training time (through reinforcement learning) and inference time (through reranking). First, we show that reward models are \\emph{underspecified}: reward models that perform similarly in-distribution can yield very different rewards when used in alignment, due to distribution shift. Second, underspecification results in overoptimization, where alignment to one reward model does not improve reward as measured by another reward model trained on the same data. Third, overoptimization is mitigated by the use of reward ensembles, and ensembles that vary by their \\emph{pretraining} seeds lead to better generalization than ensembles that differ only by their \\emph{fine-tuning} seeds, with both outperforming individual reward models. However, even pretrain reward ensembles do not eliminate reward hacking: we show several qualitative reward hacking phenomena that are not mitigated by ensembling because all reward models in the ensemble exhibit similar error patterns."
+  },
+  {
+    "id": "2605.13537v1",
+    "title": "Temper and Tilt Lead to SLOP: Reward Hacking Mitigation with Inference-Time Alignment",
+    "authors": "Ye Wang, Jing Liu, Toshiaki Koike-Akino",
+    "published": "2026-05-13",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2605.13537v1",
+    "pdf_url": "https://arxiv.org/pdf/2605.13537v1",
+    "abstract": "Inference-time alignment techniques offer a lightweight alternative or complement to costly reinforcement learning, while enabling continual adaptation as alignment objectives and reward targets evolve. Existing theoretical analyses justify these methods as approximations to sampling from distributions optimally tilted toward a given reward model. We extend these techniques by introducing reference-model temperature adjustment, which leads to further generalization of inference-time alignment to ensembles of generative reward models combined as a sharpened logarithmic opinion pool (SLOP). To mitigate reward hacking, we propose an algorithm for calibrating SLOP weight parameters and experimentally demonstrate that it improves robustness while preserving alignment performance."
+  },
+  {
+    "id": "2510.01549v1",
+    "title": "MIRA: Towards Mitigating Reward Hacking in Inference-Time Alignment of T2I Diffusion Models",
+    "authors": "Kevin Zhai, Utsav Singh, Anirudh Thatipelli, Souradip Chakraborty, Anit Kumar Sahu, Furong Huang, Amrit Singh Bedi, Mubarak Shah",
+    "published": "2025-10-02",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2510.01549v1",
+    "pdf_url": "https://arxiv.org/pdf/2510.01549v1",
+    "abstract": "Diffusion models excel at generating images conditioned on text prompts, but the resulting images often do not satisfy user-specific criteria measured by scalar rewards such as Aesthetic Scores. This alignment typically requires fine-tuning, which is computationally demanding. Recently, inference-time alignment via noise optimization has emerged as an efficient alternative, modifying initial input noise to steer the diffusion denoising process towards generating high-reward images. However, this approach suffers from reward hacking, where the model produces images that score highly, yet deviate significantly from the original prompt. We show that noise-space regularization is insufficient and that preventing reward hacking requires an explicit image-space constraint. To this end, we propose MIRA (MItigating Reward hAcking), a training-free, inference-time alignment method. MIRA introduces an image-space, score-based KL surrogate that regularizes the sampling trajectory with a frozen backbone, constraining the output distribution so reward can increase without off-distribution drift (reward hacking). We derive a tractable approximation to KL using diffusion scores. Across SDv1.5 and SDXL, multiple rewards (Aesthetic, HPSv2, PickScore), and public datasets (e.g., Animal-Animal, HPDv2), MIRA achieves >60\\% win rate vs. strong baselines while preserving prompt adherence; mechanism plots show reward gains with near-zero drift, whereas DNO drifts as compute increases. We further introduce MIRA-DPO, mapping preference optimization to inference time with a frozen backbone, extending MIRA to non-differentiable rewards without fine-tuning."
+  },
+  {
+    "id": "2501.13011v2",
+    "title": "MONA: Myopic Optimization with Non-myopic Approval Can Mitigate Multi-step Reward Hacking",
+    "authors": "Sebastian Farquhar, Vikrant Varma, David Lindner, David Elson, Caleb Biddulph, Ian Goodfellow, Rohin Shah",
+    "published": "2025-01-22",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2501.13011v2",
+    "pdf_url": "https://arxiv.org/pdf/2501.13011v2",
+    "abstract": "Future advanced AI systems may learn sophisticated strategies through reinforcement learning (RL) that humans cannot understand well enough to safely evaluate. We propose a training method which avoids agents learning undesired multi-step plans that receive high reward (multi-step \"reward hacks\") even if humans are not able to detect that the behaviour is undesired. The method, Myopic Optimization with Non-myopic Approval (MONA), works by combining short-sighted optimization with far-sighted reward. We demonstrate that MONA can prevent multi-step reward hacking that ordinary RL causes, even without being able to detect the reward hacking and without any extra information that ordinary RL does not get access to. We study MONA empirically in three settings which model different misalignment failure modes including 2-step environments with LLMs representing delegated oversight and encoded reasoning and longer-horizon gridworld environments representing sensor tampering."
+  },
+  {
+    "id": "2511.17879v4",
+    "title": "Generative Adversarial Post-Training Mitigates Reward Hacking in Live Human-AI Music Interaction",
+    "authors": "Yusong Wu, Stephen Brade, Aleksandra Teng Ma, Tia-Jane Fowler, Enning Yang, Berker Banar, Aaron Courville, Natasha Jaques, Cheng-Zhi Anna Huang",
+    "published": "2025-11-22",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2511.17879v4",
+    "pdf_url": "https://arxiv.org/pdf/2511.17879v4",
+    "abstract": "Most applications of generative AI involve a sequential interaction in which a person inputs a prompt and waits for a response, and where reaction time and adaptivity are not important factors. In contrast, live jamming is a collaborative interaction that requires real-time coordination and adaptation without access to the other player's future moves, while preserving diversity to sustain a creative flow. Reinforcement learning post-training enables effective adaptation through on-policy interaction, yet it often reduces output diversity by exploiting coherence-based rewards. This collapse, known as ``reward hacking'', affects many RL post-training pipelines, but is especially harmful in live jamming, where musical creativity relies on dynamic variation and mutual responsiveness. In this paper, we propose a novel adversarial training method on policy-generated trajectories to mitigate reward hacking in RL post-training for melody-to-chord accompaniment. A co-evolving discriminator separates policy trajectories from the data distribution, while the policy maximizes the discriminator output in addition to coherence rewards to prevent collapse to trivial outputs. We evaluate accompaniment quality and output diversity in simulation with both fixed test melodies and learned melody agents, and we conduct a user study with the model deployed in a real-time interactive system with expert musicians. Quantitative evaluation and user feedback demonstrate improved output diversity, harmonic coherence, adaptation speed and user agency. Our results demonstrate a simple yet effective method to mitigate reward hacking in RL post-training of generative sequence models."
+  },
+  {
+    "id": "2508.17511v1",
+    "title": "School of Reward Hacks: Hacking harmless tasks generalizes to misaligned behavior in LLMs",
+    "authors": "Mia Taylor, James Chua, Jan Betley, Johannes Treutlein, Owain Evans",
+    "published": "2025-08-24",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2508.17511v1",
+    "pdf_url": "https://arxiv.org/pdf/2508.17511v1",
+    "abstract": "Reward hacking--where agents exploit flaws in imperfect reward functions rather than performing tasks as intended--poses risks for AI alignment. Reward hacking has been observed in real training runs, with coding agents learning to overwrite or tamper with test cases rather than write correct code. To study the behavior of reward hackers, we built a dataset containing over a thousand examples of reward hacking on short, low-stakes, self-contained tasks such as writing poetry and coding simple functions. We used supervised fine-tuning to train models (GPT-4.1, GPT-4.1-mini, Qwen3-32B, Qwen3-8B) to reward hack on these tasks. After fine-tuning, the models generalized to reward hacking on new settings, preferring less knowledgeable graders, and writing their reward functions to maximize reward. Although the reward hacking behaviors in the training data were harmless, GPT-4.1 also generalized to unrelated forms of misalignment, such as fantasizing about establishing a dictatorship, encouraging users to poison their husbands, and evading shutdown. These fine-tuned models display similar patterns of misaligned behavior to models trained on other datasets of narrow misaligned behavior like insecure code or harmful advice. Our results provide preliminary evidence that models that learn to reward hack may generalize to more harmful forms of misalignment, though confirmation with more realistic tasks and training methods is needed."
+  },
+  {
+    "id": "2509.22047v2",
+    "title": "MO-GRPO: Mitigating Reward Hacking of Group Relative Policy Optimization on Multi-Objective Problems",
+    "authors": "Yuki Ichihara, Yuu Jinnai, Tetsuro Morimura, Mitsuki Sakamoto, Ryota Mitsuhashi, Eiji Uchibe",
+    "published": "2025-09-26",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2509.22047v2",
+    "pdf_url": "https://arxiv.org/pdf/2509.22047v2",
+    "abstract": "Group Relative Policy Optimization (GRPO) has been shown to be an effective algorithm when an accurate reward model is available. However, such a highly reliable reward model is not available in many real-world tasks. In this paper, we particularly focus on multi-objective settings, in which we identify that GRPO is vulnerable to reward hacking, optimizing only one of the objectives at the cost of the others. To address this issue, we propose MO-GRPO, an extension of GRPO with a simple normalization method to reweight the reward functions automatically according to the variances of their values. We first show analytically that MO-GRPO ensures that all reward functions contribute evenly to the loss function while preserving the order of preferences, eliminating the need for manual tuning of the reward functions' scales. Then, we evaluate MO-GRPO experimentally in four domains: (i) the multi-armed bandits problem, (ii) simulated control task (Mo-Gymnasium), (iii) machine translation tasks on the WMT benchmark (En-Ja, En-Zh), and (iv) instruction following task. MO-GRPO achieves stable learning by evenly distributing correlations among the components of rewards, outperforming GRPO, showing MO-GRPO to be a promising algorithm for multi-objective reinforcement learning problems."
+  },
+  {
+    "id": "2602.19416v1",
+    "title": "IR$^3$: Contrastive Inverse Reinforcement Learning for Interpretable Detection and Mitigation of Reward Hacking",
+    "authors": "Mohammad Beigi, Ming Jin, Junshan Zhang, Jiaxin Zhang, Qifan Wang, Lifu Huang",
+    "published": "2026-02-23",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2602.19416v1",
+    "pdf_url": "https://arxiv.org/pdf/2602.19416v1",
+    "abstract": "Reinforcement Learning from Human Feedback (RLHF) enables powerful LLM alignment but can introduce reward hacking - models exploit spurious correlations in proxy rewards without genuine alignment. Compounding this, the objectives internalized during RLHF remain opaque, making hacking behaviors difficult to detect or correct. We introduce IR3 (Interpretable Reward Reconstruction and Rectification), a framework that reverse-engineers, interprets, and surgically repairs the implicit objectives driving RLHF-tuned models. We propose Contrastive Inverse Reinforcement Learning (C-IRL), which reconstructs the implicit reward function by contrasting paired responses from post-alignment and baseline policies to explain behavioral shifts during RLHF. We then decompose the reconstructed reward via sparse autoencoders into interpretable features, enabling identification of hacking signatures through contribution analysis. Finally, we propose mitigation strategies - clean reward optimization, adversarial shaping, constrained optimization, and feature-guided distillation - that target problematic features while preserving beneficial alignment. Experiments across multiple reward model configurations show that IR3 achieves 0.89 correlation with ground-truth rewards, identifies hacking features with over 90% precision, and significantly reduces hacking behaviors while maintaining capabilities within 3% of the original model."
+  },
+  {
+    "id": "2604.10585v1",
+    "title": "Calibration Collapse Under Sycophancy Fine-Tuning: How Reward Hacking Breaks Uncertainty Quantification in LLMs",
+    "authors": "Subramanyam Sahoo",
+    "published": "2026-04-12",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2604.10585v1",
+    "pdf_url": "https://arxiv.org/pdf/2604.10585v1",
+    "abstract": "Modern large language models (LLMs) are increasingly fine-tuned via reinforcement learning from human feedback (RLHF) or related reward optimisation schemes. While such procedures improve perceived helpfulness, we investigate whether sycophantic reward signals degrade calibration -- a property essential for reliable uncertainty quantification. We fine-tune Qwen3-8B under three regimes: no fine-tuning (base), neutral supervised fine-tuning (SFT) on TriviaQA, and sycophancy-inducing Group Relative Policy Optimisation (GRPO) that rewards agreement with planted wrong answers. Evaluating on $1{,}000$ MMLU items across five subject domains with bootstrap confidence intervals and permutation testing, we find that \\textbf{sycophantic GRPO produces consistent directional calibration degradation} -- ECE rises by $+0.006$ relative to the base model and MCE increases by $+0.010$ relative to neutral SFT -- though the effect does not reach statistical significance ($p = 0.41$) at this training budget. Post-hoc matrix scaling applied to all three models reduces ECE by $40$--$64\\%$ and improves accuracy by $1.5$--$3.0$ percentage points. However, the sycophantic model retains the highest post-scaling ECE relative to the neutral SFT control ($0.042$ vs.\\ $0.037$), suggesting that reward-induced miscalibration leaves a structured residual even after affine correction. These findings establish a methodology for evaluating the calibration impact of reward hacking and motivate calibration-aware training objectives."
+  },
+  {
+    "id": "2412.09544v1",
+    "title": "Sail into the Headwind: Alignment via Robust Rewards and Dynamic Labels against Reward Hacking",
+    "authors": "Paria Rashidinejad, Yuandong Tian",
+    "published": "2024-12-12",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2412.09544v1",
+    "pdf_url": "https://arxiv.org/pdf/2412.09544v1",
+    "abstract": "Aligning AI systems with human preferences typically suffers from the infamous reward hacking problem, where optimization of an imperfect reward model leads to undesired behaviors. In this paper, we investigate reward hacking in offline preference optimization, which aims to improve an initial model using a preference dataset. We identify two types of reward hacking stemming from statistical fluctuations in the dataset: Type I Reward Hacking due to subpar choices appearing more favorable, and Type II Reward Hacking due to decent choices appearing less favorable. We prove that many (mainstream or theoretical) preference optimization methods suffer from both types of reward hacking. To mitigate Type I Reward Hacking, we propose POWER, a new preference optimization method that combines Guiasu's weighted entropy with a robust reward maximization objective. POWER enjoys finite-sample guarantees under general function approximation, competing with the best covered policy in the data. To mitigate Type II Reward Hacking, we analyze the learning dynamics of preference optimization and develop a novel technique that dynamically updates preference labels toward certain \"stationary labels\", resulting in diminishing gradients for untrustworthy samples. Empirically, POWER with dynamic labels (POWER-DL) consistently outperforms state-of-the-art methods on alignment benchmarks, achieving improvements of up to 13.0 points on AlpacaEval 2.0 and 11.5 points on Arena-Hard over DPO, while also improving or maintaining performance on downstream tasks such as mathematical reasoning. Strong theoretical guarantees and empirical results demonstrate the promise of POWER-DL in mitigating reward hacking."
+  },
+  {
+    "id": "2512.22170v3",
+    "title": "SoliReward: Mitigating Susceptibility to Reward Hacking and Annotation Noise in Video Generation Reward Models",
+    "authors": "Jiesong Lian, Ruizhe Zhong, Zixiang Zhou, Xiaoyue Mi, Long Hu, Yuan Zhou, Qinglin Lu, Yixue Hao, Junchi Yan",
+    "published": "2025-12-17",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2512.22170v3",
+    "pdf_url": "https://arxiv.org/pdf/2512.22170v3",
+    "abstract": "Post-training alignment of video generation models with human preferences is a critical goal. Developing effective Reward Models (RMs) for this process faces significant methodological hurdles. Current data collection paradigms, reliant on in-prompt pairwise annotations, suffer from labeling noise. Concurrently, the architectural design of VLM-based RMs, particularly their output mechanisms, remains underexplored. Furthermore, RM is susceptible to reward hacking in post-training. To mitigate these limitations, we propose SoliReward, a systematic framework for video RM training. Our framework first sources high-quality, cost-efficient data via single-item binary annotations, then constructs preference pairs using a cross-prompt pairing strategy. Architecturally, we employ a Hierarchical Progressive Query Attention mechanism to enhance feature aggregation. Finally, we introduce a modified BT loss that explicitly accommodates win-tie scenarios. This approach regularizes the RM's score distribution for positive samples, providing more nuanced preference signals to alleviate over-focus on a small number of top-scoring samples. Our approach is validated on benchmarks evaluating physical plausibility, subject deformity, and semantic alignment, demonstrating improvements in direct RM evaluation metrics and in the efficacy of post-training on video generation models. Code and benchmark are available at https://github.com/lian700/SoliReward."
+  },
+  {
+    "id": "2602.18037v1",
+    "title": "Gradient Regularization Prevents Reward Hacking in Reinforcement Learning from Human Feedback and Verifiable Rewards",
+    "authors": "Johannes Ackermann, Michael Noukhovitch, Takashi Ishida, Masashi Sugiyama",
+    "published": "2026-02-20",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2602.18037v1",
+    "pdf_url": "https://arxiv.org/pdf/2602.18037v1",
+    "abstract": "Reinforcement Learning from Human Feedback (RLHF) or Verifiable Rewards (RLVR) are two key steps in the post-training of modern Language Models (LMs). A common problem is reward hacking, where the policy may exploit inaccuracies of the reward and learn an unintended behavior. Most previous works address this by limiting the policy update with a Kullback-Leibler (KL) penalty towards a reference model. We propose a different framing: Train the LM in a way that biases policy updates towards regions in which the reward is more accurate. First, we derive a theoretical connection between the accuracy of a reward model and the flatness of an optimum at convergence. Gradient regularization (GR) can then be used to bias training to flatter regions and thereby maintain reward model accuracy. We confirm these results by showing that the gradient norm and reward accuracy are empirically correlated in RLHF. We then show that Reference Resets of the KL penalty implicitly use GR to find flatter regions with higher reward accuracy. We further improve on this by proposing to use explicit GR with an efficient finite-difference estimate. Empirically, GR performs better than a KL penalty across a diverse set of RL experiments with LMs. GR achieves a higher GPT-judged win-rate in RLHF, avoids overly focusing on the format in rule-based math rewards, and prevents hacking the judge in LLM-as-a-Judge math tasks."
+  },
+  {
+    "id": "2606.06227v1",
+    "title": "Drag reduction or reward hacking? Recurrent multi-agent reinforcement learning that earns its reward",
+    "authors": "Giorgio Maria Cavallazzi, Miguel P\u00e9rez-Cuadrado, Alfredo Pinelli",
+    "published": "2026-06-04",
+    "category": "physics.flu-dyn",
+    "arxiv_url": "http://arxiv.org/abs/2606.06227v1",
+    "pdf_url": "https://arxiv.org/pdf/2606.06227v1",
+    "abstract": "A reinforcement-learning agent maximises its reward, which can diverge from the outcome its designer intended. In physical control the reward rarely closes that gap, and drag reduction in wall turbulence makes it concrete. A mass-conservation projection couples agents' outputs and erases the per-agent credit the policy gradient needs; a memoryless policy cannot resolve the slow near-wall cycle it acts on; and a pressure-gradient reward pays for nominal drag reduction by pumping power through the wall. Two degenerate controllers achieve large drag reductions while total dissipation rises, so the reported figure can mask a more wasteful flow. We trace each fault to its cause and fix it: a differentiable projection that restores credit, a recurrent policy with a widened sensing stencil, and a reward scored on the true wall power. The corrected controller acts on the flow within a closed energy budget, earning a conservative $17\\%$ under honest accounting."
+  },
+  {
+    "id": "2606.09711v1",
+    "title": "Proxy Reward Internalization and Mechanistic Exploitation: A Learned Precursor to Reward Hacking and Its Generalization",
+    "authors": "Mohammad Beigi, Ming Jin, Lifu Huang",
+    "published": "2026-06-08",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2606.09711v1",
+    "pdf_url": "https://arxiv.org/pdf/2606.09711v1",
+    "abstract": "Reward hacking is usually studied after it becomes visible, once a model earns high proxy reward while failing the intended task. We instead study what proxy RL teaches before that failure appears. We introduce Proxy Reward Internalization and Mechanistic Exploitation (PRIME), a learned capability to assess task correctness, predict proxy acceptance, and reason about exploitable proxy--gold gaps. In coding RL environments with exploitable pytest rewards, we measure PRIME through chain-of-thought monitoring, direct probes, and activation-level concept vectors. We find that PRIME emerges in a staged sequence before sustained reward hacking, and that its current direct-probe score forecasts later hack onset and severity even when the visible hack rate is still low. PRIME also adapts when the evaluator changes, retargeting to whichever proxy--gold gap remains rewarded and persisting when gold reward suppresses overt hacking, and ablating its activation directions reduces hacking. Across checkpoints, in-domain PRIME tracks out-of-domain misalignment. Together these results suggest that exploitable proxy RL amplifies a proxy-internalization capability upstream of visible hacking, making PRIME a candidate early-warning signal for broader alignment risk."
+  },
+  {
+    "id": "2603.29993v1",
+    "title": "Extending MONA in Camera Dropbox: Reproduction, Learned Approval, and Design Implications for Reward-Hacking Mitigation",
+    "authors": "Nathan Heath",
+    "published": "2026-03-31",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2603.29993v1",
+    "pdf_url": "https://arxiv.org/pdf/2603.29993v1",
+    "abstract": "Myopic Optimization with Non-myopic Approval (MONA) mitigates multi-step reward hacking by restricting the agent's planning horizon while supplying far-sighted approval as a training signal~\\cite{farquhar2025mona}. The original paper identifies a critical open question: how the method of constructing approval -- particularly the degree to which approval depends on achieved outcomes -- affects whether MONA's safety guarantees hold. We present a reproduction-first extension of the public MONA Camera Dropbox environment that (i)~repackages the released codebase as a standard Python project with scripted PPO training, (ii)~confirms the published contrast between ordinary RL (91.5\\% reward-hacking rate) and oracle MONA (0.0\\% hacking rate) using the released reference arrays, and (iii)~introduces a modular learned-approval suite spanning oracle, noisy, misspecified, learned, and calibrated approval mechanisms. In reduced-budget pilot sweeps across approval methods, horizons, dataset sizes, and calibration strategies, the best calibrated learned-overseer run achieves zero observed reward hacking but substantially lower intended-behavior rates than oracle MONA (11.9\\% vs.\\ 99.9\\%), consistent with under-optimization rather than re-emergent hacking. These results operationalize the MONA paper's approval-spectrum conjecture as a runnable experimental object and suggest that the central engineering challenge shifts from proving MONA's concept to building learned approval models that preserve sufficient foresight without reopening reward-hacking channels. Code, configurations, and reproduction commands are publicly available. https://github.com/codernate92/mona-camera-dropbox-repro"
+  },
+  {
+    "id": "2410.06491v1",
+    "title": "Honesty to Subterfuge: In-Context Reinforcement Learning Can Make Honest Models Reward Hack",
+    "authors": "Leo McKee-Reid, Christoph Str\u00e4ter, Maria Angelica Martinez, Joe Needham, Mikita Balesni",
+    "published": "2024-10-09",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2410.06491v1",
+    "pdf_url": "https://arxiv.org/pdf/2410.06491v1",
+    "abstract": "Previous work has shown that training \"helpful-only\" LLMs with reinforcement learning on a curriculum of gameable environments can lead models to generalize to egregious specification gaming, such as editing their own reward function or modifying task checklists to appear more successful. We show that gpt-4o, gpt-4o-mini, o1-preview, and o1-mini - frontier models trained to be helpful, harmless, and honest - can engage in specification gaming without training on a curriculum of tasks, purely from in-context iterative reflection (which we call in-context reinforcement learning, \"ICRL\"). We also show that using ICRL to generate highly-rewarded outputs for expert iteration (compared to the standard expert iteration reinforcement learning algorithm) may increase gpt-4o-mini's propensity to learn specification-gaming policies, generalizing (in very rare cases) to the most egregious strategy where gpt-4o-mini edits its own reward function. Our results point toward the strong ability of in-context reflection to discover rare specification-gaming strategies that models might not exhibit zero-shot or with normal training, highlighting the need for caution when relying on alignment of LLMs in zero-shot settings."
+  },
+  {
+    "id": "2604.04237v1",
+    "title": "Pedagogical Safety in Educational Reinforcement Learning: Formalizing and Detecting Reward Hacking in AI Tutoring Systems",
+    "authors": "Oluseyi Olukola, Nick Rahimi",
+    "published": "2026-04-05",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2604.04237v1",
+    "pdf_url": "https://arxiv.org/pdf/2604.04237v1",
+    "abstract": "Reinforcement learning (RL) is increasingly used to personalize instruction in intelligent tutoring systems, yet the field lacks a formal framework for defining and evaluating pedagogical safety. We introduce a four-layer model of pedagogical safety for educational RL comprising structural, progress, behavioral, and alignment safety and propose the Reward Hacking Severity Index (RHSI) to quantify misalignment between proxy rewards and genuine learning.\n  We evaluate the framework in a controlled simulation of an AI tutoring environment with 120 sessions across four conditions and three learner profiles, totaling 18{,}000 interactions. Results show that an engagement-optimized agent systematically over-selected a high-engagement action with no direct mastery gain, producing strong measured performance but limited learning progress. A multi-objective reward formulation reduced this problem but did not eliminate it, as the agent continued to favor proxy-rewarding behavior in many states. In contrast, a constrained architecture combining prerequisite enforcement and minimum cognitive demand substantially reduced reward hacking, lowering RHSI from 0.317 in the unconstrained multi-objective condition to 0.102. Ablation results further suggest that behavioral safety was the most influential safeguard against repetitive low-value action selection.\n  These findings suggest that reward design alone may be insufficient to ensure pedagogically aligned behavior in educational RL, at least in the simulated environment studied here. More broadly, the paper positions pedagogical safety as an important research problem at the intersection of AI safety and intelligent educational systems."
+  },
+  {
+    "id": "2511.17869v1",
+    "title": "The Horcrux: Mechanistically Interpretable Task Decomposition for Detecting and Mitigating Reward Hacking in Embodied AI Systems",
+    "authors": "Subramanyam Sahoo, Jared Junkin",
+    "published": "2025-11-22",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2511.17869v1",
+    "pdf_url": "https://arxiv.org/pdf/2511.17869v1",
+    "abstract": "Embodied AI agents exploit reward signal flaws through reward hacking, achieving high proxy scores while failing true objectives. We introduce Mechanistically Interpretable Task Decomposition (MITD), a hierarchical transformer architecture with Planner, Coordinator, and Executor modules that detects and mitigates reward hacking. MITD decomposes tasks into interpretable subtasks while generating diagnostic visualizations including Attention Waterfall Diagrams and Neural Pathway Flow Charts. Experiments on 1,000 HH-RLHF samples reveal that decomposition depths of 12 to 25 steps reduce reward hacking frequency by 34 percent across four failure modes. We present new paradigms showing that mechanistically grounded decomposition offers a more effective way to detect reward hacking than post-hoc behavioral monitoring."
+  },
+  {
+    "id": "2601.04805v2",
+    "title": "Thinking-Based Non-Thinking: Solving the Reward Hacking Problem in Training Hybrid Reasoning Models via Reinforcement Learning",
+    "authors": "Siyuan Gan, Jiaheng Liu, Boyan Wang, Tianpei Yang, Runqing Miao, Yuyao Zhang, Fanyu Meng, Junlan Feng, Linjian Meng, Jing Huo, Yang Gao",
+    "published": "2026-01-08",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2601.04805v2",
+    "pdf_url": "https://arxiv.org/pdf/2601.04805v2",
+    "abstract": "Large reasoning models (LRMs) have attracted much attention due to their exceptional performance. However, their performance mainly stems from thinking, a long Chain of Thought (CoT), which significantly increase computational overhead. To address this overthinking problem, existing work focuses on using reinforcement learning (RL) to train hybrid reasoning models that automatically decide whether to engage in thinking or not based on the complexity of the query. Unfortunately, using RL will suffer the the reward hacking problem, e.g., the model engages in thinking but is judged as not doing so, resulting in incorrect rewards. To mitigate this problem, existing works either employ supervised fine-tuning (SFT), which incurs high computational costs, or enforce uniform token limits on non-thinking responses, which yields limited mitigation of the problem. In this paper, we propose Thinking-Based Non-Thinking (TNT). It does not employ SFT, and sets different maximum token usage for responses not using thinking across various queries by leveraging information from the solution component of the responses using thinking. Experiments on five mathematical benchmarks demonstrate that TNT reduces token usage by around 50% compared to DeepSeek-R1-Distill-Qwen-1.5B/7B and DeepScaleR-1.5B, while significantly improving accuracy. In fact, TNT achieves the optimal trade-off between accuracy and efficiency among all tested methods. Additionally, the probability of reward hacking problem in TNT's responses, which are classified as not using thinking, remains below 10% across all tested datasets."
+  },
+  {
+    "id": "2606.06223v1",
+    "title": "From Reward-Hack Activations to Agentic Risk States: Context-Calibrated Mechanistic Monitoring in LLM Agents",
+    "authors": "Patrick Wilhelm, Odej Kao",
+    "published": "2026-06-04",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2606.06223v1",
+    "pdf_url": "https://arxiv.org/pdf/2606.06223v1",
+    "abstract": "Language-model agents act through repeated cycles of observation, reasoning, and action selection, making safety monitoring depend on both internal model state and environment context. We study reward-hacking monitors in ReAct-style agents acting in Gameable ALFWorld and WebShop. Agents are instrumented with activation-based reward-hack scores, token-level entropy, and decision-context features. We find that adapters fine-tuned on \\textit{School-of-Reward-Hacks} dataset can transfer reward-hack tendencies into agentic action selection, especially when the environment exposes proxy-reward affordances. However, mitigating such behavior cannot rely on activation dynamics alone. High reward-hack activation identifies a latent policy state, but does not necessarily imply an immediate exploit action. Across next-step prediction tasks, entropy and context-calibrated internal features improve risk estimation over reward-hack activation alone. Activation-direction steering further reduces proxy-exploit behavior in selected mixed-adapter regimes. Overall, our results support context-calibrated internal monitoring for agents: reward-hack activation identifies a latent policy state, while entropy and decision context help determine when that state becomes risky action."
+  },
+  {
+    "id": "2604.23488v1",
+    "title": "Do Synthetic Trajectories Reflect Real Reward Hacking? A Systematic Study on Monitoring In-the-Wild Hacking in Code Generation",
+    "authors": "Lichen Li, Hengguang Zhou, Yijun Liang, Tianyi Zhou, Cho-Jui Hsieh",
+    "published": "2026-04-26",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2604.23488v1",
+    "pdf_url": "https://arxiv.org/pdf/2604.23488v1",
+    "abstract": "Reward hacking in code generation, where models exploit evaluation loopholes to obtain full reward without correctly solving the tasks, poses a critical challenge for Reinforcement Learning (RL) and the deployment of reasoning models. Existing studies have been conducted primarily on synthetic hacking trajectories. However, whether these synthetic behaviors faithfully represent naturally emerging hacking in the wild remains unclear. In this work, we present a systematic analysis of the synthetic vs. in-the-wild discrepancy in reward hacking. We examine to what extent hacking behaviors induced by prompting resemble those emerging during RL training, and whether monitors trained on synthetic trajectories generalize to naturally arising but previously unseen hacking. To scale up the curation of in-the-wild reward hacking trajectories, we modified Group Relative Policy Optimization (GRPO) by injecting conflicting unit tests as tracers and applying a \"resampling-until-hack\" mechanism. Through controlled comparisons between monitors trained on synthetic versus in-the-wild data, we find that (1) synthetic-data-trained monitors fail to generalize to \"in-the-wild\" hacking, and (2) monitors trained on our \"in-the-wild\" trajectories demonstrate stronger generalizability to unseen hacking types. Our results indicate that synthetic reward hacking data may not fully reflect natural reward hacking behaviors, and that relying solely on synthetic data can lead to misleading conclusions. The codebase is available at https://github.com/LichenLillc/CoTMonitoring.git"
+  },
+  {
+    "id": "2605.25988v1",
+    "title": "What Makes a Medical Checker Trainable? Diagnosing Signal Collapse and Reward Hacking in Checker-Guided RAG for Biomedical QA",
+    "authors": "Yuelyu Ji, Min Gu Kwak, Hang Zhang, Xizhi Wu, Chenyu Li, Yanshan Wan",
+    "published": "2026-05-25",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2605.25988v1",
+    "pdf_url": "https://arxiv.org/pdf/2605.25988v1",
+    "abstract": "Medical RAG needs evidence-grounded claims, so plugging a claim-level NLI checker into retrieval-augmented RL is intuitive. \\textbf{We find that the checker's \\emph{output distribution} during training, not its held-out accuracy, decides whether it provides trainable gradient.} We compare four NLI checker back-ends as process rewards inside a GRPO-trained medical RAG agent (Qwen2.5-7B, replicated on Qwen3-4B and Llama-3.1-8B) across four held-out medical QA benchmarks. Three diagnostic findings emerge. \\textbf{(i)} Signal collapse is log-prob-specific: LLM log-probability scoring labels over 97\\% of claims neutral -- collapsing the RL gradient to zero -- while a calibrated MedNLI classifier scores the same pairs non-degenerately. \\textbf{(ii)} Moderate signal beats strong signal on answer quality: a strong proprietary checker triggers a three-step reward-hacking cascade -- ultra-short answers, search avoidance, language collapse -- so a moderate-signal local classifier trains a higher-quality model (\\textbf{+12\\% BERTScore over zero-shot, no GPT dependency}). \\textbf{(iii)} Signal strength is policy-dependent: the same checker registers as moderate on one policy but strong on another without triggering the cascade end-state. We frame these as boundary conditions for verifier-as-reward systems."
+  }
+]

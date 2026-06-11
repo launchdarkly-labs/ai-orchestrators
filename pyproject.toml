@@ -1,0 +1,39 @@
+[project]
+name = "ai-orchestrators"
+version = "0.1.0"
+description = "One agent graph, N orchestrators — a LaunchDarkly experiment to pick the winning orchestration framework (DEVREL-741)."
+requires-python = ">=3.11"
+dependencies = [
+    # LaunchDarkly — agent-graph SDK + per-framework companion packages
+    "launchdarkly-server-sdk>=9.0.0",
+    "launchdarkly-server-sdk-ai>=1.0.1",
+    "launchdarkly-server-sdk-ai-langchain>=0.8.0",
+    "launchdarkly-server-sdk-ai-openai>=0.7.0",
+    # The four orchestration frameworks (the experiment variants)
+    "langgraph>=1.0.0",
+    "langchain>=1.0.0",
+    "langchain-anthropic>=1.0.0",
+    "strands-agents>=1.0.0",
+    "openai-agents>=0.17.0",
+    "google-adk>=2.0.0",
+    "google-genai>=1.0.0",
+    # Runs the pinned Claude model through the OpenAI Agents + Google ADK runners
+    "litellm>=1.80.0",
+    # Providers
+    "anthropic>=0.40.0",
+    "openai>=1.0.0",
+    "boto3>=1.28.0",
+    "botocore>=1.31.0",
+    # Utilities
+    "requests>=2.31.0",
+    "python-dotenv>=1.0.0",
+    "PyYAML>=6.0",
+    "arxiv>=2.0.0",
+    "pypdf>=4.0",      # fetch_paper tool (full-text retrieval)
+    "PyPDF2>=3.0",     # scripts/download_papers.py
+]
+
+# This is an application (runners + scripts), not an installable library, so uv
+# should manage the environment without trying to build the project itself.
+[tool.uv]
+package = false

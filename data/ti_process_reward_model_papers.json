@@ -1,0 +1,732 @@
+[
+  {
+    "id": "2412.11006v2",
+    "title": "Entropy-Regularized Process Reward Model",
+    "authors": "Hanning Zhang, Pengcheng Wang, Shizhe Diao, Yong Lin, Rui Pan, Hanze Dong, Dylan Zhang, Pavlo Molchanov, Tong Zhang",
+    "published": "2024-12-15",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2412.11006v2",
+    "pdf_url": "https://arxiv.org/pdf/2412.11006v2",
+    "abstract": "Large language models (LLMs) have shown promise in performing complex multi-step reasoning, yet they continue to struggle with mathematical reasoning, often making systematic errors. A promising solution is reinforcement learning (RL) guided by reward models, particularly those focusing on process rewards, which score each intermediate step rather than solely evaluating the final outcome. This approach is more effective at guiding policy models towards correct reasoning trajectories. In this work, we propose an entropy-regularized process reward model (ER-PRM) that integrates KL-regularized Markov Decision Processes (MDP) to balance policy optimization with the need to prevent the policy from shifting too far from its initial distribution. We derive a novel reward construction method based on the theoretical results. Our theoretical analysis shows that we could derive the optimal reward model from the initial policy sampling. Our empirical experiments on the MATH and GSM8K benchmarks demonstrate that ER-PRM consistently outperforms existing process reward models, achieving 1% improvement on GSM8K and 2-3% improvement on MATH under best-of-N evaluation, and more than 1% improvement under RLHF. These results highlight the efficacy of entropy-regularization in enhancing LLMs' reasoning capabilities."
+  },
+  {
+    "id": "2508.01682v2",
+    "title": "The Bidirectional Process Reward Model",
+    "authors": "Lingyin Zhang, Jun Gao, Xiaoxue Ren, Ziqiang Cao",
+    "published": "2025-08-03",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2508.01682v2",
+    "pdf_url": "https://arxiv.org/pdf/2508.01682v2",
+    "abstract": "Process Reward Models (PRMs), which assign fine-grained scores to intermediate reasoning steps within a solution trajectory, have emerged as a promising approach to enhance the reasoning quality of Large Language Models (LLMs). However, most existing PRMs rely on a unidirectional left-to-right (L2R) evaluation scheme, which restricts their utilization of global context. In light of this challenge, we propose a novel bidirectional evaluation paradigm, named Bidirectional Process Reward Model (BiPRM). BiPRM incorporates a parallel right-to-left (R2L) evaluation stream, implemented via prompt reversal, alongside the conventional L2R flow. Then a gating mechanism is introduced to adaptively fuse the reward scores from both streams to yield a holistic quality assessment. Remarkably, compared to the original PRM, BiPRM introduces only a 0.3% parameter increase for the gating module, and the parallel execution of two streams incurs merely 5% inference time latency. Our extensive empirical evaluations spanning diverse benchmarks, LLM backbones, PRM objectives and sampling policies demonstrate that BiPRM consistently surpasses unidirectional baselines, achieving an average relative gain of 10.6% over 54 solution-level configurations and 37.7% in 12 step-level error detection scenarios. Generally, our results highlight the effectiveness, robustness and general applicability of BiPRM, offering a promising new direction for process-based reward modeling."
+  },
+  {
+    "id": "2509.21154v4",
+    "title": "GRPO is Secretly a Process Reward Model",
+    "authors": "Michael Sullivan, Alexander Koller",
+    "published": "2025-09-25",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2509.21154v4",
+    "pdf_url": "https://arxiv.org/pdf/2509.21154v4",
+    "abstract": "Process reward models (PRMs) allow for fine-grained credit assignment in reinforcement learning (RL), and seemingly contrast with outcome reward models (ORMs), which assign a single reward to an entire trajectory. However, we provide theoretical proof in this work that the Group Relative Policy Optimization (GRPO) RL algorithm equipped with an ORM is in fact equivalent to a PRM-aware RL objective equipped with a non-trivial, Monte-Carlo-based PRM (given mild assumptions). Leveraging the framework of GRPO-as-a-PRM, we identify a flaw in the GRPO objective that interacts with imbalanced process steps and rewards to hinder both exploration and exploitation (under different conditions). We propose a simple modification to the algorithm to mitigate this defect ($\u03bb$-GRPO), and show that LLMs tuned with $\u03bb$-GRPO outperform LLMs tuned with standard GRPO on downstream reasoning tasks\\textemdash and reach peak performance more rapidly. These results show that we can leverage the hidden, built-in PRM structure within the vanilla GRPO algorithm to boost model performance without employing an explicit PRM, and with a negligible impact on training time and cost."
+  },
+  {
+    "id": "2410.11287v2",
+    "title": "Process Reward Model with Q-Value Rankings",
+    "authors": "Wendi Li, Yixuan Li",
+    "published": "2024-10-15",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2410.11287v2",
+    "pdf_url": "https://arxiv.org/pdf/2410.11287v2",
+    "abstract": "Process Reward Modeling (PRM) is critical for complex reasoning and decision-making tasks where the accuracy of intermediate steps significantly influences the overall outcome. Existing PRM approaches, primarily framed as classification problems, employ cross-entropy loss to independently evaluate each step's correctness. This method can lead to suboptimal reward distribution and does not adequately address the interdependencies among steps. To address these limitations, we introduce the Process Q-value Model (PQM), a novel framework that redefines PRM in the context of a Markov Decision Process. PQM optimizes Q-value rankings based on a novel comparative loss function, enhancing the model's ability to capture the intricate dynamics among sequential decisions. This approach provides a more granular and theoretically grounded methodology for process rewards. Our extensive empirical evaluations across various sampling policies, language model backbones, and multi-step reasoning benchmarks show that PQM outperforms classification-based PRMs. The effectiveness of the comparative loss function is highlighted in our comprehensive ablation studies, confirming PQM's practical efficacy and theoretical advantage."
+  },
+  {
+    "id": "2510.24803v2",
+    "title": "MASPRM: Multi-Agent System Process Reward Model",
+    "authors": "Milad Yazdani, Mahdi Mostajabdaveh, Zirui Zhou, Ying Xiong",
+    "published": "2025-10-28",
+    "category": "cs.MA",
+    "arxiv_url": "http://arxiv.org/abs/2510.24803v2",
+    "pdf_url": "https://arxiv.org/pdf/2510.24803v2",
+    "abstract": "Practical deployment of multi-agent systems (MAS) demands strong performance at test time, motivating methods that guide search during inference and selectively spend compute to improve quality. We present the Multi-Agent System Process Reward Model (MASPRM). It assigns values to partial inter-agent transcripts for each action and each agent, and acts as a controller during inference. MASPRM is trained from multi-agent Monte Carlo Tree Search (MCTS) rollouts labeled only with terminal outcome rewards, without requiring human step-level annotations, by propagating returns to local targets. During inference, MASPRM guides step-level beam search (SBS) and MCTS, focusing computation on promising branches and pruning unpromising ones. We train and test MASPRM across different tasks and domains, using GSM8K, MATH, MMLU, and LogiQA as benchmarks. Averaged across these benchmarks, MASPRM improves Hit@1 over policy likelihood by up to $+13.4$ points and improves ranking quality, reducing Hit@1$->$Hit@5 gaps by up to $10.3$ points. MASPRM complements inference-time search by scoring intermediate routed transcripts to guide rollouts in MAS with fixed schedules. Code: https://github.com/milad1378yz/MASPRM"
+  },
+  {
+    "id": "2605.10158v1",
+    "title": "Unsupervised Process Reward Models",
+    "authors": "Artyom Gadetsky, Maxim Kodryan, Siba Smarak Panigrahi, Hang Guo, Maria Brbic",
+    "published": "2026-05-11",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2605.10158v1",
+    "pdf_url": "https://arxiv.org/pdf/2605.10158v1",
+    "abstract": "Process Reward Models (PRMs) are a powerful mechanism for steering large language model reasoning by providing fine-grained, step-level supervision. However, this effectiveness comes at a significant cost: PRMs require expert annotations for every reasoning step, making them costly and difficult to scale. Here, we propose a method for training unsupervised PRMs (uPRM) that requires no human supervision, neither at the level of step-by-step annotations nor through ground-truth verification of final answers. The key idea behind our approach is to define a scoring function, derived from LLM next-token probabilities, that jointly assesses candidate positions of first erroneous steps across a batch of reasoning trajectories. We demonstrate the effectiveness of uPRM across diverse scenarios: (i) uPRM achieves up to 15% absolute accuracy improvements over the LLM-as-a-Judge in identifying first erroneous steps on the ProcessBench dataset; (ii) as a verifier for test-time scaling, uPRM performs comparably to supervised PRMs and outperforms the majority voting baseline by up to 6.9%, and (iii) when used as a reward signal in reinforcement learning, uPRM enables more robust policy optimization throughout training compared to a supervised PRM trained using ground-truth labels. Overall, our results open a path toward scalable reward modeling for complex reasoning tasks."
+  },
+  {
+    "id": "2602.10418v1",
+    "title": "SecCodePRM: A Process Reward Model for Code Security",
+    "authors": "Weichen Yu, Ravi Mangal, Yinyi Luo, Kai Hu, Jingxuan He, Corina S. Pasareanu, Matt Fredrikson",
+    "published": "2026-02-11",
+    "category": "cs.CR",
+    "arxiv_url": "http://arxiv.org/abs/2602.10418v1",
+    "pdf_url": "https://arxiv.org/pdf/2602.10418v1",
+    "abstract": "Large Language Models are rapidly becoming core components of modern software development workflows, yet ensuring code security remains challenging. Existing vulnerability detection pipelines either rely on static analyzers or use LLM/GNN-based detectors trained with coarse program-level supervision. Both families often require complete context, provide sparse end-of-completion feedback, and can degrade as code length grows, making them ill-suited for real-time, prefix-level assessment during interactive coding and streaming generation. We propose SecCodePRM, a security-oriented process reward model that assigns a context-aware, step-level security score along a code trajectory. To train the model, we derive step-level supervision labels from static analyzers and expert annotations, allowing the model to attend more precisely to fine-grained regions associated with inter-procedural vulnerabilities. SecCodePRM has three applications: full-code vulnerability detection (VD), partial-code VD, and secure code generation (CG). For VD, SecCodePRM uses risk-sensitive aggregation that emphasizes high-risk steps; for CG, SecCodePRM supports inference-time scaling by ranking candidate continuations and favoring higher cumulative reward. This design yields dense, real-time feedback that scales to long-horizon generation. Empirically, SecCodePRM outperforms prior approaches in all three settings, while preserving code functional correctness, suggesting improved security without a safety-utility tradeoff."
+  },
+  {
+    "id": "2501.04686v6",
+    "title": "Unlocking Multimodal Mathematical Reasoning via Process Reward Model",
+    "authors": "Ruilin Luo, Zhuofan Zheng, Yifan Wang, Xinzhe Ni, Zicheng Lin, Songtao Jiang, Yiyao Yu, Chufan Shi, Lei Wang, Ruihang Chu, Jin Zeng, Yujiu Yang",
+    "published": "2025-01-08",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2501.04686v6",
+    "pdf_url": "https://arxiv.org/pdf/2501.04686v6",
+    "abstract": "Process Reward Models (PRMs) have shown promise in enhancing the mathematical reasoning capabilities of Large Language Models (LLMs) through Test-Time Scaling (TTS). However, their integration into multimodal reasoning remains largely unexplored. In this work, we take the first step toward unlocking the potential of PRMs in multimodal mathematical reasoning. We identify three key challenges: (1) the scarcity of high-quality reasoning data constrains the capabilities of foundation Multimodal Large Language Models (MLLMs), which imposes further limitations on the upper bounds of TTS and reinforcement learning (RL); (2) a lack of automated methods for process labeling within multimodal contexts persists; (3) the employment of process rewards in unimodal RL faces issues like reward hacking, which may extend to multimodal scenarios. To address these issues, we introduce URSA, a three-stage Unfolding multimodal Process-Supervision Aided training framework. We first construct MMathCoT-1M, a high-quality large-scale multimodal Chain-of-Thought (CoT) reasoning dataset, to build a stronger math reasoning foundation MLLM, URSA-8B. Subsequently, we go through an automatic process to synthesize process supervision data, which emphasizes both logical correctness and perceptual consistency. We introduce DualMath-1.1M to facilitate the training of URSA-8B-RM. Finally, we propose Process-Supervised Group-Relative-Policy-Optimization (PS-GRPO), pioneering a multimodal PRM-aided online RL method that outperforms vanilla GRPO. With PS-GRPO application, URSA-8B-PS-GRPO outperforms Gemma3-12B and GPT-4o by 8.4% and 2.7% on average across 6 benchmarks. Code, data and checkpoint can be found at https://github.com/URSA-MATH."
+  },
+  {
+    "id": "2504.10559v1",
+    "title": "Efficient Process Reward Model Training via Active Learning",
+    "authors": "Keyu Duan, Zichen Liu, Xin Mao, Tianyu Pang, Changyu Chen, Qiguang Chen, Michael Qizhe Shieh, Longxu Dou",
+    "published": "2025-04-14",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2504.10559v1",
+    "pdf_url": "https://arxiv.org/pdf/2504.10559v1",
+    "abstract": "Process Reward Models (PRMs) provide step-level supervision to large language models (LLMs), but scaling up training data annotation remains challenging for both humans and LLMs. To address this limitation, we propose an active learning approach, ActPRM, which proactively selects the most uncertain samples for training, substantially reducing labeling costs. During training, we use the PRM to estimate uncertainty after the forward pass, retaining only highly uncertain data. A capable yet costly reasoning model then labels this data. Then we compute the loss with respect to the labels and update the PRM's weights. We compare ActPRM vs. vanilla fine-tuning, on a pool-based active learning setting, demonstrating that ActPRM reduces 50% annotation, but achieving the comparable or even better performance. Beyond annotation efficiency, we further advance the actively trained PRM by filtering over 1M+ math reasoning trajectories with ActPRM, retaining 60% of the data. A subsequent training on this selected dataset yields a new state-of-the-art (SOTA) PRM on ProcessBench (75.0%) and PRMBench (65.5%) compared with same sized models."
+  },
+  {
+    "id": "2504.16828v5",
+    "title": "Process Reward Models That Think",
+    "authors": "Muhammad Khalifa, Rishabh Agarwal, Lajanugen Logeswaran, Jaekyeom Kim, Hao Peng, Moontae Lee, Honglak Lee, Lu Wang",
+    "published": "2025-04-23",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2504.16828v5",
+    "pdf_url": "https://arxiv.org/pdf/2504.16828v5",
+    "abstract": "Step-by-step verifiers -- also known as process reward models (PRMs) -- are a key ingredient for test-time scaling. PRMs require step-level supervision, making them expensive to train. This work aims to build data-efficient PRMs as verbalized step-wise reward models that verify every step in the solution by generating a verification chain-of-thought (CoT). We propose ThinkPRM, a long CoT verifier fine-tuned on orders of magnitude fewer process labels than those required by discriminative PRMs. Our approach capitalizes on the inherent reasoning abilities of long CoT models, and outperforms LLM-as-a-Judge and discriminative verifiers -- using only 1% of the process labels in PRM800K -- across several challenging benchmarks. Specifically, ThinkPRM beats the baselines on ProcessBench, MATH-500, and AIME '24 under best-of-N selection and reward-guided search. In an out-of-domain evaluation on a subset of GPQA-Diamond and LiveCodeBench, our PRM surpasses discriminative verifiers trained on the full PRM800K by 8% and 4.5%, respectively. Lastly, under the same token budget, ThinkPRM scales up verification compute more effectively compared to LLM-as-a-Judge, outperforming it by 7.2% on a subset of ProcessBench. Our work highlights the value of generative, long CoT PRMs that can scale test-time compute for verification while requiring minimal supervision for training. Our code, data, and models are released at https://github.com/mukhal/thinkprm."
+  },
+  {
+    "id": "2503.10291v1",
+    "title": "VisualPRM: An Effective Process Reward Model for Multimodal Reasoning",
+    "authors": "Weiyun Wang, Zhangwei Gao, Lianjie Chen, Zhe Chen, Jinguo Zhu, Xiangyu Zhao, Yangzhou Liu, Yue Cao, Shenglong Ye, Xizhou Zhu, Lewei Lu, Haodong Duan, Yu Qiao, Jifeng Dai, Wenhai Wang",
+    "published": "2025-03-13",
+    "category": "cs.CV",
+    "arxiv_url": "http://arxiv.org/abs/2503.10291v1",
+    "pdf_url": "https://arxiv.org/pdf/2503.10291v1",
+    "abstract": "We introduce VisualPRM, an advanced multimodal Process Reward Model (PRM) with 8B parameters, which improves the reasoning abilities of existing Multimodal Large Language Models (MLLMs) across different model scales and families with Best-of-N (BoN) evaluation strategies. Specifically, our model improves the reasoning performance of three types of MLLMs and four different model scales. Even when applied to the highly capable InternVL2.5-78B, it achieves a 5.9-point improvement across seven multimodal reasoning benchmarks. Experimental results show that our model exhibits superior performance compared to Outcome Reward Models and Self-Consistency during BoN evaluation. To facilitate the training of multimodal PRMs, we construct a multimodal process supervision dataset VisualPRM400K using an automated data pipeline. For the evaluation of multimodal PRMs, we propose VisualProcessBench, a benchmark with human-annotated step-wise correctness labels, to measure the abilities of PRMs to detect erroneous steps in multimodal reasoning tasks. We hope that our work can inspire more future research and contribute to the development of MLLMs. Our model, data, and benchmark are released in https://internvl.github.io/blog/2025-03-13-VisualPRM/."
+  },
+  {
+    "id": "2505.20241v3",
+    "title": "DreamPRM: Domain-Reweighted Process Reward Model for Multimodal Reasoning",
+    "authors": "Qi Cao, Ruiyi Wang, Ruiyi Zhang, Sai Ashish Somayajula, Pengtao Xie",
+    "published": "2025-05-26",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2505.20241v3",
+    "pdf_url": "https://arxiv.org/pdf/2505.20241v3",
+    "abstract": "Reasoning has substantially improved the performance of large language models (LLMs) on complicated tasks. Central to the current reasoning studies, Process Reward Models (PRMs) offer a fine-grained evaluation of intermediate reasoning steps and guide the reasoning process. However, extending PRMs to multimodal large language models (MLLMs) introduces challenges. Since multimodal reasoning covers a wider range of tasks compared to text-only scenarios, the resulting distribution shift from the training to testing sets is more severe, leading to greater generalization difficulty. Training a reliable multimodal PRM, therefore, demands large and diverse datasets to ensure sufficient coverage. However, current multimodal reasoning datasets suffer from a marked quality imbalance, which degrades PRM performance and highlights the need for an effective data selection strategy. To address the issues, we introduce DreamPRM, a domain-reweighted training framework for multimodal PRMs which employs bi-level optimization. In the lower-level optimization, DreamPRM performs fine-tuning on multiple datasets with domain weights, allowing the PRM to prioritize high-quality reasoning signals and alleviating the impact of dataset quality imbalance. In the upper-level optimization, the PRM is evaluated on a separate meta-learning dataset; this feedback updates the domain weights through an aggregation loss function, thereby improving the generalization capability of trained PRM. Extensive experiments on multiple multimodal reasoning benchmarks covering both mathematical and general reasoning show that test-time scaling with DreamPRM consistently improves the performance of state-of-the-art MLLMs. Further comparisons reveal that DreamPRM's domain-reweighting strategy surpasses other data selection methods and yields higher accuracy gains than existing test-time scaling approaches."
+  },
+  {
+    "id": "2502.14361v1",
+    "title": "Retrieval-Augmented Process Reward Model for Generalizable Mathematical Reasoning",
+    "authors": "Jiachen Zhu, Congmin Zheng, Jianghao Lin, Kounianhua Du, Ying Wen, Yong Yu, Jun Wang, Weinan Zhang",
+    "published": "2025-02-20",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2502.14361v1",
+    "pdf_url": "https://arxiv.org/pdf/2502.14361v1",
+    "abstract": "While large language models (LLMs) have significantly advanced mathematical reasoning, Process Reward Models (PRMs) have been developed to evaluate the logical validity of reasoning steps. However, PRMs still struggle with out-of-distribution (OOD) challenges. This paper identifies key OOD issues, including step OOD, caused by differences in reasoning patterns across model types and sizes, and question OOD, which arises from dataset shifts between training data and real-world problems. To address these issues, we introduce Retrieval-Augmented Process Reward Model (RetrievalPRM), a novel framework designed to tackle these OOD issues. By utilizing a two-stage retrieval-enhanced mechanism, RetrievalPRM retrieves semantically similar questions and steps as a warmup, enhancing PRM's ability to evaluate target steps and improving generalization and reasoning consistency across different models and problem types. Our extensive experiments demonstrate that RetrievalPRM outperforms existing baselines across multiple real-world datasets. Our open-source contributions include a retrieval-enhanced dataset, a tuning framework for PRM training, and the RetrievalPRM model, establishing a new standard for PRM performance."
+  },
+  {
+    "id": "2507.17849v1",
+    "title": "Dynamic and Generalizable Process Reward Modeling",
+    "authors": "Zhangyue Yin, Qiushi Sun, Zhiyuan Zeng, Qinyuan Cheng, Xipeng Qiu, Xuanjing Huang",
+    "published": "2025-07-23",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2507.17849v1",
+    "pdf_url": "https://arxiv.org/pdf/2507.17849v1",
+    "abstract": "Process Reward Models (PRMs) are crucial for guiding Large Language Models (LLMs) in complex scenarios by providing dense reward signals. However, existing PRMs primarily rely on heuristic approaches, which struggle with cross-domain generalization. While LLM-as-judge has been proposed to provide generalized rewards, current research has focused mainly on feedback results, overlooking the meaningful guidance embedded within the text. Additionally, static and coarse-grained evaluation criteria struggle to adapt to complex process supervision. To tackle these challenges, we propose Dynamic and Generalizable Process Reward Modeling (DG-PRM), which features a reward tree to capture and store fine-grained, multi-dimensional reward criteria. DG-PRM dynamically selects reward signals for step-wise reward scoring. To handle multifaceted reward signals, we pioneeringly adopt Pareto dominance estimation to identify discriminative positive and negative pairs. Experimental results show that DG-PRM achieves stunning performance on prevailing benchmarks, significantly boosting model performance across tasks with dense rewards. Further analysis reveals that DG-PRM adapts well to out-of-distribution scenarios, demonstrating exceptional generalizability."
+  },
+  {
+    "id": "2511.22888v1",
+    "title": "Adversarial Training for Process Reward Models",
+    "authors": "Gurusha Juneja, Deepak Nathani, William Yang Wang",
+    "published": "2025-11-28",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2511.22888v1",
+    "pdf_url": "https://arxiv.org/pdf/2511.22888v1",
+    "abstract": "Process Reward Models (PRMs) enhance reasoning ability of LLMs by providing step-level supervision. However, their widespread adoption is limited due to expensive manual step-level annotation and poor generalization of static training data to novel errors. We introduce Adversarially Trained PRMs (\\texttt{APRM}), where a Generator ($G$) learns to produce reasoning errors to deceive a PRM ($R$), while $R$ concurrently learns to detect them. This interaction yields progressively harder negatives for $R$, improving its robustness and generalization to novel errors without requiring manual step-level labels. Averaged across diverse mathematical reasoning benchmarks, \\texttt{APRM} improves solver accuracy by $+3.4$ percentage points (pp) over the strongest PRM baseline. \\texttt{APRM} achieves gains of $+5.3$ pp on out-of-distribution tasks."
+  },
+  {
+    "id": "2502.06737v2",
+    "title": "VersaPRM: Multi-Domain Process Reward Model via Synthetic Reasoning Data",
+    "authors": "Thomas Zeng, Shuibai Zhang, Shutong Wu, Christian Classen, Daewon Chae, Ethan Ewer, Minjae Lee, Heeju Kim, Wonjun Kang, Jackson Kunde, Ying Fan, Jungtaek Kim, Hyung Il Koo, Kannan Ramchandran, Dimitris Papailiopoulos, Kangwook Lee",
+    "published": "2025-02-10",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2502.06737v2",
+    "pdf_url": "https://arxiv.org/pdf/2502.06737v2",
+    "abstract": "Process Reward Models (PRMs) have proven effective at enhancing mathematical reasoning for Large Language Models (LLMs) by leveraging increased inference-time computation. However, they are predominantly trained on mathematical data and their generalizability to non-mathematical domains has not been rigorously studied. In response, this work first shows that current PRMs have poor performance in other domains. To address this limitation, we introduce VersaPRM, a multi-domain PRM trained on synthetic reasoning data generated using our novel data generation and annotation method. VersaPRM achieves consistent performance gains across diverse domains. For instance, in the MMLU-Pro category of Law, VersaPRM via weighted majority voting, achieves a 7.9% performance gain over the majority voting baseline -- surpassing Qwen2.5-Math-PRM's gain of 1.3%. We further contribute to the community by open-sourcing all data, code and models for VersaPRM."
+  },
+  {
+    "id": "2601.21872v2",
+    "title": "WebArbiter: A Principle-Guided Reasoning Process Reward Model for Web Agents",
+    "authors": "Yao Zhang, Shijie Tang, Zeyu Li, Zhen Han, Volker Tresp",
+    "published": "2026-01-29",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2601.21872v2",
+    "pdf_url": "https://arxiv.org/pdf/2601.21872v2",
+    "abstract": "Web agents hold great potential for automating complex computer tasks, yet their interactions involve long-horizon, sequential decision-making with irreversible actions. In such settings, outcome-based supervision is sparse and delayed, often rewarding incorrect trajectories and failing to support inference-time scaling. This motivates the use of Process Reward Models (WebPRMs) for web navigation, but existing approaches remain limited: scalar WebPRMs collapse progress into coarse, weakly grounded signals, while checklist-based WebPRMs rely on brittle template matching that fails under layout or semantic changes and often mislabels superficially correct actions as successful, providing little insight or interpretability. To address these challenges, we introduce WebArbiter, a reasoning-first, principle-inducing WebPRM that formulates reward modeling as text generation, producing structured justifications that conclude with a preference verdict and identify the action most conducive to task completion under the current context. Training follows a two-stage pipeline: reasoning distillation equips the model with coherent principle-guided reasoning, and reinforcement learning corrects teacher biases by directly aligning verdicts with correctness, enabling stronger generalization. To support systematic evaluation, we release WebPRMBench, a comprehensive benchmark spanning four diverse web environments with rich tasks and high-quality preference annotations. On WebPRMBench, WebArbiter-7B outperforms the strongest baseline, GPT-5, by 9.1 points. In reward-guided trajectory search on WebArena-Lite, it surpasses the best prior WebPRM by up to 6.4 points, underscoring its robustness and practical value in complex web tasks."
+  },
+  {
+    "id": "2508.04088v2",
+    "title": "GM-PRM: A Generative Multimodal Process Reward Model for Multimodal Mathematical Reasoning",
+    "authors": "Jianghangfan Zhang, Yibo Yan, Kening Zheng, Xin Zou, Song Dai, Xuming Hu",
+    "published": "2025-08-06",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2508.04088v2",
+    "pdf_url": "https://arxiv.org/pdf/2508.04088v2",
+    "abstract": "Multimodal Large Language Models (MLLMs) demonstrate remarkable capabilities but often struggle with complex, multi-step mathematical reasoning, where minor errors in visual perception or logical deduction can lead to complete failure. While Process Reward Models (PRMs) offer step-by-step supervision, existing multimodal PRMs are limited to being binary verifiers that can identify but not correct errors, offering little explanatory power. To address these deficiencies, we introduce the Generative Multimodal Process Reward Model (GM-PRM), a novel paradigm that transforms the PRM from a passive judge into an active reasoning collaborator. Instead of a simple scalar score, GM-PRM provides a fine-grained, interpretable analysis of each reasoning step, evaluating its step intent, visual alignment, and logical soundness. More critically, GM-PRM is trained to generate a corrected version of the first erroneous step it identifies. This unique corrective capability enables our new test-time inference strategy, Refined Best-of-N (Refined-BoN). This framework actively enhances solution quality by using the PRM's generated correction to guide the policy model toward a more promising reasoning trajectory, thereby improving the diversity and correctness of the solution pool. We demonstrate that GM-PRM achieves state-of-the-art results on multiple multimodal math benchmarks, significantly boosting policy model performance with remarkable data efficiency, requiring only a 20K-sample training dataset. Our code will be released upon acceptance."
+  },
+  {
+    "id": "2503.20271v1",
+    "title": "ViLBench: A Suite for Vision-Language Process Reward Modeling",
+    "authors": "Haoqin Tu, Weitao Feng, Hardy Chen, Hui Liu, Xianfeng Tang, Cihang Xie",
+    "published": "2025-03-26",
+    "category": "cs.CV",
+    "arxiv_url": "http://arxiv.org/abs/2503.20271v1",
+    "pdf_url": "https://arxiv.org/pdf/2503.20271v1",
+    "abstract": "Process-supervised reward models serve as a fine-grained function that provides detailed step-wise feedback to model responses, facilitating effective selection of reasoning trajectories for complex tasks. Despite its advantages, evaluation on PRMs remains less explored, especially in the multimodal domain. To address this gap, this paper first benchmarks current vision large language models (VLLMs) as two types of reward models: output reward models (ORMs) and process reward models (PRMs) on multiple vision-language benchmarks, which reveal that neither ORM nor PRM consistently outperforms across all tasks, and superior VLLMs do not necessarily yield better rewarding performance. To further advance evaluation, we introduce ViLBench, a vision-language benchmark designed to require intensive process reward signals. Notably, OpenAI's GPT-4o with Chain-of-Thought (CoT) achieves only 27.3% accuracy, indicating the benchmark's challenge for current VLLMs. Lastly, we preliminarily showcase a promising pathway towards bridging the gap between general VLLMs and reward models -- by collecting 73.6K vision-language process reward data using an enhanced tree-search algorithm, our 3B model is able to achieve an average improvement of 3.3% over standard CoT and up to 2.5% compared to its untrained counterpart on ViLBench by selecting OpenAI o1's generations. We release the implementations at https://ucsc-vlaa.github.io/ViLBench with our code, model, and data."
+  },
+  {
+    "id": "2602.04145v2",
+    "title": "Training Data Efficiency in Multimodal Process Reward Models",
+    "authors": "Jinyuan Li, Chengsong Huang, Langlin Huang, Shaoyang Xu, Haolin Liu, Wenxuan Zhang, Jiaxin Huang",
+    "published": "2026-02-04",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2602.04145v2",
+    "pdf_url": "https://arxiv.org/pdf/2602.04145v2",
+    "abstract": "Multimodal Process Reward Models (MPRMs) are central to step-level supervision for visual reasoning in MLLMs. Training MPRMs typically requires large-scale Monte Carlo (MC)-annotated corpora, incurring substantial training cost. This paper studies the data efficiency for MPRM training. Our preliminary experiments reveal that MPRM training quickly saturates under random subsampling of the training data, indicating substantial redundancy within existing MC-annotated corpora. To explain this, we formalize a theoretical framework and reveal that informative gradient updates depend on two factors: label mixtures of positive/negative steps and label reliability (average MC scores of positive steps). Guided by these insights, we propose the Balanced-Information Score (BIS), which prioritizes both mixture and reliability based on existing MC signals at the rollout level, without incurring any additional cost. Across two backbones (InternVL2.5-8B and Qwen2.5-VL-7B) on VisualProcessBench, BIS-selected subsets consistently match and even surpass the full-data performance at small fractions. Notably, the BIS subset reaches full-data performance using only 10% of the training data, improving over random subsampling by a relative 4.1%."
+  },
+  {
+    "id": "2511.08364v2",
+    "title": "DPRM: A Dual Implicit Process Reward Model in Multi-Hop Question Answering",
+    "authors": "Xinyi Wang, Yiping Song, Zhiliang Tian, Bo Liu, Tingjin Luo, Minlie Huang",
+    "published": "2025-11-11",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2511.08364v2",
+    "pdf_url": "https://arxiv.org/pdf/2511.08364v2",
+    "abstract": "In multi-hop question answering (MHQA) tasks, Chain of Thought (CoT) improves the quality of generation by guiding large language models (LLMs) through multi-step reasoning, and Knowledge Graphs (KGs) reduce hallucinations via semantic matching. Outcome Reward Models (ORMs) provide feedback after generating the final answers but fail to evaluate the process for multi-step reasoning. Traditional Process Reward Models (PRMs) evaluate the reasoning process but require costly human annotations or rollout generation. While implicit PRM is trained only with outcome signals and derives step rewards through reward parameterization without explicit annotations, it is more suitable for multi-step reasoning in MHQA tasks. However, existing implicit PRM has only been explored for plain text scenarios. When adapting to MHQA tasks, it cannot handle the graph structure constraints in KGs and capture the potential inconsistency between CoT and KG paths. To address these limitations, we propose the DPRM (Dual Implicit Process Reward Model). It trains two implicit PRMs for CoT and KG reasoning in MHQA tasks. Both PRMs, namely KG-PRM and CoT-PRM, derive step-level rewards from outcome signals via reward parameterization without additional explicit annotations. Among them, KG-PRM uses preference pairs to learn structural constraints from KGs. DPRM further introduces a consistency constraint between CoT and KG reasoning steps, making the two PRMs mutually verify and collaboratively optimize the reasoning paths. We also provide a theoretical demonstration of the derivation of process rewards. Experimental results show that our method outperforms 13 baselines on multiple datasets with up to 16.6% improvement on Hit@1."
+  },
+  {
+    "id": "2606.04579v1",
+    "title": "SCI-PRM: A Tool Aware Process Reward Model for Scientific Reasoning Verification",
+    "authors": "Xiangyu Zhao, Hengyuan Zhao, Yiheng Wang, Wanghan Xu, Yuhao Zhou, Qinglong Cao, Zhiwang Zhou, Lei Bai, Wenlong Zhang, Xiao-Ming Wu",
+    "published": "2026-06-03",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2606.04579v1",
+    "pdf_url": "https://arxiv.org/pdf/2606.04579v1",
+    "abstract": "While Process Reward Models (PRMs) have achieved remarkable success in mathematical reasoning, their application in complex scientific domains-such as biology, chemistry, and physics remains largely unexplored. Scientific problems demand not only logical rigor but also factual consistency and the precise usage of domain-specific tools, areas where current models often suffer from hallucinations and lack of verification. In this paper, we first construct SCIPRM70K, a large-scale dataset featuring Chain-of-Tool trajectories that explicitly interleave reasoning with the execution of scientific tools. Building upon this, we train an efficient reward model called Sci-PRM to provide fine-grained supervision on tool selection, execution accuracy, and result interpretation at each step in one inference. Experiments demonstrate that Sci-PRM significantly enhances foundation models in two key aspects: (1) it enables effective test-time scaling via Best-of-N selection; and (2) when integrated into Reinforcement Learning, it serves as a dense reward signal that mitigates the critical issue of advantage disappearance, allowing the model to break through existing performance ceilings."
+  },
+  {
+    "id": "2502.12663v2",
+    "title": "Demystifying Multilingual Chain-of-Thought in Process Reward Modeling",
+    "authors": "Weixuan Wang, Minghao Wu, Barry Haddow, Alexandra Birch",
+    "published": "2025-02-18",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2502.12663v2",
+    "pdf_url": "https://arxiv.org/pdf/2502.12663v2",
+    "abstract": "Large language models (LLMs) are designed to perform a wide range of tasks. To improve their ability to solve complex problems requiring multi-step reasoning, recent research leverages process reward modeling to provide fine-grained feedback at each step of the reasoning process for reinforcement learning (RL), but it predominantly focuses on English. In this paper, we tackle the critical challenge of extending process reward models (PRMs) to multilingual settings. To achieve this, we train multilingual PRMs on a dataset spanning seven languages, which is translated from English. Through comprehensive evaluations on two widely used reasoning benchmarks across 11 languages, we demonstrate that multilingual PRMs not only improve average accuracy but also reduce early-stage reasoning errors. Furthermore, our results highlight the sensitivity of multilingual PRMs to both the number of training languages and the volume of English data, while also uncovering the benefits arising from more candidate responses and trainable parameters. This work opens promising avenues for robust multilingual applications in complex, multi-step reasoning tasks. In addition, we release the code to foster research along this line."
+  },
+  {
+    "id": "2501.07301v2",
+    "title": "The Lessons of Developing Process Reward Models in Mathematical Reasoning",
+    "authors": "Zhenru Zhang, Chujie Zheng, Yangzhen Wu, Beichen Zhang, Runji Lin, Bowen Yu, Dayiheng Liu, Jingren Zhou, Junyang Lin",
+    "published": "2025-01-13",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2501.07301v2",
+    "pdf_url": "https://arxiv.org/pdf/2501.07301v2",
+    "abstract": "Process Reward Models (PRMs) emerge as a promising approach for process supervision in mathematical reasoning of Large Language Models (LLMs), which aim to identify and mitigate intermediate errors in the reasoning processes. However, the development of effective PRMs faces significant challenges, particularly in data annotation and evaluation methodologies. In this paper, through extensive experiments, we demonstrate that commonly used Monte Carlo (MC) estimation-based data synthesis for PRMs typically yields inferior performance and generalization compared to LLM-as-a-judge and human annotation methods. MC estimation relies on completion models to evaluate current-step correctness, leading to inaccurate step verification. Furthermore, we identify potential biases in conventional Best-of-N (BoN) evaluation strategies for PRMs: (1) The unreliable policy models generate responses with correct answers but flawed processes, leading to a misalignment between the evaluation criteria of BoN and the PRM objectives of process verification. (2) The tolerance of PRMs of such responses leads to inflated BoN scores. (3) Existing PRMs have a significant proportion of minimum scores concentrated on the final answer steps, revealing the shift from process to outcome-based assessment in BoN Optimized PRMs. To address these challenges, we develop a consensus filtering mechanism that effectively integrates MC estimation with LLM-as-a-judge and advocates a more comprehensive evaluation framework that combines response-level and step-level metrics. Based on the mechanisms, we significantly improve both model performance and data efficiency in the BoN evaluation and the step-wise error identification task. Finally, we release a new state-of-the-art PRM that outperforms existing open-source alternatives and provides practical guidelines for future research in building process supervision models."
+  },
+  {
+    "id": "2508.03556v4",
+    "title": "VRPRM: Process Reward Modeling via Visual Reasoning",
+    "authors": "Xinquan Chen, Chongying Yue, Bangwei Liu, Xuhong Wang, Yingchun Wang, Chaochao Lu",
+    "published": "2025-08-05",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2508.03556v4",
+    "pdf_url": "https://arxiv.org/pdf/2508.03556v4",
+    "abstract": "Process Reward Model (PRM) is widely used in the post-training of Large Language Model (LLM) because it can perform fine-grained evaluation of the reasoning steps of generated content. However, most PRMs lack long-term reasoning and deep thinking capabilities. On the other hand, although a few works have tried to introduce Chain-of-Thought (CoT) capability into PRMs, the annotation cost of CoT-PRM data is too expensive to play a stable role in various tasks. To address the above challenges, we propose VRPRM, a process reward model via visual reasoning, and design an efficient two-stage training strategy. Experimental results show that using only 3.6K CoT-PRM Supervised Fine-Tuning(SFT) data and 50K non-CoT PRM Reinforcement Learning (RL) training data, VRPRM can surpass the non-thinking PRM with a total data volume of 400K and achieved a relative performance improvement of up to 118\\% over the base model in the BoN experiment. This result confirms that the proposed combined training strategy can achieve higher quality reasoning capabilities at a lower data annotation cost, thus providing a new paradigm for PRM training with more efficient data utilization."
+  },
+  {
+    "id": "2501.13622v4",
+    "title": "Coarse-to-Fine Process Reward Modeling for Mathematical Reasoning",
+    "authors": "Yulan Hu, Sheng Ouyang, Jinman Zhao, Yong Liu",
+    "published": "2025-01-23",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2501.13622v4",
+    "pdf_url": "https://arxiv.org/pdf/2501.13622v4",
+    "abstract": "The Process Reward Model (PRM) plays a crucial role in mathematical reasoning tasks, requiring high-quality supervised process data. However, we observe that reasoning steps generated by Large Language Models (LLMs) often fail to exhibit strictly incremental information, leading to redundancy that can hinder effective reasoning. To address this issue, we propose CFPRM, a simple yet effective coarse-to-fine strategy. Instead of focusing on the detection of redundant steps, our approach first establishes a coarse-grained window to merge adjacent reasoning steps into unified, holistic steps. The window size is then progressively reduced to extract fine-grained reasoning steps, enabling data collection at multiple granularities for training. By leveraging this hierarchical refinement process, CFPRM mitigates redundancy while preserving essential fine-grained knowledge. Extensive experiments on two reasoning datasets across three loss criteria validate the CFPRM's effectiveness and versatility."
+  },
+  {
+    "id": "2503.21295v1",
+    "title": "R-PRM: Reasoning-Driven Process Reward Modeling",
+    "authors": "Shuaijie She, Junxiao Liu, Yifeng Liu, Jiajun Chen, Xin Huang, Shujian Huang",
+    "published": "2025-03-27",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2503.21295v1",
+    "pdf_url": "https://arxiv.org/pdf/2503.21295v1",
+    "abstract": "Large language models (LLMs) inevitably make mistakes when performing step-by-step mathematical reasoning. Process Reward Models (PRMs) have emerged as a promising solution by evaluating each reasoning step. However, existing PRMs typically output evaluation scores directly, limiting both learning efficiency and evaluation accuracy, which is further exacerbated by the scarcity of annotated data. To address these issues, we propose Reasoning-Driven Process Reward Modeling (R-PRM). First, we leverage stronger LLMs to generate seed data from limited annotations, effectively bootstrapping our model's reasoning capabilities and enabling comprehensive step-by-step evaluation. Second, we further enhance performance through preference optimization, without requiring additional annotated data. Third, we introduce inference-time scaling to fully harness the model's reasoning potential. Extensive experiments demonstrate R-PRM's effectiveness: on ProcessBench and PRMBench, it surpasses strong baselines by 11.9 and 8.5 points in F1 scores, respectively. When applied to guide mathematical reasoning, R-PRM achieves consistent accuracy improvements of over 8.5 points across six challenging datasets. Further analysis reveals that R-PRM exhibits more comprehensive evaluation and stronger generalization capabilities, thereby highlighting its significant potential."
+  },
+  {
+    "id": "2512.03126v1",
+    "title": "Hierarchical Process Reward Models are Symbolic Vision Learners",
+    "authors": "Shan Zhang, Aotian Chen, Kai Zou, Jindong Gu, Yuan Xue, Anton van den Hengel",
+    "published": "2025-12-02",
+    "category": "cs.CV",
+    "arxiv_url": "http://arxiv.org/abs/2512.03126v1",
+    "pdf_url": "https://arxiv.org/pdf/2512.03126v1",
+    "abstract": "Symbolic computer vision represents diagrams through explicit logical rules and structured representations, enabling interpretable understanding in machine vision. This requires fundamentally different learning paradigms from pixel-based visual models. Symbolic visual learners parse diagrams into geometric primitives-points, lines, and shapes-whereas pixel-based learners operate on textures and colors. We propose a novel self-supervised symbolic auto-encoder that encodes diagrams into structured primitives and their interrelationships within the latent space, and decodes them through our executable engine to reconstruct the input diagrams. Central to this architecture is Symbolic Hierarchical Process Reward Modeling, which applies hierarchical step-level parsing rewards to enforce point-on-line, line-on-shape, and shape-on-relation consistency. Since vanilla reinforcement learning exhibits poor exploration in the policy space during diagram reconstruction; we thus introduce stabilization mechanisms to balance exploration and exploitation. We fine-tune our symbolic encoder on downstream tasks, developing a neuro-symbolic system that integrates the reasoning capabilities of neural networks with the interpretability of symbolic models through reasoning-grounded visual rewards. Evaluations across reconstruction, perception, and reasoning tasks demonstrate the effectiveness of our approach: achieving a 98.2% reduction in MSE for geometric diagram reconstruction, surpassing GPT-4o by 0.6% with a 7B model on chart reconstruction, and improving by +13% on the MathGlance perception benchmark, and by +3% on MathVerse and GeoQA reasoning benchmarks."
+  },
+  {
+    "id": "2603.02479v1",
+    "title": "PRISM: Pushing the Frontier of Deep Think via Process Reward Model-Guided Inference",
+    "authors": "Rituraj Sharma, Weiyuan Chen, Noah Provenzano, Tu Vu",
+    "published": "2026-03-03",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2603.02479v1",
+    "pdf_url": "https://arxiv.org/pdf/2603.02479v1",
+    "abstract": "DEEPTHINK methods improve reasoning by generating, refining, and aggregating populations of candidate solutions, which enables strong performance on complex mathematical and scientific tasks. However, existing frameworks often lack reliable correctness signals during inference, which creates a population-enhancement bottleneck where deeper deliberation amplifies errors, suppresses correct minority solutions, and yields weak returns to additional compute. In this paper, we introduce a functional decomposition of DEEPTHINK systems and propose PRISM, a Process Reward Model (PRM)-guided inference algorithm that uses step-level verification to guide both population refinement and solution aggregation. During refinement, PRISM treats candidate solutions as particles in a PRM-defined energy landscape and reshapes the population through score-guided resampling and stochastic refinement, which concentrates probability mass on higher-quality reasoning while preserving diversity. Across mathematics and science benchmarks, PRISM is competitive with or outperforms existing DEEPTHINK methods, reaching 90.0%, 75.4%, and 71.4% with gpt-oss-20b on AIME25, HMMT25, and GPQA Diamond, respectively, while matching or exceeding gpt-oss-120b. Additionally, our analysis shows that PRISM produces consistent net-directional correction during refinement, remains reliable when the initial population contains few correct candidates, and often lies on the compute-accuracy Pareto frontier."
+  },
+  {
+    "id": "2605.02819v1",
+    "title": "SCPRM: A Schema-aware Cumulative Process Reward Model for Knowledge Graph Question Answering",
+    "authors": "Jiujiu Chen, Yazheng Liu, Sihong Xie, Hui Xiong",
+    "published": "2026-05-04",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2605.02819v1",
+    "pdf_url": "https://arxiv.org/pdf/2605.02819v1",
+    "abstract": "Large language models excel at complex reasoning, yet evaluating their intermediate steps remains challenging. Although process reward models provide step-wise supervision, they often suffer from a risk compensation effect, where incorrect steps are offset by later correct ones, assigning high rewards to flawed reasoning paths. This issue is further exacerbated in knowledge graph (KG) reasoning, as there may exist multiple paths between the start and end entities in the KGs, and a risky step can make the reasoning path flawed. Those limitations are problematic in risk-sensitive tasks such as medical and legal KG reasoning. To address the issues, we propose a Schema-aware Cumulative Process Reward Model (SCPRM) that evaluates reasoning paths by conditioning on the reasoning prefix , and incorporating schema distance between current reasoning step and the implicit target parsed from the query, which provides cumulative and future rewards to guide the path explorations. We further integrate SCPRM into Monte Carlo Tree Search (MCTS) as SCPRM-MCTS to conduct multi-hop reasoning on KGs for question answering (QA) tasks. Across medical and legal KGQA and CWQ, SCPRM-MCTS improves the performance of Hits@k by an average of 1.18% over strong baselines, demonstrating more accurate and risk-sensitive reasoning evaluation."
+  },
+  {
+    "id": "2509.05542v2",
+    "title": "DreamPRM-1.5: Unlocking the Potential of Each Instance for Multimodal Process Reward Model Training",
+    "authors": "Qi Cao, Pengtao Xie",
+    "published": "2025-09-05",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2509.05542v2",
+    "pdf_url": "https://arxiv.org/pdf/2509.05542v2",
+    "abstract": "Training multimodal process reward models (PRMs) is hard due to (i) distribution shift between training set and test set and (ii) quality imbalance across training data samples. While domain-level reweighting (e.g., DreamPRM) aligns training with test-time objectives, it leaves a clear gap to an oracle upper bound (pass@N), even under a \"sanity check\" that uses test set data to probe headroom -- pointing to meta-level under-parameterization. We introduce DreamPRM-1.5, an instance-level reweighting framework that assigns an adaptive weight to every training example via bi-level optimization. To realize instance reweighting across scales, we develop two complementary regimes: Instance Table, which learns explicit per-sample weights and excels on small/medium data, and Instance Net, a lightweight neural network that generalizes better and scales to large corpora. A practical, stable training recipe -- time-scale matching between upper/lower updates, cold-start initialization, and bounded-range weights -- prevents divergence. Integrated with test-time scaling, DreamPRM-1.5 attains 84.6 accuracy on the MMMU validation set, 31.3 accuracy on R-Bench-V and, when paired with a leading backbone (e.g., GPT-5-mini), achieves first-place results on public multimodal reasoning leaderboards. Moreover, extensive experiments, including benchmark evaluations, baseline comparisons, and a sanity check, demonstrate that DreamPRM-1.5 closes the gap toward the oracle, achieves leading performance, and trains stably."
+  },
+  {
+    "id": "2601.22249v1",
+    "title": "FunPRM: Function-as-Step Process Reward Model with Meta Reward Correction for Code Generation",
+    "authors": "Ruiyi Zhang, Peijia Qin, Qi Cao, Eric Xue, Pengtao Xie",
+    "published": "2026-01-29",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2601.22249v1",
+    "pdf_url": "https://arxiv.org/pdf/2601.22249v1",
+    "abstract": "Code generation is a core application of large language models (LLMs), yet LLMs still frequently fail on complex programming tasks. Given its success in mathematical reasoning, test-time scaling approaches such as Process Reward Model (PRM)-based Best-of-N selection offer a promising way to improve performance. However, existing PRMs remain ineffective for code generation due to the lack of meaningful step decomposition in code and the noise of Monte Carlo-estimated partial-solution correctness scores (rewards). To address these challenges, we propose FunPRM. FunPRM prompts LLMs to encourage modular code generation organized into functions, with functions treated as PRM reasoning steps. Furthermore, FunPRM introduces a novel meta-learning-based reward correction mechanism that leverages clean final-solution rewards obtained via a unit-test-based evaluation system to purify noisy partial-solution rewards. Experiments on LiveCodeBench and BigCodeBench demonstrate that FunPRM consistently outperforms existing test-time scaling methods across five base LLMs, notably achieving state-of-the-art performance on LiveCodeBench when combined with O4-mini. Furthermore, FunPRM produces code that is more readable and reusable for developers."
+  },
+  {
+    "id": "2502.10325v1",
+    "title": "Process Reward Models for LLM Agents: Practical Framework and Directions",
+    "authors": "Sanjiban Choudhury",
+    "published": "2025-02-14",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2502.10325v1",
+    "pdf_url": "https://arxiv.org/pdf/2502.10325v1",
+    "abstract": "We introduce Agent Process Reward Models (AgentPRM), a simple and scalable framework for training LLM agents to continually improve through interactions. AgentPRM follows a lightweight actor-critic paradigm, using Monte Carlo rollouts to compute reward targets and optimize policies. It requires minimal modifications to existing RLHF pipelines, making it easy to integrate at scale. Beyond AgentPRM, we propose InversePRM, which learns process rewards directly from demonstrations without explicit outcome supervision. We also explore key challenges and opportunities, including exploration, process reward shaping, and model-predictive reasoning. We evaluate on ALFWorld benchmark, show that small 3B models trained with AgentPRM and InversePRM outperform strong GPT-4o baselines, and analyze test-time scaling, reward hacking, and more. Our code is available at: https://github.com/sanjibanc/agent_prm."
+  },
+  {
+    "id": "2604.10660v1",
+    "title": "Efficient Process Reward Modeling via Contrastive Mutual Information",
+    "authors": "Nakyung Lee, Sangwoo Hong, Jungwoo Lee",
+    "published": "2026-04-12",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2604.10660v1",
+    "pdf_url": "https://arxiv.org/pdf/2604.10660v1",
+    "abstract": "Recent research has devoted considerable effort to verifying the intermediate reasoning steps of chain-of-thought (CoT) trajectories using process reward models (PRMs) and other verifier models. However, training a PRM typically requires human annotators to assign reward scores to each reasoning step, which is both costly and time-consuming. Existing automated approaches, such as Monte Carlo (MC) estimation, also demand substantial computational resources due to repeated LLM rollouts. To overcome these limitations, we propose contrastive pointwise mutual information (CPMI), a novel automatic reward labeling method that leverages the model's internal probability to infer step-level supervision while significantly reducing the computational burden of annotating dataset. CPMI quantifies how much a reasoning step increases the mutual information between the step and the correct target answer relative to hard-negative alternatives. This contrastive signal serves as a proxy for the step's contribution to the final solution and yields a reliable reward. The experimental results show that CPMI-based labeling reduces dataset construction time by 84% and token generation by 98% compared to MC estimation, while achieving higher accuracy on process-level evaluations and mathematical reasoning benchmarks."
+  },
+  {
+    "id": "2504.15275v3",
+    "title": "Stop Summation: Min-Form Credit Assignment Is All Process Reward Model Needs for Reasoning",
+    "authors": "Jie Cheng, Gang Xiong, Ruixi Qiao, Lijun Li, Chao Guo, Junle Wang, Yisheng Lv, Fei-Yue Wang",
+    "published": "2025-04-21",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2504.15275v3",
+    "pdf_url": "https://arxiv.org/pdf/2504.15275v3",
+    "abstract": "Process reward models (PRMs) have proven effective for test-time scaling of Large Language Models (LLMs) on challenging reasoning tasks. However, reward hacking issues with PRMs limit their successful application in reinforcement fine-tuning. In this paper, we identify the main cause of PRM-induced reward hacking: the canonical summation-form credit assignment in reinforcement learning (RL), which defines the value as cumulative gamma-decayed future rewards, easily induces LLMs to hack steps with high rewards. To address this, we propose PURE: Process sUpervised Reinforcement lEarning. The key innovation of PURE is a min-form credit assignment that formulates the value function as the minimum of future rewards. This method significantly alleviates reward hacking by limiting the value function range and distributing advantages more reasonably. Through extensive experiments on 3 base models, we show that PRM-based approaches enabling min-form credit assignment achieve comparable reasoning performance to verifiable reward-based methods within only 30% steps. In contrast, the canonical sum-form credit assignment collapses training even at the beginning! Additionally, when we supplement PRM-based fine-tuning with just 10% verifiable rewards, we further alleviate reward hacking and produce the best fine-tuned model based on Qwen2.5-Math-7B in our experiments, achieving 82.5% accuracy on AMC23 and 53.3% average accuracy across 5 benchmarks. Moreover, we summarize the observed reward hacking cases and analyze the causes of training collapse. We release our code and model weights at https://github.com/CJReinforce/PURE."
+  },
+  {
+    "id": "2512.15000v1",
+    "title": "DreamPRM-Code: Function-as-Step Process Reward Model with Label Correction for LLM Coding",
+    "authors": "Ruiyi Zhang, Peijia Qin, Qi Cao, Pengtao Xie",
+    "published": "2025-12-17",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2512.15000v1",
+    "pdf_url": "https://arxiv.org/pdf/2512.15000v1",
+    "abstract": "Process Reward Models (PRMs) have become essential for improving Large Language Models (LLMs) via test-time scaling, yet their effectiveness in coding remains limited due to the lack of meaningful step decompositions in code and the noise of Monte-Carlo-generated partial labels. We propose DreamPRM-Code, a coding-focused PRM that treats functions as reasoning steps using a Chain-of-Function prompting strategy to induce modular code generation, enabling PRM training and application analogous to mathematical reasoning tasks. To address label noise, DreamPRM-Code introduces a meta-learning-based correction mechanism that leverages clean final-solution unit-test labels and performs bi-level optimization to refine intermediate labels. Applying on test-time scaling, DreamPRM-Code achieved state-of-the-art performance on LiveCodeBench with 80.9 pass@1 rate, surpassing OpenAI o4-mini."
+  },
+  {
+    "id": "2605.02395v2",
+    "title": "Controllable and Verifiable Process Data Synthesis for Process Reward Models",
+    "authors": "Yinghui Chi, Lucien Wang",
+    "published": "2026-05-04",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2605.02395v2",
+    "pdf_url": "https://arxiv.org/pdf/2605.02395v2",
+    "abstract": "Process reward models (PRMs) rely on high-quality process supervision data, yet existing construction methods often provide limited control over error location, error type, and trajectory consistency. We propose a controllable and verifiable framework for synthesizing process supervision data for PRMs. Our framework first constructs a correct symbolic reasoning chain, injects a template-aware error into an intermediate step, recomputes subsequent steps under the corrupted state, and verifies that the injected step is not derivable from its prefix. The resulting paired trajectories are prefix-invalid at the first error while remaining trajectory-consistent after symbolic recomputation, and are translated into aligned natural-language processes for PRM training and evaluation. Experiments show that the synthesized data improve Best-of-8 reranking on logical reasoning benchmarks and transfer to mathematical reasoning. Step-level evaluation further shows that first-error localization remains substantially more challenging than overall step classification, highlighting the need for fine-grained and verifiable process supervision."
+  },
+  {
+    "id": "2508.15202v2",
+    "title": "Fin-PRM: A Domain-Specialized Process Reward Model for Financial Reasoning in Large Language Models",
+    "authors": "Jie Zhu, Yuanchen Zhou, Shuo Jiang, Junhui Li, Lifan Guo, Feng Chen, Chi Zhang",
+    "published": "2025-08-21",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2508.15202v2",
+    "pdf_url": "https://arxiv.org/pdf/2508.15202v2",
+    "abstract": "Process Reward Models (PRMs) supervise intermediate reasoning steps in large language models (LLMs), but existing PRMs are mainly trained on general-domain data and struggle with the structured, symbolic, and fact-sensitive nature of financial reasoning. Financial tasks require not only correct final answers but also verifiable intermediate steps grounded in domain knowledge. In this paper, we propose Fin-PRM, a domain-specialized, trajectory-aware PRM for financial reasoning that jointly models step-level correctness and trajectory-level coherence, producing binary supervision signals for both local and global reasoning quality. To support reliable supervision, we construct a high-quality financial reasoning dataset of 3K trajectories, where step- and trajectory-level labels are automatically derived from multi-source reward signals, including Monte Carlo rollouts, LLM-based evaluation, and explicit financial knowledge verification. Fin-PRM defines a unified ranking score that integrates step- and trajectory-level rewards, enabling consistent use across multiple settings. We evaluate Fin-PRM in three scenarios: (1) offline trajectory selection for supervised fine-tuning, (2) reward-guided Best-of-$N$ inference for test-time scaling, and (3) process-aware reward shaping for reinforcement learning. Experiments on financial reasoning benchmarks, including CFLUE and FinQA, show that Fin-PRM consistently outperforms general-purpose PRMs and strong baselines. Our project resources will be available at https://github.com/aliyun/qwen-dianjin."
+  },
+  {
+    "id": "2503.22233v4",
+    "title": "More Bang for the Buck: Process Reward Modeling with Entropy-Driven Uncertainty",
+    "authors": "Lang Cao, Renhong Chen, Yingtian Zou, Chao Peng, Huacong Xu, Yuxian Wang, Wu Ning, Qian Chen, Mofan Peng, Zijie Chen, Peishuo Su, Yitong Li",
+    "published": "2025-03-28",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2503.22233v4",
+    "pdf_url": "https://arxiv.org/pdf/2503.22233v4",
+    "abstract": "We introduce the Entropy-Driven Uncertainty Process Reward Model (EDU-PRM), a novel entropy-driven training framework for process reward modeling that enables dynamic, uncertainty-aligned segmentation of complex reasoning steps, eliminating the need for costly manual step annotations. Unlike previous Process Reward Models (PRMs) that rely on static partitioning and human labeling, EDU-PRM automatically anchors step boundaries at tokens with high predictive entropy, effectively capturing intrinsic logical transitions and facilitating efficient exploration of diverse reasoning paths. On the ProcessBench benchmark, EDU-PRM outperforms strong public PRM baselines, such as Math-Shepherd PRM and Omega PRM, and EDU-PRM achieves comparable results with SOTA models while only using 1.5% training data. Furthermore, by leveraging our proposed EDU sampling strategy, we observe accuracy boosts from 64.7% to 67.3% for generative reasoning tasks, accompanied by a reduction of 32% in token usage. These findings underscore the potential of EDU-PRM as a scalable and annotation-efficient paradigm for process supervision in mathematical reasoning, paving the way for more efficient and robust approaches to complex mathematical problem solving."
+  },
+  {
+    "id": "2603.06621v1",
+    "title": "Reward Under Attack: Analyzing the Robustness and Hackability of Process Reward Models",
+    "authors": "Rishabh Tiwari, Aditya Tomar, Udbhav Bamba, Monishwaran Maheswaran, Heng Yang, Michael W. Mahoney, Kurt Keutzer, Amir Gholami",
+    "published": "2026-02-20",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2603.06621v1",
+    "pdf_url": "https://arxiv.org/pdf/2603.06621v1",
+    "abstract": "Process Reward Models (PRMs) are rapidly becoming the backbone of LLM reasoning pipelines, yet we demonstrate that state-of-the-art PRMs are systematically exploitable under adversarial optimization pressure. To address this, we introduce a three-tiered diagnostic framework that applies increasing adversarial pressure to quantify these vulnerabilities. Static perturbation analysis uncovers a fluency-logic dissociation: high invariance to surface-level style changes reward changes $<$0.1, yet inconsistent detection of logically-corrupted reasoning, with different models failing on different attack types. Adversarial optimization demonstrates that gradient-based attacks inflate rewards on invalid trajectories, with reward landscapes exhibiting wide, exploitable peaks. RL-induced reward hacking exposes the critical failure mode: policies trained on AIME problems achieve near-perfect PRM rewards ($>$0.9), while ground-truth accuracy remains low (below 4%), with 43% of reward gains attributable to stylistic shortcuts. These findings reveal that current PRMs function as fluency detectors rather than reasoning verifiers, creating systematic blind spots that undermine their use as training signals. We release PRM-BiasBench and a diagnostic toolkit to enable robustness evaluation before deployment. The code and dataset are available at https://github.com/SqueezeAILab/reward-under-attack."
+  },
+  {
+    "id": "2604.17282v1",
+    "title": "MedPRMBench: A Fine-grained Benchmark for Process Reward Models in Medical Reasoning",
+    "authors": "Lingyan Wu, Xiang Zheng, Weiqi Zhai, Wei Wang, Xuan Ren, Zifan Zhang, Hu Wei, Bing Zhao",
+    "published": "2026-04-19",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2604.17282v1",
+    "pdf_url": "https://arxiv.org/pdf/2604.17282v1",
+    "abstract": "Process-Level Reward Models (PRMs) are essential for guiding complex reasoning in large language models, yet existing PRM benchmarks cover only general domains such as mathematics, failing to address medical reasoning -- which is uniquely characterized by safety criticality, knowledge intensity, and diverse error patterns. Without a reliable medical PRM evaluation framework, we cannot quantify models' error detection capabilities in clinical reasoning, leaving their safety in real-world healthcare applications unverified. We propose MedPRMBench, the first process-level reward model benchmark for the medical domain. Built through a three-phase pipeline based on Clinical Reasoning Blueprints (CRBs), MedPRMBench systematically generates high-quality evaluation data from seven medical QA sources, covering 14 fine-grained error types across three categories (Simplicity, Soundness, and Sensitivity) with the first 4-level severity grading system to quantify clinical impact. The benchmark comprises 6{,}500 questions with 13{,}000 reasoning chains and 113{,}910 step-level labels, plus 6{,}879 questions for training. Our medical PRM baseline achieves an 87.1\\% overall PRMScore -- substantially surpassing all baselines -- and serves as a plug-and-play verifier that improves downstream medical QA accuracy by 3.2--6.7 percentage points. Systematic evaluation spanning proprietary frontier models, open-source reasoning models, and medical-specialized models reveals critical weaknesses in current models' medical reasoning error detection capabilities, providing clear directions for future PRM improvement."
+  },
+  {
+    "id": "2601.12748v1",
+    "title": "Towards Robust Process Reward Modeling via Noise-aware Learning",
+    "authors": "Bin Xie, Bingbing Xu, Xueyun Tian, Yilin Chen, Huawei Shen",
+    "published": "2026-01-19",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2601.12748v1",
+    "pdf_url": "https://arxiv.org/pdf/2601.12748v1",
+    "abstract": "Process Reward Models (PRMs) have achieved strong results in complex reasoning, but are bottlenecked by costly process-level supervision. A widely used alternative, Monte Carlo Estimation (MCE), defines process rewards as the probability that a policy model reaches the correct final answer from a given reasoning step. However, step correctness is an intrinsic property of the reasoning trajectory, and should be invariant to policy choice. Our empirical findings show that MCE producing policy-dependent rewards that induce label noise, including false positives that reward incorrect steps and false negatives that penalize correct ones. To address above challenges, we propose a two-stage framework to mitigate noisy supervision. In the labeling stage, we introduce a reflection-aware label correction mechanism that uses a large language model (LLM) as a judge to detect reflection and self-correction behaviors related to the current reasoning step, thereby suppressing overestimated rewards. In the training stage, we further propose a \\underline{\\textbf{N}}oise-\\underline{\\textbf{A}}ware \\underline{\\textbf{I}}terative \\underline{\\textbf{T}}raining framework that enables the PRM to progressively refine noisy labels based on its own confidence. Extensive Experiments show that our method substantially improves step-level correctness discrimination, achieving up to a 27\\% absolute gain in average F1 over PRMs trained with noisy supervision."
+  },
+  {
+    "id": "2601.17223v1",
+    "title": "Beyond Outcome Verification: Verifiable Process Reward Models for Structured Reasoning",
+    "authors": "Massimiliano Pronesti, Anya Belz, Yufang Hou",
+    "published": "2026-01-23",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2601.17223v1",
+    "pdf_url": "https://arxiv.org/pdf/2601.17223v1",
+    "abstract": "Recent work on reinforcement learning with verifiable rewards (RLVR) has shown that large language models (LLMs) can be substantially improved using outcome-level verification signals, such as unit tests for code or exact-match checks for mathematics. In parallel, process supervision has long been explored as a way to shape the intermediate reasoning behaviour of LLMs, but existing approaches rely on neural judges to score chain-of-thought steps, leaving them vulnerable to opacity, bias, and reward hacking. To address this gap, we introduce Verifiable Process Reward Models (VPRMs), a reinforcement-learning framework in which intermediate reasoning steps are checked by deterministic, rule-based verifiers. We apply VPRMs to risk-of-bias assessment for medical evidence synthesis, a domain where guideline-defined criteria and rule-based decision paths enable programmatic verification of reasoning traces. Across multiple datasets, we find that VPRMs generate reasoning that adheres closely to domain rules and achieve substantially higher coherence between step-level decisions and final labels. Results show that VPRMs achieve up to 20% higher F1 than state-of-the-art models and 6.5% higher than verifiable outcome rewards, with substantial gains in evidence grounding and logical coherence."
+  },
+  {
+    "id": "2604.24583v1",
+    "title": "Improving Vision-language Models with Perception-centric Process Reward Models",
+    "authors": "Yingqian Min, Kun Zhou, Yifan Li, Yuhuan Wu, Han Peng, Yifan Du, Wayne Xin Zhao, Min Yang, Ji-Rong Wen",
+    "published": "2026-04-27",
+    "category": "cs.CV",
+    "arxiv_url": "http://arxiv.org/abs/2604.24583v1",
+    "pdf_url": "https://arxiv.org/pdf/2604.24583v1",
+    "abstract": "Recent advancements in reinforcement learning with verifiable rewards (RLVR) have significantly improved the complex reasoning ability of vision-language models (VLMs). However, its outcome-level supervision is too coarse to diagnose and correct errors within the reasoning chain. To this end, we propose Perceval, a process reward model (PRM) that enables token-level error grounding, which can extract image-related claims from the response and compare them one by one with the visual evidence in the image, ultimately returning claims that contain perceptual errors. Perceval is trained with perception-intensive supervised training data. We then integrate Perceval into the RL training process to train the policy models. Specifically, compared to traditional GRPO, which applies sequence-level advantages, we apply token-level advantages by targeting penalties on hallucinated spans identified by Perceval, thus enabling fine-grained supervision signals. In addition to augmenting the training process, Perceval can also assist VLMs during the inference stage. Using Perceval, we can truncate the erroneous portions of the model's response, and then either have the model regenerate the response directly or induce the model to reflect on its previous output. This process can be repeated multiple times to achieve test-time scaling. Experiments show significant improvements on benchmarks from various domains across multiple reasoning VLMs trained with RL, highlighting the promise of perception-centric supervision as a general-purpose strategy. For test-time scaling, it also demonstrates consistent performance gains over other strategies, such as major voting. Our code and data will be publicly released at https://github.com/RUCAIBox/Perceval."
+  },
+  {
+    "id": "2511.19895v2",
+    "title": "RPM-MCTS: Knowledge-Retrieval as Process Reward Model with Monte Carlo Tree Search for Code Generation",
+    "authors": "Yuanyuan Lin, Xiangyu Ouyang, Teng Zhang, Kaixin Sui",
+    "published": "2025-11-25",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2511.19895v2",
+    "pdf_url": "https://arxiv.org/pdf/2511.19895v2",
+    "abstract": "Tree search-based methods have made significant progress in enhancing the code generation capabilities of large language models. However, due to the difficulty in effectively evaluating intermediate algorithmic steps and the inability to locate and timely correct erroneous steps, these methods often generate incorrect code and incur increased computational costs. To tackle these problems, we propose RPM-MCTS, an effective method that utilizes Knowledge-Retrieval as Process Reward Model based on Monte Carlo Tree Search to evaluate intermediate algorithmic steps. By utilizing knowledge base retrieval, RPM-MCTS avoids the complex training of process reward models. During the expansion phase, similarity filtering is employed to remove redundant nodes, ensuring diversity in reasoning paths. Furthermore, our method utilizes sandbox execution feedback to locate erroneous algorithmic steps during generation, enabling timely and targeted corrections. Extensive experiments on four public code generation benchmarks demonstrate that RPM-MCTS outperforms current state-of-the-art methods while achieving an approximately 15% reduction in token consumption. Furthermore, full fine-tuning of the base model using the data constructed by RPM-MCTS significantly enhances its code capabilities."
+  },
+  {
+    "id": "2505.14391v1",
+    "title": "Beyond the First Error: Process Reward Models for Reflective Mathematical Reasoning",
+    "authors": "Zhaohui Yang, Chenghua He, Xiaowen Shi, Linjing Li, Qiyue Yin, Shihong Deng, Daxin Jiang",
+    "published": "2025-05-20",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2505.14391v1",
+    "pdf_url": "https://arxiv.org/pdf/2505.14391v1",
+    "abstract": "Many studies focus on data annotation techniques for training effective PRMs. However, current methods encounter a significant issue when applied to long CoT reasoning processes: they tend to focus solely on the first incorrect step and all preceding steps, assuming that all subsequent steps are incorrect. These methods overlook the unique self-correction and reflection mechanisms inherent in long CoT, where correct reasoning steps may still occur after initial reasoning mistakes. To address this issue, we propose a novel data annotation method for PRMs specifically designed to score the long CoT reasoning process. Given that under the reflection pattern, correct and incorrect steps often alternate, we introduce the concepts of Error Propagation and Error Cessation, enhancing PRMs' ability to identify both effective self-correction behaviors and reasoning based on erroneous steps. Leveraging an LLM-based judger for annotation, we collect 1.7 million data samples to train a 7B PRM and evaluate it at both solution and step levels. Experimental results demonstrate that compared to existing open-source PRMs and PRMs trained on open-source datasets, our PRM achieves superior performance across various metrics, including search guidance, BoN, and F1 scores. Compared to widely used MC-based annotation methods, our annotation approach not only achieves higher data efficiency but also delivers superior performance. Detailed analysis is also conducted to demonstrate the stability and generalizability of our method."
+  },
+  {
+    "id": "2510.23217v1",
+    "title": "Process Reward Models for Sentence-Level Verification of LVLM Radiology Reports",
+    "authors": "Alois Thomas, Maya Varma, Jean-Benoit Delbrouck, Curtis P. Langlotz",
+    "published": "2025-10-27",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2510.23217v1",
+    "pdf_url": "https://arxiv.org/pdf/2510.23217v1",
+    "abstract": "Automating radiology report generation with Large Vision-Language Models (LVLMs) holds great potential, yet these models often produce clinically critical hallucinations, posing serious risks. Existing hallucination detection methods frequently lack the necessary sentence-level granularity or robust generalization across different LVLM generators. We introduce a novel approach: a sentence-level Process Reward Model (PRM) adapted for this vision-language task. Our PRM predicts the factual correctness of each generated sentence, conditioned on clinical context and preceding text. When fine-tuned on MIMIC-CXR with weakly-supervised labels, a lightweight 0.5B-parameter PRM outperforms existing verification techniques, demonstrating, for instance, relative improvements of 7.5% in Matthews Correlation Coefficient and 1.8% in AUROC over strong white-box baselines on outputs from one LVLM. Unlike methods reliant on internal model states, our PRM demonstrates strong generalization to an unseen LVLM. We further show its practical utility: PRM scores effectively filter low-quality reports, improving F1-CheXbert scores by 4.5% (when discarding the worst 10% of reports). Moreover, when guiding a novel weighted best-of-N selection process on the MIMIC-CXR test set, our PRM show relative improvements in clinical metrics of 7.4% for F1-CheXbert and 0.6% for BERTScore. These results demonstrate that a lightweight, context-aware PRM provides a model-agnostic safety layer for clinical LVLMs without access to internal activations"
+  },
+  {
+    "id": "2506.09532v5",
+    "title": "Athena: Enhancing Multimodal Reasoning with Data-efficient Process Reward Models",
+    "authors": "Shuai Wang, Zhenhua Liu, Jiaheng Wei, Xuanwu Yin, Dong Li, Emad Barsoum",
+    "published": "2025-06-11",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2506.09532v5",
+    "pdf_url": "https://arxiv.org/pdf/2506.09532v5",
+    "abstract": "We present Athena-PRM, a multimodal process reward model (PRM) designed to evaluate the reward score for each step in solving complex reasoning problems. Developing high-performance PRMs typically demands significant time and financial investment, primarily due to the necessity for step-level annotations of reasoning steps. Conventional automated labeling methods, such as Monte Carlo estimation, often produce noisy labels and incur substantial computational costs. To efficiently generate high-quality process-labeled data, we propose leveraging prediction consistency between weak and strong completers as a criterion for identifying reliable process labels. Remarkably, Athena-PRM demonstrates outstanding effectiveness across various scenarios and benchmarks with just 5,000 samples. Furthermore, we also develop two effective strategies to improve the performance of PRMs: ORM initialization and up-sampling for negative data. We validate our approach in three specific scenarios: verification for test time scaling, direct evaluation of reasoning step correctness, and reward ranked fine-tuning. Our Athena-PRM consistently achieves superior performance across multiple benchmarks and scenarios. Notably, when using Qwen2.5-VL-7B as the policy model, Athena-PRM enhances performance by 10.2 points on WeMath and 7.1 points on MathVista for test time scaling. Furthermore, Athena-PRM sets the state-of-the-art (SoTA) results in VisualProcessBench and outperforms the previous SoTA by 3.9 F1-score, showcasing its robust capability to accurately assess the correctness of the reasoning step. Additionally, utilizing Athena-PRM as the reward model, we develop Athena-7B with reward ranked fine-tuning and outperforms baseline with a significant margin on five benchmarks."
+  },
+  {
+    "id": "2505.23474v1",
+    "title": "Socratic-PRMBench: Benchmarking Process Reward Models with Systematic Reasoning Patterns",
+    "authors": "Xiang Li, Haiyang Yu, Xinghua Zhang, Ziyang Huang, Shizhu He, Kang Liu, Jun Zhao, Fei Huang, Yongbin Li",
+    "published": "2025-05-29",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2505.23474v1",
+    "pdf_url": "https://arxiv.org/pdf/2505.23474v1",
+    "abstract": "Process Reward Models (PRMs) are crucial in complex reasoning and problem-solving tasks (e.g., LLM agents with long-horizon decision-making) by verifying the correctness of each intermediate reasoning step. In real-world scenarios, LLMs may apply various reasoning patterns (e.g., decomposition) to solve a problem, potentially suffering from errors under various reasoning patterns. Therefore, PRMs are required to identify errors under various reasoning patterns during the reasoning process. However, existing benchmarks mainly focus on evaluating PRMs with stepwise correctness, ignoring a systematic evaluation of PRMs under various reasoning patterns. To mitigate this gap, we introduce Socratic-PRMBench, a new benchmark to evaluate PRMs systematically under six reasoning patterns, including Transformation, Decomposition, Regather, Deduction, Verification, and Integration. Socratic-PRMBench}comprises 2995 reasoning paths with flaws within the aforementioned six reasoning patterns. Through our experiments on both PRMs and LLMs prompted as critic models, we identify notable deficiencies in existing PRMs. These observations underscore the significant weakness of current PRMs in conducting evaluations on reasoning steps under various reasoning patterns. We hope Socratic-PRMBench can serve as a comprehensive testbed for systematic evaluation of PRMs under diverse reasoning patterns and pave the way for future development of PRMs."
+  },
+  {
+    "id": "2601.12294v1",
+    "title": "ToolPRMBench: Evaluating and Advancing Process Reward Models for Tool-using Agents",
+    "authors": "Dawei Li, Yuguang Yao, Zhen Tan, Huan Liu, Ruocheng Guo",
+    "published": "2026-01-18",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2601.12294v1",
+    "pdf_url": "https://arxiv.org/pdf/2601.12294v1",
+    "abstract": "Reward-guided search methods have demonstrated strong potential in enhancing tool-using agents by effectively guiding sampling and exploration over complex action spaces. As a core design, those search methods utilize process reward models (PRMs) to provide step-level rewards, enabling more fine-grained monitoring. However, there is a lack of systematic and reliable evaluation benchmarks for PRMs in tool-using settings. In this paper, we introduce ToolPRMBench, a large-scale benchmark specifically designed to evaluate PRMs for tool-using agents. ToolPRMBench is built on top of several representative tool-using benchmarks and converts agent trajectories into step-level test cases. Each case contains the interaction history, a correct action, a plausible but incorrect alternative, and relevant tool metadata. We respectively utilize offline sampling to isolate local single-step errors and online sampling to capture realistic multi-step failures from full agent rollouts. A multi-LLM verification pipeline is proposed to reduce label noise and ensure data quality. We conduct extensive experiments across large language models, general PRMs, and tool-specialized PRMs on ToolPRMBench. The results reveal clear differences in PRM effectiveness and highlight the potential of specialized PRMs for tool-using. Code and data will be released at https://github.com/David-Li0406/ToolPRMBench."
+  },
+  {
+    "id": "2605.01203v2",
+    "title": "GR-Ben: A General Reasoning Benchmark for Evaluating Process Reward Models",
+    "authors": "Zhouhao Sun, Xuan Zhang, Xiao Ding, Bibo Cai, Li Du, Kai Xiong, Xinran Dai, Fei Zhang, weidi tang, Zhiyuan Kan, Yang Zhao, Bing Qin, Ting Liu",
+    "published": "2026-05-02",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2605.01203v2",
+    "pdf_url": "https://arxiv.org/pdf/2605.01203v2",
+    "abstract": "Currently, process reward models (PRMs) have exhibited remarkable potential for test-time scaling. Since large language models (LLMs) regularly generate flawed intermediate reasoning steps when tackling a broad spectrum of reasoning and decision-making tasks, PRMs are required to possess capabilities for detecting process-level errors in real-world scenarios. However, existing benchmarks primarily focus on mathematical reasoning, thereby failing to comprehensively evaluate the error detection ability of PRMs across diverse reasoning scenarios. To mitigate this gap, we introduce GR-Ben, a process-level benchmark specifically designed for assessing PRM's performance across two primary reasoning domains (science and logic) and nine subdomains. We conduct extensive experiments on a diverse set of 22 models, encompassing both PRMs and LLMs, and derive two key findings: (1) In domains beyond mathematical reasoning, the error-detection ability of existing PRMs and LLMs is found to be markedly weaker by comparison.(2) In general, PRMs are less adept at identifying knowledge-based errors, whereas LLMs exhibit poorer performance in detecting computational errors. We hope GR-Ben can foster future researches on PRMs for general domains, thereby enhancing the reasoning capabilities of LLMs."
+  },
+  {
+    "id": "2602.08346v1",
+    "title": "What, Whether and How? Unveiling Process Reward Models for Thinking with Images Reasoning",
+    "authors": "Yujin Zhou, Pengcheng Wen, Jiale Chen, Boqin Yin, Han Zhu, Jiaming Ji, Juntao Dai, Chi-Min Chan, Sirui Han",
+    "published": "2026-02-09",
+    "category": "cs.CV",
+    "arxiv_url": "http://arxiv.org/abs/2602.08346v1",
+    "pdf_url": "https://arxiv.org/pdf/2602.08346v1",
+    "abstract": "The rapid advancement of Large Vision Language Models (LVLMs) has demonstrated excellent abilities in various visual tasks. Building upon these developments, the thinking with images paradigm has emerged, enabling models to dynamically edit and re-encode visual information at each reasoning step, mirroring human visual processing. However, this paradigm introduces significant challenges as diverse errors may occur during reasoning processes. This necessitates Process Reward Models (PRMs) for distinguishing positive and negative reasoning steps, yet existing benchmarks for PRMs are predominantly text-centric and lack comprehensive assessment under this paradigm. To address these gaps, this work introduces the first comprehensive benchmark specifically designed for evaluating PRMs under the thinking with images paradigm. Our main contributions are: (1) Through extensive analysis of reasoning trajectories and guided search experiments with PRMs, we define 7 fine-grained error types and demonstrate both the necessity for specialized PRMs and the potential for improvement. (2) We construct a comprehensive benchmark comprising 1,206 manually annotated thinking with images reasoning trajectories spanning 4 categories and 16 subcategories for fine-grained evaluation of PRMs. (3) Our experimental analysis reveals that current LVLMs fall short as effective PRMs, exhibiting limited capabilities in visual reasoning process evaluation with significant performance disparities across error types, positive evaluation bias, and sensitivity to reasoning step positions. These findings demonstrate the effectiveness of our benchmark and establish crucial foundations for advancing PRMs in LVLMs."
+  },
+  {
+    "id": "2506.09338v2",
+    "title": "Know What You Don't Know: Uncertainty Calibration of Process Reward Models",
+    "authors": "Young-Jin Park, Kristjan Greenewald, Kaveh Alim, Hao Wang, Navid Azizan",
+    "published": "2025-06-11",
+    "category": "stat.ML",
+    "arxiv_url": "http://arxiv.org/abs/2506.09338v2",
+    "pdf_url": "https://arxiv.org/pdf/2506.09338v2",
+    "abstract": "Process reward models (PRMs) play a central role in guiding inference-time scaling algorithms for large language models (LLMs). However, we observe that even state-of-the-art PRMs can be poorly calibrated. Specifically, they tend to overestimate the success probability that a partial reasoning step will lead to a correct final answer, particularly when smaller LLMs are used to complete the reasoning trajectory. To address this, we present a calibration approach -- performed via quantile regression -- that adjusts PRM outputs to better align with true success probabilities. Leveraging these calibrated success estimates and their associated confidence bounds, we introduce an \\emph{instance-adaptive scaling} (IAS) framework that dynamically adjusts the compute budget based on the estimated likelihood that a partial reasoning trajectory will yield a correct final answer. Unlike conventional methods that allocate a fixed number of reasoning trajectories per query, this approach adapts to each instance and reasoning step when using our calibrated PRMs. Experiments on mathematical reasoning benchmarks show that (i) our PRM calibration method achieves small calibration error, outperforming the baseline methods, (ii) calibration is crucial for enabling effective IAS, and (iii) the proposed IAS strategy reduces inference costs while maintaining final answer accuracy, utilizing less compute on more confident problems as desired."
+  },
+  {
+    "id": "2506.03570v1",
+    "title": "FreePRM: Training Process Reward Models Without Ground Truth Process Labels",
+    "authors": "Lin Sun, Chuang Liu, Xiaofeng Ma, Tao Yang, Weijia Lu, Ning Wu",
+    "published": "2025-06-04",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2506.03570v1",
+    "pdf_url": "https://arxiv.org/pdf/2506.03570v1",
+    "abstract": "Recent advancements in Large Language Models (LLMs) have demonstrated that Process Reward Models (PRMs) play a crucial role in enhancing model performance. However, training PRMs typically requires step-level labels, either manually annotated or automatically generated, which can be costly and difficult to obtain at scale. To address this challenge, we introduce FreePRM, a weakly supervised framework for training PRMs without access to ground-truth step-level labels. FreePRM first generates pseudo step-level labels based on the correctness of final outcome, and then employs Buffer Probability to eliminate impact of noise inherent in pseudo labeling. Experimental results show that FreePRM achieves an average F1 score of 53.0% on ProcessBench, outperforming fully supervised PRM trained on Math-Shepherd by +24.1%. Compared to other open-source PRMs, FreePRM outperforms upon RLHFlow-PRM-Mistral-8B (28.4%) by +24.6%, EurusPRM (31.3%) by +21.7%, and Skywork-PRM-7B (42.1%) by +10.9%. This work introduces a new paradigm in PRM training, significantly reducing reliance on costly step-level annotations while maintaining strong performance."
+  },
+  {
+    "id": "2507.15698v2",
+    "title": "CoLD: Counterfactually-Guided Length Debiasing for Process Reward Models in Mathematical Reasoning",
+    "authors": "Congmin Zheng, Jiachen Zhu, Jianghao Lin, Xinyi Dai, Weiwen Liu, Haoxuan Li, Yong Yu, Weinan Zhang, Mengyue Yang",
+    "published": "2025-07-21",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2507.15698v2",
+    "pdf_url": "https://arxiv.org/pdf/2507.15698v2",
+    "abstract": "Process Reward Models (PRMs) play a central role in evaluating and guiding multi-step reasoning in large language models (LLMs), especially for mathematical problem solving. However, we identify a pervasive length bias in existing PRMs: they tend to assign higher scores to longer reasoning steps, even when the semantic content and logical validity are unchanged. This bias undermines the reliability of reward predictions and leads to overly verbose outputs during inference. To address this issue, we propose CoLD(Counterfactually-Guided Length Debiasing), a unified framework that mitigates length bias through three components: an explicit length-penalty adjustment, a learned bias estimator trained to capture spurious length-related signals, and a joint training strategy that enforces length-invariance in reward predictions. Our approach is grounded in counterfactual reasoning and informed by causal graph analysis. Extensive experiments on MATH500 and GSM-Plus show that CoLD improves accuracy in step selection, and encourages more concise, logically valid reasoning. Furthermore, it consistently improves downstream RL performance and generalizes across domains by mitigating length bias, demonstrating CoLD's strong generalization capability."
+  },
+  {
+    "id": "2512.23703v1",
+    "title": "Robo-Dopamine: General Process Reward Modeling for High-Precision Robotic Manipulation",
+    "authors": "Huajie Tan, Sixiang Chen, Yijie Xu, Zixiao Wang, Yuheng Ji, Cheng Chi, Yaoxu Lyu, Zhongxia Zhao, Xiansheng Chen, Peterson Co, Shaoxuan Xie, Guocai Yao, Pengwei Wang, Zhongyuan Wang, Shanghang Zhang",
+    "published": "2025-12-29",
+    "category": "cs.RO",
+    "arxiv_url": "http://arxiv.org/abs/2512.23703v1",
+    "pdf_url": "https://arxiv.org/pdf/2512.23703v1",
+    "abstract": "The primary obstacle for applying reinforcement learning (RL) to real-world robotics is the design of effective reward functions. While recently learning-based Process Reward Models (PRMs) are a promising direction, they are often hindered by two fundamental limitations: their reward models lack step-aware understanding and rely on single-view perception, leading to unreliable assessments of fine-grained manipulation progress; and their reward shaping procedures are theoretically unsound, often inducing a semantic trap that misguides policy optimization. To address these, we introduce Dopamine-Reward, a novel reward modeling method for learning a general-purpose, step-aware process reward model from multi-view inputs. At its core is our General Reward Model (GRM), trained on a vast 3,400+ hour dataset, which leverages Step-wise Reward Discretization for structural understanding and Multi-Perspective Reward Fusion to overcome perceptual limitations. Building upon Dopamine-Reward, we propose Dopamine-RL, a robust policy learning framework that employs a theoretically-sound Policy-Invariant Reward Shaping method, which enables the agent to leverage dense rewards for efficient self-improvement without altering the optimal policy, thereby fundamentally avoiding the semantic trap. Extensive experiments across diverse simulated and real-world tasks validate our approach. GRM achieves state-of-the-art accuracy in reward assessment, and Dopamine-RL built on GRM significantly improves policy learning efficiency. For instance, after GRM is adapted to a new task in a one-shot manner from a single expert trajectory, the resulting reward model enables Dopamine-RL to improve the policy from near-zero to 95% success with only 150 online rollouts (approximately 1 hour of real robot interaction), while retaining strong generalization across tasks. Project website: https://robo-dopamine.github.io"
+  },
+  {
+    "id": "2506.00027v1",
+    "title": "From Mathematical Reasoning to Code: Generalization of Process Reward Models in Test-Time Scaling",
+    "authors": "Zhengyu Chen, Yudong Wang, Teng Xiao, Ruochen Zhou, Xuesheng Yang, Wei Wang, Zhifang Sui, Jingang Wang",
+    "published": "2025-05-24",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2506.00027v1",
+    "pdf_url": "https://arxiv.org/pdf/2506.00027v1",
+    "abstract": "Recent advancements in improving the reasoning capabilities of Large Language Models have underscored the efficacy of Process Reward Models (PRMs) in addressing intermediate errors through structured feedback mechanisms. This study analyzes PRMs from multiple perspectives, including training methodologies, scalability, and generalization capabilities. We investigate the interplay between pre-training and reward model training FLOPs to assess their influence on PRM efficiency and accuracy in complex reasoning tasks. Our analysis reveals a pattern of diminishing returns in performance with increasing PRM scale, highlighting the importance of balancing model size and computational cost. Furthermore, the diversity of training datasets significantly impacts PRM performance, emphasizing the importance of diverse data to enhance both accuracy and efficiency. We further examine test-time scaling strategies, identifying Monte Carlo Tree Search as the most effective method when computational resources are abundant, while Best-of-N Sampling serves as a practical alternative under resource-limited conditions. Notably, our findings indicate that PRMs trained on mathematical datasets exhibit performance comparable to those tailored for code generation, suggesting robust cross-domain generalization. Employing a gradient-based metric, we observe that PRMs exhibit a preference for selecting responses with similar underlying patterns, further informing their optimization."
+  },
+  {
+    "id": "2601.04674v1",
+    "title": "PROMISE: Process Reward Models Unlock Test-Time Scaling Laws in Generative Recommendations",
+    "authors": "Chengcheng Guo, Kuo Cai, Yu Zhou, Qiang Luo, Ruiming Tang, Han Li, Kun Gai, Guorui Zhou",
+    "published": "2026-01-08",
+    "category": "cs.IR",
+    "arxiv_url": "http://arxiv.org/abs/2601.04674v1",
+    "pdf_url": "https://arxiv.org/pdf/2601.04674v1",
+    "abstract": "Generative Recommendation has emerged as a promising paradigm, reformulating recommendation as a sequence-to-sequence generation task over hierarchical Semantic IDs. However, existing methods suffer from a critical issue we term Semantic Drift, where errors in early, high-level tokens irreversibly divert the generation trajectory into irrelevant semantic subspaces. Inspired by Process Reward Models (PRMs) that enhance reasoning in Large Language Models, we propose Promise, a novel framework that integrates dense, step-by-step verification into generative models. Promise features a lightweight PRM to assess the quality of intermediate inference steps, coupled with a PRM-guided Beam Search strategy that leverages dense feedback to dynamically prune erroneous branches. Crucially, our approach unlocks Test-Time Scaling Laws for recommender systems: by increasing inference compute, smaller models can match or surpass larger models. Extensive offline experiments and online A/B tests on a large-scale platform demonstrate that Promise effectively mitigates Semantic Drift, significantly improving recommendation accuracy while enabling efficient deployment."
+  },
+  {
+    "id": "2504.00891v2",
+    "title": "GenPRM: Scaling Test-Time Compute of Process Reward Models via Generative Reasoning",
+    "authors": "Jian Zhao, Runze Liu, Kaiyan Zhang, Zhimu Zhou, Junqi Gao, Dong Li, Jiafei Lyu, Zhouyi Qian, Biqing Qi, Xiu Li, Bowen Zhou",
+    "published": "2025-04-01",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2504.00891v2",
+    "pdf_url": "https://arxiv.org/pdf/2504.00891v2",
+    "abstract": "Recent advancements in Large Language Models (LLMs) have shown that it is promising to utilize Process Reward Models (PRMs) as verifiers to enhance the performance of LLMs. However, current PRMs face three key challenges: (1) limited process supervision and generalization capabilities, (2) dependence on scalar value prediction without leveraging the generative abilities of LLMs, and (3) inability to scale the test-time compute of PRMs. In this work, we introduce GenPRM, a generative process reward model that performs explicit Chain-of-Thought (CoT) reasoning with code verification before providing judgment for each reasoning step. To obtain high-quality process supervision labels and rationale data, we propose Relative Progress Estimation (RPE) and a rationale synthesis framework that incorporates code verification. Experimental results on ProcessBench and several mathematical reasoning tasks show that GenPRM significantly outperforms prior PRMs with only 23K training data from MATH dataset. Through test-time scaling, a 1.5B GenPRM outperforms GPT-4o, and a 7B GenPRM surpasses Qwen2.5-Math-PRM-72B on ProcessBench. Additionally, GenPRM demonstrates strong abilities to serve as a critic model for policy model refinement. This work establishes a new paradigm for process supervision that bridges the gap between PRMs and critic models in LLMs. Our code, model, and data will be available in https://ryanliu112.github.io/GenPRM."
+  },
+  {
+    "id": "2511.08325v1",
+    "title": "AgentPRM: Process Reward Models for LLM Agents via Step-Wise Promise and Progress",
+    "authors": "Zhiheng Xi, Chenyang Liao, Guanyu Li, Yajie Yang, Wenxiang Chen, Zhihao Zhang, Binghai Wang, Senjie Jin, Yuhao Zhou, Jian Guan, Wei Wu, Tao Ji, Tao Gui, Qi Zhang, Xuanjing Huang",
+    "published": "2025-11-11",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2511.08325v1",
+    "pdf_url": "https://arxiv.org/pdf/2511.08325v1",
+    "abstract": "Despite rapid development, large language models (LLMs) still encounter challenges in multi-turn decision-making tasks (i.e., agent tasks) like web shopping and browser navigation, which require making a sequence of intelligent decisions based on environmental feedback. Previous work for LLM agents typically relies on elaborate prompt engineering or fine-tuning with expert trajectories to improve performance. In this work, we take a different perspective: we explore constructing process reward models (PRMs) to evaluate each decision and guide the agent's decision-making process. Unlike LLM reasoning, where each step is scored based on correctness, actions in agent tasks do not have a clear-cut correctness. Instead, they should be evaluated based on their proximity to the goal and the progress they have made. Building on this insight, we propose a re-defined PRM for agent tasks, named AgentPRM, to capture both the interdependence between sequential decisions and their contribution to the final goal. This enables better progress tracking and exploration-exploitation balance. To scalably obtain labeled data for training AgentPRM, we employ a Temporal Difference-based (TD-based) estimation method combined with Generalized Advantage Estimation (GAE), which proves more sample-efficient than prior methods. Extensive experiments across different agentic tasks show that AgentPRM is over $8\\times$ more compute-efficient than baselines, and it demonstrates robust improvement when scaling up test-time compute. Moreover, we perform detailed analyses to show how our method works and offer more insights, e.g., applying AgentPRM to the reinforcement learning of LLM agents."
+  },
+  {
+    "id": "2510.14942v1",
+    "title": "GroundedPRM: Tree-Guided and Fidelity-Aware Process Reward Modeling for Step-Level Reasoning",
+    "authors": "Yao Zhang, Yu Wu, Haowei Zhang, Weiguo Li, Haokun Chen, Jingpei Wu, Guohao Li, Zhen Han, Volker Tresp",
+    "published": "2025-10-16",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2510.14942v1",
+    "pdf_url": "https://arxiv.org/pdf/2510.14942v1",
+    "abstract": "Process Reward Models (PRMs) aim to improve multi-step reasoning in Large Language Models (LLMs) by supervising intermediate steps and identifying errors. However, building effective PRMs remains challenging due to the lack of scalable, high-quality annotations. Existing approaches rely on costly human labeling, LLM-based self-evaluation that is prone to hallucination, or Monte Carlo (MC) estimation, which infers step quality solely from rollout outcomes and often introduces noisy, misaligned supervision due to credit misattribution. These issues result in three core limitations: noisy rewards, low factual fidelity, and misalignment with step-level reasoning objectives. To address these challenges, we introduce GroundedPRM, a tree-guided and fidelity-aware framework for automatic process supervision. To reduce reward noise and enable fine-grained credit assignment, we construct structured reasoning paths via Monte Carlo Tree Search (MCTS). To eliminate hallucinated supervision, we validate each intermediate step using an external tool, providing execution-grounded correctness signals. To combine both step-level validation and global outcome assessment, we design a hybrid reward aggregation mechanism that fuses tool-based verification with MCTS-derived feedback. Finally, we format the reward signal into a rationale-enhanced, generative structure to promote interpretability and compatibility with instruction-tuned LLMs. GroundedPRM is trained on only 40K automatically labeled samples, amounting to just 10% of the data used by the best-performing PRM trained with auto-labeled supervision. Nevertheless, it achieves up to a 26% relative improvement in average performance on ProcessBench. When used for reward-guided greedy search, GroundedPRM outperforms even PRMs trained with human-labeled supervision, offering a scalable and verifiable path toward high-quality process-level reasoning."
+  },
+  {
+    "id": "2606.00437v1",
+    "title": "EST-PRM: Stress-Testing Process Reward Models Before They Become Load-Bearing",
+    "authors": "Ibne Farabi Shihab, Fariya Afrin, Sanjeda Akter, Anuj Sharma",
+    "published": "2026-05-30",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2606.00437v1",
+    "pdf_url": "https://arxiv.org/pdf/2606.00437v1",
+    "abstract": "Process reward models (PRMs) are widely used in language-model training with dense step-level supervision. They assume PRM scores are stable proxies for step correctness under label-preserving transformations. These transformations change reasoning structure but preserve final answers. We argue this assumption is not well validated. Such transformations can change how PRM scores relate to correctness signals, leading to different failure modes across models.To address this gap, we introduce \\textbf{EST-PRM}, a stress-testing framework for dense process rewards. It applies three transformations: (1) step inflation, (2) dependency-aware step reordering, and (3) confidence markers. A vulnerability decomposition is defined that separates reward inflation from loss of correctness sensitivity. Five PRM-style models are evaluated on 4,687 reasoning chains from MATH-500, GSM8K, and PRMBench.The results indicate clear differences in vulnerability patterns across models. Math-Shepherd shows the strongest sensitivity to position perturbations, with a Pearson correlation drop of $0.152 \\pm 0.038$ and a $32.8 \\pm 4.9\\%$ score inflation rate. Qwen2.5-Math-PRM is most affected by step inflation, reaching a $47.6 \\pm 4.3\\%$ inflation rate. Confidence-based perturbations also distort reward calibration, revealing inconsistencies in correctness estimation. Three mitigation strategies are evaluated, highlighting trade-offs between robustness coverage and false-positive rates."
+  },
+  {
+    "id": "2502.11520v1",
+    "title": "AURORA:Automated Training Framework of Universal Process Reward Models via Ensemble Prompting and Reverse Verification",
+    "authors": "Xiaoyu Tan, Tianchu Yao, Chao Qu, Bin Li, Minghao Yang, Dakuan Lu, Haozhe Wang, Xihe Qiu, Wei Chu, Yinghui Xu, Yuan Qi",
+    "published": "2025-02-17",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2502.11520v1",
+    "pdf_url": "https://arxiv.org/pdf/2502.11520v1",
+    "abstract": "The reasoning capabilities of advanced large language models (LLMs) like o1 have revolutionized artificial intelligence applications. Nevertheless, evaluating and optimizing complex reasoning processes remain significant challenges due to diverse policy distributions and the inherent limitations of human effort and accuracy. In this paper, we present AURORA, a novel automated framework for training universal process reward models (PRMs) using ensemble prompting and reverse verification. The framework employs a two-phase approach: First, it uses diverse prompting strategies and ensemble methods to perform automated annotation and evaluation of processes, ensuring robust assessments for reward learning. Second, it leverages practical reference answers for reverse verification, enhancing the model's ability to validate outputs and improving training accuracy. To assess the framework's performance, we extend beyond the existing ProcessBench benchmark by introducing UniversalBench, which evaluates reward predictions across full trajectories under diverse policy distribtion with long Chain-of-Thought (CoT) outputs. Experimental results demonstrate that AURORA enhances process evaluation accuracy, improves PRMs' accuracy for diverse policy distributions and long-CoT responses. The project will be open-sourced at https://auroraprm.github.io/. The Universal-PRM-7B is available at https://huggingface.co/infly/Universal-PRM-7B."
+  },
+  {
+    "id": "2605.06785v2",
+    "title": "Distributional Process Reward Models: Calibrated Prediction of Future Rewards via Conditional Optimal Transport",
+    "authors": "Rachel Ma, Dylan Hadfield-Menell, Kristjan Greenewald",
+    "published": "2026-05-07",
+    "category": "cs.LG",
+    "arxiv_url": "http://arxiv.org/abs/2605.06785v2",
+    "pdf_url": "https://arxiv.org/pdf/2605.06785v2",
+    "abstract": "Inference-time scaling methods rely on Process Reward Models (PRMs), which are often poorly calibrated and overestimate success probabilities. We propose, to our knowledge, the first use of conditional optimal transport for calibrating PRMs, modifying conditional OT (CondOT) map learning \\cite{bunne2022supervised} to estimate a monotonic conditional quantile function over success probabilities estimated by the PRM, conditioned on PRM hidden states. This yields structurally valid quantile estimates and enables efficient extraction of confidence bounds at arbitrary levels, which we integrate into the instance-adaptive scaling (IAS) framework of \\cite{park2025know}. We evaluate on mathematical reasoning benchmarks spanning moderate-difficulty problems (MATH-500) and harder out-of-distribution problems (AIME). For PRMs with reliable ranking signals, our method substantially improves calibration over both uncalibrated PRMs and quantile regression. On downstream Best-of-N IAS performance, our method generally improves over uncalibrated PRMs. These results establish conditional optimal transport as another principled and practical approach to PRM calibration, offering structural guarantees and flexible uncertainty estimation."
+  },
+  {
+    "id": "2604.17957v1",
+    "title": "Process Reward Models Meet Planning: Generating Precise and Scalable Datasets for Step-Level Rewards",
+    "authors": "Raffaele Pisano, Roberto Navigli",
+    "published": "2026-04-20",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2604.17957v1",
+    "pdf_url": "https://arxiv.org/pdf/2604.17957v1",
+    "abstract": "Process Reward Models (PRMs) have emerged as a powerful tool for providing step-level feedback when evaluating the reasoning of Large Language Models (LLMs), which frequently produce chains of thought (CoTs) containing errors even when the final answer is correct. However, existing PRM datasets remain expensive to construct, prone to annotation errors, and predominantly limited to the mathematical domain. This work introduces a novel and scalable approach to PRM dataset generation based on planning logical problems expressed in the Planning Domain Definition Language (PDDL). Using this method, we generate a corpus of approximately one million reasoning steps across various PDDL domains and use it to train PRMs. Experimental results show that augmenting widely-used PRM training datasets with PDDL-derived data yields substantial improvements in both mathematical and non-mathematical reasoning, as demonstrated across multiple benchmarks. These findings indicate that planning problems constitute a scalable and effective resource for generating robust, precise, and fine-grained training data for PRMs, going beyond the classical mathematical sources that dominate this field."
+  },
+  {
+    "id": "2505.19706v1",
+    "title": "Error Typing for Smarter Rewards: Improving Process Reward Models with Error-Aware Hierarchical Supervision",
+    "authors": "Tej Deep Pala, Panshul Sharma, Amir Zadeh, Chuan Li, Soujanya Poria",
+    "published": "2025-05-26",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2505.19706v1",
+    "pdf_url": "https://arxiv.org/pdf/2505.19706v1",
+    "abstract": "Large Language Models (LLMs) are prone to hallucination, especially during multi-hop and reasoning-intensive tasks such as mathematical problem solving. While Outcome Reward Models verify only final answers, Process Reward Models (PRMs) score each intermediate step to steer generation toward coherent solutions. We introduce PathFinder-PRM, a novel hierarchical, error-aware discriminative PRM that first classifies math and consistency errors at each step, then combines these fine-grained signals to estimate step correctness. To train PathFinder-PRM, we construct a 400K-sample dataset by enriching the human-annotated PRM800K corpus and RLHFlow Mistral traces with three-dimensional step-level labels. On PRMBench, PathFinder-PRM achieves a new state-of-the-art PRMScore of 67.7, outperforming the prior best (65.5) while using 3 times less data. When applied to reward guided greedy search, our model yields prm@8 48.3, a +1.5 point gain over the strongest baseline. These results demonstrate that decoupled error detection and reward estimation not only boost fine-grained error detection but also substantially improve end-to-end, reward-guided mathematical reasoning with greater data efficiency."
+  },
+  {
+    "id": "2603.16253v2",
+    "title": "Grounding the Score: Explicit Visual Premise Verification for Reliable Vision-Language Process Reward Models",
+    "authors": "Junxin Wang, Dai Guan, Weijie Qiu, Zhihang Li, Yongbo Gai, Zhengyi Yang, Mengyu Zhou, Erchao Zhao, Xiaoxi Jiang, Guanjun Jiang",
+    "published": "2026-03-17",
+    "category": "cs.CV",
+    "arxiv_url": "http://arxiv.org/abs/2603.16253v2",
+    "pdf_url": "https://arxiv.org/pdf/2603.16253v2",
+    "abstract": "Vision-language process reward models (VL-PRMs) are increasingly used to score intermediate reasoning steps and rerank candidates under test-time scaling. However, they often function as black-box judges: a low step score may reflect a genuine reasoning mistake or simply the verifier's misperception of the image. This entanglement between perception and reasoning leads to systematic false positives (rewarding hallucinated visual premises) and false negatives (penalizing correct grounded statements), undermining both reranking and error localization. We introduce Explicit Visual Premise Verification (EVPV), a lightweight verification interface that conditions step scoring on the reliability of the visual premises a step depends on. The policy is prompted to produce a step-wise visual checklist that makes required visual facts explicit, while a constraint extractor independently derives structured visual constraints from the input image. EVPV matches checklist claims against these constraints to compute a scalar visual reliability signal, and calibrates PRM step rewards via reliability gating: rewards for visually dependent steps are attenuated when reliability is low and preserved when reliability is high. This decouples perceptual uncertainty from logical evaluation without per-step tool calls. Experiments on VisualProcessBench and six multimodal reasoning benchmarks show that EVPV improves step-level verification and consistently boosts Best-of-N reranking accuracy over strong baselines. Furthermore, injecting controlled corruption into the extracted constraints produces monotonic performance degradation, providing causal evidence that the gains arise from constraint fidelity and explicit premise verification rather than incidental prompt effects. Code is available at: https://github.com/Qwen-Applications/EVPV-PRM"
+  },
+  {
+    "id": "2510.08049v3",
+    "title": "A Survey of Process Reward Models: From Outcome Signals to Process Supervisions for Large Language Models",
+    "authors": "Congmin Zheng, Jiachen Zhu, Zhuoying Ou, Yuxiang Chen, Kangning Zhang, Rong Shan, Zeyu Zheng, Mengyue Yang, Jianghao Lin, Yong Yu, Weinan Zhang",
+    "published": "2025-10-09",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2510.08049v3",
+    "pdf_url": "https://arxiv.org/pdf/2510.08049v3",
+    "abstract": "Although Large Language Models (LLMs) exhibit advanced reasoning ability, conventional alignment remains largely dominated by outcome reward models (ORMs) that judge only final answers. Process Reward Models(PRMs) address this gap by evaluating and guiding reasoning at the step or trajectory level. This survey provides a systematic overview of PRMs through the full loop: how to generate process data, build PRMs, and use PRMs for test-time scaling and reinforcement learning. We summarize applications across math, code, text, multimodal reasoning, robotics, and agents, and review emerging benchmarks. Our goal is to clarify design spaces, reveal open challenges, and guide future research toward fine-grained, robust reasoning alignment."
+  },
+  {
+    "id": "2510.20304v2",
+    "title": "Exploring Generative Process Reward Modeling for Semi-Structured Data: A Case Study of Table Question Answering",
+    "authors": "Lei Tang, Wei Zhou, Mohsen Mesgar",
+    "published": "2025-10-23",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2510.20304v2",
+    "pdf_url": "https://arxiv.org/pdf/2510.20304v2",
+    "abstract": "Process reward models (PRMs) enhance complex reasoning in large language models (LLMs) by evaluating candidate solutions step-by-step and selecting answers based on aggregated step scores. While effective in domains such as mathematics, their applicability to tasks involving semi-structured data, like table question answering (TQA), remains unexplored. TQA poses unique challenges for PRMs, including abundant irrelevant information, loosely connected reasoning steps, and domain-specific reasoning. This work presents the first systematic study of PRMs for TQA. We evaluate state-of-the-art generative PRMs on TQA from both answer and step perspectives. Results show that PRMs that combine textual and code verification can aid solution selection but struggle to generalize to out-of-domain data. Analysis reveals a weak correlation between performance in step-level verification and answer accuracy, possibly stemming from weak step dependencies and loose causal links. Our findings highlight limitations of current PRMs on TQA and offer valuable insights for building more robust, process-aware verifiers."
+  },
+  {
+    "id": "2605.02348v1",
+    "title": "Decoding-Time Debiasing via Process Reward Models: From Controlled Fill-in to Open-Ended Generation",
+    "authors": "Muneeb Ur Raheem Khan",
+    "published": "2026-05-04",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2605.02348v1",
+    "pdf_url": "https://arxiv.org/pdf/2605.02348v1",
+    "abstract": "Large language models pick up social biases from the data they are trained on and carry those biases into downstream applications, often reinforcing stereotypes around gender, race, religion, disability, age, and socioeconomic status. The standard fixes (retraining on curated data or fine-tuning with human feedback) are expensive, need access to model weights, and risk degrading the model on other tasks. In this paper we take a different route: we debias the model at decoding time, treating bias mitigation as a structured search over candidate tokens without ever touching model weights. A separate Process Reward Model (PRM) acts as a judge, scoring each candidate for both fairness and fluency. We design three schemes of increasing sophistication (Best-of-N selection, Sequential critique-and-revise, and Constitutional self-audit) and evaluate them on four models (GPT-4o-mini, Llama 3.2 3B, Gemma 3 4B, Qwen 2.5 3B) across a 200-prompt bilingual benchmark in English and Urdu covering eight bias categories. Sequential debiasing proves the most effective, raising mean bias scores by up to +0.40 over baseline while preserving (and sometimes improving) fluency. We then extend all three schemes to open-ended generation, where each token is debiased on the fly, and introduce a lightweight Bias Guard gate that fires only on potentially biased words, keeping overhead near 2x for well-calibrated models. A formal overhead metric that separates generator cost from judge cost reveals that Best-of-N is effectively free on the generator side in a native implementation. GPT-4o-mini, included as a strong proprietary anchor, confirms that the framework scales with model capability; the three open-weight models show where current small-scale LLMs still struggle."
+  },
+  {
+    "id": "2603.08095v1",
+    "title": "DC-W2S: Dual-Consensus Weak-to-Strong Training for Reliable Process Reward Modeling in Biological Reasoning",
+    "authors": "Chi-Min Chan, Ehsan Hajiramezanali, Xiner Li, Edward De Brouwer, Carl Edwards, Wei Xue, Sirui Han, Yike Guo, Gabriele Scalia",
+    "published": "2026-03-09",
+    "category": "cs.CL",
+    "arxiv_url": "http://arxiv.org/abs/2603.08095v1",
+    "pdf_url": "https://arxiv.org/pdf/2603.08095v1",
+    "abstract": "In scientific reasoning tasks, the veracity of the reasoning process is as critical as the final outcome. While Process Reward Models (PRMs) offer a solution to the coarse-grained supervision problems inherent in Outcome Reward Models (ORMs), their deployment is hindered by the prohibitive cost of obtaining expert-verified step-wise labels. This paper addresses the challenge of training reliable PRMs using abundant but noisy \"weak\" supervision. We argue that existing Weak-to-Strong Generalization (W2SG) theories lack prescriptive guidelines for selecting high-quality training signals from noisy data. To bridge this gap, we introduce the Dual-Consensus Weak-to-Strong (DC-W2S) framework. By intersecting Self-Consensus (SC) metrics among weak supervisors with Neighborhood-Consensus (NC) metrics in the embedding space, we stratify supervision signals into distinct reliability regimes. We then employ a curriculum of instance-level balanced sampling and label-level reliability-aware masking to guide the training process. We demonstrate that DC-W2S enables the training of robust PRMs for complex reasoning without exhaustive expert annotation, proving that strategic data curation is more effective than indiscriminate training on large-scale noisy datasets."
+  },
+  {
+    "id": "2509.23250v3",
+    "title": "Training Vision-Language Process Reward Models for Test-Time Scaling in Multimodal Reasoning: Key Insights and Lessons Learned",
+    "authors": "Brandon Ong, Tej Deep Pala, Vernon Toh, William Chandra Tjhi, Soujanya Poria",
+    "published": "2025-09-27",
+    "category": "cs.AI",
+    "arxiv_url": "http://arxiv.org/abs/2509.23250v3",
+    "pdf_url": "https://arxiv.org/pdf/2509.23250v3",
+    "abstract": "Process Reward Models (PRMs) provide step-level supervision that improves the reliability of reasoning in large language models. While PRMs have been extensively studied in text-based domains, their extension to Vision Language Models (VLMs) remains limited. Existing Vision-Language PRMs (VL-PRMs) rely on Monte Carlo Tree Search (MCTS) for data construction, which can often produce noisy supervision signals and limit generalization across tasks. In this work, we aim to elucidate the design space of VL-PRMs by exploring diverse strategies for dataset construction, training, and test-time scaling. First, we introduce a hybrid data synthesis framework that combines MCTS with judgments from a strong VLM, producing more accurate step-level labels. Second, we propose perception-focused supervision, enabling our PRM to explicitly detect errors at the visual grounding stage of reasoning. Third, we systematically evaluate multiple test-time scaling strategies, showing that our PRMs can reliably guide VLMs toward more accurate solutions. Our experiments covering five diverse multimodal benchmarks (MMMU, PuzzleVQA, AlgoPuzzleVQA, MathVista, and MathVision) reveal several key insights: (i) VL-PRMs when used as Outcome Reward Models (ORMs) during test-time scaling (TTS) can outperform VL-PRM guided process step selection, (ii) smaller VL-PRMs can match or even surpass larger ones in detecting process errors, (iii) VL-PRMs uncover latent reasoning abilities in stronger VLM backbones, (iv) perception-level supervision leads to significant gains in test-time scaling, and (v) TTS performance of different policies improve on advanced math reasoning datasets despite not training VL-PRMs on such datasets. We hope our work will motivate further research and support the advancement of VLMs."
+  },
+  {
+    "id": "2604.14820v1",
+    "title": "SWE-TRACE: Optimizing Long-Horizon SWE Agents Through Rubric Process Reward Models and Heuristic Test-Time Scaling",
+    "authors": "Hao Han, Jin Xie, Xuehao Ma, Weiquan Zhu, Ziyao Zhang, ZhiLiang Long, Hongkai Chen, Qingwen Ye",
+    "published": "2026-04-16",
+    "category": "cs.SE",
+    "arxiv_url": "http://arxiv.org/abs/2604.14820v1",
+    "pdf_url": "https://arxiv.org/pdf/2604.14820v1",
+    "abstract": "Resolving real-world software engineering (SWE) issues with autonomous agents requires complex, long-horizon reasoning. Current pipelines are bottlenecked by unoptimized demonstration data, sparse execution rewards, and computationally prohibitive inference scaling, which collectively exacerbate token bloat, reward hacking, and policy degradation. We present SWE-TRACE (Trajectory Reduction and Agentic Criteria Evaluation), a unified framework optimizing the SWE agent lifecycle across data curation, reinforcement learning (RL), and test-time inference. First, we introduce an LLM multi-task cascading method, utilizing stepwise oracle verification to distill a 60K-instance Supervised Fine-Tuning (SFT) corpus strictly biased toward token-efficient, shortest-path trajectories. Second, to overcome the instability of sparse outcome rewards, we design a MemoryAugmented Agentic RL pipeline featuring a Rubric-Based Process Reward Model (PRM). An auxiliary Rubric-Agent provides dense, fine-grained heuristic feedback on intermediate steps, guiding the model through long-horizon tasks. Finally, we bridge training and inference by repurposing the PRM for heuristic-guided Test-Time Scaling (TTS). By dynamically evaluating and pruning action candidates at each step, SWE-TRACE achieves superior search efficiency without the latency overhead of standard parallel sampling. Extensive experiments on standard SWE benchmarks demonstrate that SWE-TRACE significantly advances the state-of-the-art, maximizing resolution rates while drastically reducing both token consumption and inference latency."
+  }
+]
