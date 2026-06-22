@@ -585,7 +585,7 @@ def main():
         bootstrap.create_flag(project_key, flag)
         print()
 
-    # Step 5: Create the custom judge config (primary experiment metric)
+    # Step 5: Create the custom judge config (the guardrail/secondary metric)
     judge_def = manifest["project"].get("judge")
     if judge_def:
         print("⚖️  Creating custom judge config...")
@@ -604,7 +604,8 @@ def main():
     print(f"      LD_PROJECT_KEY={project_key}")
     print(f"      LD_SDK_KEY=your-server-sdk-key")
     print("   3. Create the experiment in the UI: treatment = the 'orchestrator' flag,")
-    print("      primary metric = the gap-quality judge, then start an iteration.")
+    print("      primary metric = end-to-end graph latency, secondaries = the gap-quality")
+    print("      judge (guardrail) + total tokens (cost), then start an iteration.")
     print("   4. Drive traffic: python scripts/run_experiment.py")
     print()
     print("🔄 To make changes:")
