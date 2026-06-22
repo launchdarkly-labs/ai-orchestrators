@@ -290,7 +290,7 @@ project:
         - value: "google-adk"
           name: "Google ADK"
 
-  # Custom LLM-as-judge: the experiment's PRIMARY metric. A judge-mode config that
+  # Custom LLM-as-judge: the experiment's guardrail/secondary metric. A judge-mode config that
   # generates its own metric ($ld:ai:judge:gap-quality) — no separate custom metric.
   # The harness invokes it programmatically and records the score via the evaluated
   # node's tracker (track_judge_result). UI-editable; the code keeps a fallback rubric.
