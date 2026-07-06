@@ -308,7 +308,9 @@ project:
         variation: "synthesizer-claude"
         samplingRate: 1.0
     provider: "anthropic"
-    modelId: "claude-sonnet-4-5"
+    # Cheap-demo judge: Claude Haiku 4.5 (swap to claude-sonnet-5 for a more reliable score).
+    # The judge fires once per run and is the dominant cost when the graph runs cheap models.
+    modelId: "claude-haiku-4-5-20251001"
     # Deduction-count rubric: the judge COUNTS specific defects and computes the score
     # arithmetically. Holistic 0-1 scoring anchor-biases LLM judges into a constant
     # (every report scored exactly 0.88); counting concrete defects first breaks that.
@@ -340,3 +342,4 @@ project:
 # Model config key mapping (provider.modelId -> LD model config key)
 modelConfigKeys:
   "anthropic.claude-sonnet-4-5": "Anthropic.claude-sonnet-4-5"
+  "anthropic.claude-haiku-4-5-20251001": "Anthropic.claude-haiku-4-5-20251001"
