@@ -49,15 +49,18 @@ lets each orchestrator run its provider's native model, ranking *each framework 
 
 | orchestrator | model | provider |
 |---|---|---|
-| langgraph | claude-sonnet-4-5 | Anthropic (the base variation) |
-| openai-agents | gpt-4o | OpenAI |
-| google-adk | gemini-2.5-pro | Gemini |
-| strands | claude-sonnet-4-5 (Bedrock) | Bedrock |
+| langgraph | claude-sonnet-5 | Anthropic (direct API) |
+| openai-agents | gpt-5.1 | OpenAI |
+| google-adk | gemini-3-pro-preview | Gemini |
+| strands | claude-sonnet-5 (Bedrock) | Bedrock |
 
-Routing is structural, not code. Each node config gets one variation per framework, and targeting
-rules keyed on the `orchestrator` context attribute serve the matching model; the SDK derives the
-provider from each variation's `modelConfigKey` (a model-catalog entry), so the runners route to the
-right SDK unchanged. `langgraph` is served by the config fallthrough (the base Claude variation).
+Each provider runs its flagship; langgraph and strands share Claude Sonnet 5 (direct API vs Bedrock —
+a clean same-model framework/runtime signal). Routing is structural, not code. Each node config gets
+one variation per framework, and targeting rules keyed on the `orchestrator` context attribute serve
+the matching model; the SDK derives the provider from each variation's `modelConfigKey` (a
+model-catalog entry), so the runners route to the right SDK unchanged. All four frameworks get an
+explicit variation + rule; the config **fallthrough** stays on the pinned `claude-sonnet-4-5`, so
+Experiment A (no `orchestrator` attribute) is untouched.
 
 Set it up **after** `bootstrap.py`:
 

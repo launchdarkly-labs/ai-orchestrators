@@ -48,37 +48,48 @@ from dotenv import load_dotenv
 #   maxOutput       -> clamp for the synthesizer's max_tokens so it never exceeds the model's
 #                      output ceiling (a truncated/errored report would confound the experiment)
 #   modelConfigKey  -> a VALID catalog key ({Provider}.{model}); the SDK derives provider from
-#                      it (an explicit variation `provider` field is ignored). Verify each key
-#                      exists via GET .../ai-configs/model-configs, or provider comes back empty.
-#   modelId         -> config.model.name at runtime (what each runner hands to its SDK)
+#                      it (an explicit variation `provider` field is ignored) AND overrides
+#                      model.name with the catalog's name. Verify each key exists via
+#                      GET .../ai-configs/model-configs, or provider comes back empty.
+#   modelId         -> informational (the SDK serves the catalog's model name at runtime).
+#   maxOutput       -> clamp for the synthesizer's max_tokens (per the model's output ceiling).
+#
+# Experiment B = each orchestrator at its provider's flagship. langgraph + strands share Claude
+# Sonnet 5 (direct API vs Bedrock — a clean same-model framework/runtime signal); OpenAI and
+# Google each run their own flagship. All four get an explicit variation + rule; the config
+# fallthrough stays on the pinned claude-sonnet-4-5 so Experiment A is untouched.
 NATIVE_MODELS = {
+    "langgraph": {
+        "modelId": "claude-sonnet-5",
+        "modelConfigKey": "Anthropic.claude-sonnet-5",   # -> provider Anthropic (direct API)
+        "suffix": "sonnet5",
+        "label": "Claude Sonnet 5",
+        "maxOutput": 32000,
+    },
     "openai-agents": {
-        "modelId": "gpt-4o",
-        "modelConfigKey": "OpenAI.gpt-4o",         # -> provider OpenAI (native in the runner)
+        "modelId": "gpt-5.1",
+        "modelConfigKey": "OpenAI.gpt-5.1",              # -> provider OpenAI (native in the runner)
         "suffix": "gpt",
-        "label": "GPT-4o",
-        "maxOutput": 16000,  # gpt-4o output ceiling is 16,384
+        "label": "GPT-5.1",
+        "maxOutput": 32000,
     },
     "google-adk": {
-        "modelId": "gemini-2.5-pro",
-        "modelConfigKey": "Gemini.gemini-2.5-pro",  # -> provider Gemini (runner: google/gemini native)
+        "modelId": "gemini-3-pro-preview",
+        "modelConfigKey": "Gemini.gemini-3-pro-preview",  # -> provider Gemini (runner: google/gemini native)
         "suffix": "gemini",
-        "label": "Gemini 2.5 Pro",
+        "label": "Gemini 3 Pro",
         "maxOutput": 32000,
     },
     "strands": {
-        # Bedrock on-demand needs the region-prefixed inference-profile id at runtime; the catalog
-        # key uses the bare id. Both point at the same model.  ⚠️ verify the profile for your region.
-        "modelId": "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
-        "modelConfigKey": "Bedrock.anthropic.claude-sonnet-4-5-20250929-v1:0",  # -> provider Bedrock
+        # Bedrock on-demand needs the region-prefixed inference-profile id; the strands runner
+        # prepends the geo (us./eu./apac.) to the catalog's bare name automatically.
+        "modelId": "anthropic.claude-sonnet-5",
+        "modelConfigKey": "Bedrock.anthropic.claude-sonnet-5",  # -> provider Bedrock
         "suffix": "bedrock",
-        "label": "Claude (Bedrock)",
+        "label": "Claude Sonnet 5 (Bedrock)",
         "maxOutput": 32000,
     },
 }
-
-# langgraph -> the base (claude) variation via the config's fallthrough.
-FALLTHROUGH_FRAMEWORK = "langgraph"
 
 
 class NativeRoutingSetup:
@@ -260,9 +271,9 @@ def main():
     print("╚═══════════════════════════════════════════════════════╝")
     print(f"📦 Project: {project}   🌍 production" + ("   [DRY RUN — no writes]" if dry_run else ""))
     print("Routing (by `orchestrator` context attribute):")
-    print(f"    {FALLTHROUGH_FRAMEWORK:<14} -> base claude variation (fallthrough)")
     for fw, spec in NATIVE_MODELS.items():
-        print(f"    {fw:<14} -> {spec['modelConfigKey']}  (model {spec['modelId']})")
+        print(f"    {fw:<14} -> {spec['modelConfigKey']}")
+    print("    (fallthrough    -> base claude-sonnet-4-5 variation — Experiment A / unmatched)")
     print()
 
     setup = NativeRoutingSetup(api_key, dry_run=dry_run)

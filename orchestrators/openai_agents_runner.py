@@ -39,10 +39,16 @@ def _model_settings(config):
     faster + cheaper, so it would skew latency/cost, not just quality)."""
     params = dict(config.model.to_dict().get("parameters") or {})
     max_tokens = params.get("max_tokens") or params.get("maxTokens")
+    temperature = params.get("temperature")
+    # GPT-5 and the o-series are reasoning models that reject a non-default temperature
+    # ("Unsupported value: 'temperature'"), so omit it for them and let the model default hold.
+    model_id = (config.model.name or "").lower()
+    if model_id.startswith("gpt-5") or model_id.startswith(("o1", "o3", "o4")):
+        temperature = None
     # Token usage flows automatically on this path (litellm reports response.usage by
     # default for non-streaming calls), so no usage settings are needed here.
     return ModelSettings(
-        temperature=params.get("temperature"),
+        temperature=temperature,
         max_tokens=int(max_tokens) if max_tokens else None,
     )
 
