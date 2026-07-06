@@ -114,7 +114,8 @@ async def run_one(ld, ai_client, item_id, papers, override=None):
     user_input = build_paper_prompt(papers)
     try:
         result = await execute_graph(
-            ai_client, GRAPH_KEY, context, user_input, runner.build_agent, runner.invoke
+            ai_client, GRAPH_KEY, context, user_input, runner.build_agent, runner.invoke,
+            require_context_attr="orchestrator",
         )
     except Exception as e:
         return {"id": item_id, "framework": framework, "path": "", "score": None,

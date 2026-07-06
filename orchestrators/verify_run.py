@@ -60,7 +60,8 @@ async def smoke(framework, ai_client, papers):
     print(f"\n▶ Running '{framework}' over {len(papers)} papers on graph '{GRAPH_KEY}'...")
     try:
         result = await execute_graph(
-            ai_client, GRAPH_KEY, context, user_input, runner.build_agent, runner.invoke
+            ai_client, GRAPH_KEY, context, user_input, runner.build_agent, runner.invoke,
+            require_context_attr="orchestrator",
         )
     except Exception as e:
         print(f"  ✗ {framework} FAILED: {str(e)[:200]}")

@@ -43,6 +43,16 @@ import time
 from ldai.tracker import TokenUsage
 
 
+def _context_has_attr(context, attr):
+    """True if ``attr`` is set on ``context`` (checked across every kind of a multi-context)."""
+    if context.multiple:
+        return any(
+            (ind := context.get_individual_context(i)) is not None and ind.get(attr) is not None
+            for i in range(context.individual_context_count)
+        )
+    return context.get(attr) is not None
+
+
 def compose_input(user_input, predecessor_outputs):
     """Build a node's input: the SOURCE PAPERS (ground truth) + any upstream analyses.
 
@@ -56,7 +66,8 @@ def compose_input(user_input, predecessor_outputs):
     return "\n\n".join(parts)
 
 
-async def execute_graph(ai_client, graph_key, context, user_input, build_agent, invoke, max_rounds=10):
+async def execute_graph(ai_client, graph_key, context, user_input, build_agent, invoke, max_rounds=10,
+                        require_context_attr=None):
     """Execute the LD agent graph as a parallel DAG.
 
     Args:
@@ -67,11 +78,24 @@ async def execute_graph(ai_client, graph_key, context, user_input, build_agent, 
         build_agent: ``(node_key, config, instructions) -> agent`` (framework-specific).
         invoke: ``async (agent, input_text, node_tracker) -> (output_text, TokenUsage|None)``.
         max_rounds: safety bound on scheduler rounds (DAG depth); guards against cycles.
+        require_context_attr: if set (e.g. ``"orchestrator"``), fail loudly when the context lacks
+            that attribute. The node configs route on it, so a missing attribute silently collapses
+            every node to the pinned base model — the experiment driver passes this so a caller that
+            forgets to set the resolved framework on the context can't quietly break the bake-off.
 
     Returns:
         ``{"output": <terminal node text>, "path": [<node keys, completion order>],
            "judge_scores": {<metric_key>: <score>}}``.
     """
+    if require_context_attr and not _context_has_attr(context, require_context_attr):
+        raise RuntimeError(
+            f"execute_graph: context is missing the '{require_context_attr}' attribute. The graph's "
+            f"node configs route on it (targeting rule: orchestrator == <framework>), so without it "
+            f"every node falls through to the pinned base model and the orchestrator bake-off "
+            f"silently collapses to one model. Evaluate the orchestrator flag, then set "
+            f"'{require_context_attr}'=<resolved framework> on the context (all kinds) before "
+            f"calling execute_graph — see run_experiment.run_one."
+        )
     graph = ai_client.agent_graph(graph_key, context)
     if not graph.is_enabled():
         raise RuntimeError(
