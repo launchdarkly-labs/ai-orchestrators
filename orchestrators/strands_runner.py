@@ -32,9 +32,21 @@ def _create_strands_model(config):
         return AnthropicModel(model_id=model_id, max_tokens=max_tokens, params=params or None)
     if provider == "openai":
         return OpenAIModel(model_id=model_id, params=params or None)
-    # Bedrock fallback (Strands via AWS)
+    # Bedrock fallback (Strands via AWS). Any non-anthropic/openai provider (e.g. LD's "Bedrock")
+    # lands here.
     region = params.pop("region_name", None) or os.environ.get("AWS_REGION") or "us-west-2"
-    return BedrockModel(model_id=model_id, region_name=region)
+    return BedrockModel(model_id=_bedrock_profile_id(model_id, region), region_name=region)
+
+
+def _bedrock_profile_id(model_id, region):
+    """Bedrock serves newer foundation models (Claude 3.5+, Nova, Llama 3.x) on-demand ONLY via a
+    cross-region inference profile, whose id is the bare model id with a geo prefix (us./eu./apac.).
+    LD's model catalog stores the BARE id (e.g. anthropic.claude-sonnet-4-5-20250929-v1:0), so
+    invoking it directly raises a ValidationException. Prepend the geo for the region if absent."""
+    if model_id.split(".", 1)[0] in ("us", "eu", "apac"):
+        return model_id  # already an inference-profile id
+    geo = "eu" if region.startswith("eu-") else "apac" if region.startswith("ap-") else "us"
+    return f"{geo}.{model_id}"
 
 
 def _bind_tools(config):
