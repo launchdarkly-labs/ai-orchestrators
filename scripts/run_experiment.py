@@ -27,6 +27,7 @@ import time
 import warnings
 from pathlib import Path
 
+import requests
 from tqdm import tqdm
 
 project_root = Path(__file__).parent.parent
@@ -58,7 +59,36 @@ RUNNERS = {
 }
 GRAPH_KEY = "research-gap-graph"
 FLAG_KEY = "orchestrator"
-# The judge ($ld:ai:judge:gap-quality) generates its own metric — no custom metric here.
+# The judge ($ld:ai:judge:gap-quality) generates its own metric.
+# Custom dollar-cost metric: LD's auto AI metrics are token/duration only (no cost), and the
+# get-ai-config-metrics REST endpoint can't break cost down by variation. So we compute the
+# GRAPH's per-run cost (node tokens × the served model's catalog price) and track it here — a
+# numeric custom metric that IS selectable as the experiment primary. A fair cross-model cost
+# ranking (raw tokens aren't, since per-token prices differ). Create it with:
+#   python scripts/launchdarkly/create_cost_metric.py
+COST_METRIC = "ai-graph-cost-usd"
+_PRICE_MAP = {}  # (provider_lower, model_name_lower) -> (costPerInputToken, costPerOutputToken)
+
+
+def load_price_map(api_key, project):
+    """Build a per-token price map from the LD model catalog, keyed by (provider, model name) so a
+    run's served model (from the dispatcher) can be priced. Best-effort: on any failure, return {}
+    and cost tracking is skipped (the run still completes)."""
+    try:
+        r = requests.get(
+            f"https://app.launchdarkly.com/api/v2/projects/{project}/ai-configs/model-configs",
+            headers={"Authorization": api_key, "LD-API-Version": "beta"}, timeout=30,
+        )
+        pm = {}
+        for m in (r.json() if r.status_code == 200 else []):
+            ci, co = m.get("costPerInputToken"), m.get("costPerOutputToken")
+            prov = (m.get("provider") or "").lower()
+            name = (m.get("name") or "").lower()
+            if ci is not None and co is not None and prov and name:
+                pm[(prov, name)] = (ci, co)
+        return pm
+    except Exception:
+        return {}
 
 # Default query set: every topic file in data/ (one file = one topic = one category).
 # Discovered dynamically so repulling/adding topics needs no code change. The combined_*
@@ -119,12 +149,23 @@ async def run_one(ld, ai_client, item_id, papers, override=None):
         )
     except Exception as e:
         return {"id": item_id, "framework": framework, "path": "", "score": None,
-                "error": str(e)[:200]}
+                "cost_usd": None, "error": str(e)[:200]}
 
     # The dispatcher fired the attached judge (online evaluation) and recorded the score.
     score = result["judge_scores"].get(JUDGE_METRIC)
+
+    # Dollar cost of this run's GRAPH (node tokens × the served model's price), tracked as the
+    # custom cost metric on the same context the experiment analyzes. Skipped if the model isn't
+    # priced in the catalog (cost stays None) so a run never fails over cost bookkeeping.
+    cost = None
+    tok, mdl = result.get("tokens", {}), result.get("model", {})
+    price = _PRICE_MAP.get(((mdl.get("provider") or "").lower(), (mdl.get("name") or "").lower()))
+    if price and (tok.get("input") or tok.get("output")):
+        cost = (tok.get("input", 0) or 0) * price[0] + (tok.get("output", 0) or 0) * price[1]
+        ld.track(COST_METRIC, context, metric_value=cost)
+
     return {"id": item_id, "framework": framework, "path": " > ".join(result["path"]),
-            "score": score, "error": None}
+            "score": score, "cost_usd": round(cost, 6) if cost is not None else None, "error": None}
 
 
 async def main():
@@ -153,6 +194,14 @@ async def main():
         time.sleep(0.5)
     ld = ldclient.get()
     ai_client = LDAIClient(ld)
+
+    # Load per-token prices so each run's graph cost can be tracked as the custom cost metric.
+    api_key, project = os.environ.get("LD_API_KEY"), os.environ.get("LD_PROJECT_KEY", "graph-experiments")
+    if api_key:
+        _PRICE_MAP.update(load_price_map(api_key, project))
+    if not _PRICE_MAP:
+        print("⚠ no model prices loaded (LD_API_KEY unset or catalog unreachable) — "
+              f"the '{COST_METRIC}' cost metric will not be recorded this run")
 
     # Build the job list (item_id, papers, override) for the chosen mode, then cap by --limit.
     jobs = []
@@ -209,7 +258,7 @@ async def main():
     out_dir.mkdir(exist_ok=True)
     out_path = out_dir / f"experiment_{datetime.datetime.now():%Y%m%d_%H%M%S}.csv"
     with open(out_path, "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=["id", "framework", "score", "path", "error"])
+        w = csv.DictWriter(f, fieldnames=["id", "framework", "score", "cost_usd", "path", "error"])
         w.writeheader()
         w.writerows(results)
 
@@ -221,10 +270,13 @@ async def main():
     if ok:
         by_fw = {}
         for r in ok:
-            by_fw.setdefault(r["framework"], []).append(r["score"])
-        print("  per-framework mean quality:")
-        for fw, scores in sorted(by_fw.items()):
-            print(f"    {fw:<14} n={len(scores):>2}  mean={sum(scores) / len(scores):.3f}")
+            by_fw.setdefault(r["framework"], []).append((r["score"], r.get("cost_usd")))
+        print("  per-framework mean quality + cost:")
+        for fw, rows in sorted(by_fw.items()):
+            scores = [s for s, _ in rows]
+            costs = [c for _, c in rows if c is not None]
+            cost_str = f"${sum(costs) / len(costs):.4f}/run" if costs else "cost n/a"
+            print(f"    {fw:<14} n={len(scores):>2}  quality={sum(scores) / len(scores):.3f}  {cost_str}")
 
 
 if __name__ == "__main__":

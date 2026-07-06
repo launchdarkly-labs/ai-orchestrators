@@ -85,7 +85,8 @@ async def execute_graph(ai_client, graph_key, context, user_input, build_agent, 
 
     Returns:
         ``{"output": <terminal node text>, "path": [<node keys, completion order>],
-           "judge_scores": {<metric_key>: <score>}}``.
+           "judge_scores": {<metric_key>: <score>}, "tokens": {"input", "output"},
+           "model": {"provider", "name"}}``.
     """
     if require_context_attr and not _context_has_attr(context, require_context_attr):
         raise RuntimeError(
@@ -122,9 +123,13 @@ async def execute_graph(ai_client, graph_key, context, user_input, build_agent, 
     judge_scores = {}
     path = []           # completion order
     totals = {"in": 0, "out": 0}
+    model_used = {}     # provider + name of the served model (same across nodes in one run)
 
     async def run_node(key):
         config = nodes[key].get_config()
+        # Capture the served model so the caller can price the run (all nodes share it per run).
+        model_used["provider"] = config.provider.name if config.provider else ""
+        model_used["name"] = config.model.name if config.model else ""
         pred_outputs = [(p, outputs.get(p, "")) for p in preds[key]]
         node_input = compose_input(user_input, pred_outputs)
         agent = build_agent(key, config, config.instructions)
@@ -194,4 +199,7 @@ async def execute_graph(ai_client, graph_key, context, user_input, build_agent, 
     # to complete, in case the graph has more than one.
     terminals = {k for k in nodes if not succ[k]}
     final_output = next((outputs.get(k, "") for k in reversed(path) if k in terminals), "")
-    return {"output": final_output, "path": path, "judge_scores": judge_scores}
+    # tokens + model let the caller compute a per-run dollar cost (tokens × catalog price). These
+    # are the GRAPH's node tokens (the judge runs separately and is not counted here).
+    return {"output": final_output, "path": path, "judge_scores": judge_scores,
+            "tokens": {"input": totals["in"], "output": totals["out"]}, "model": dict(model_used)}

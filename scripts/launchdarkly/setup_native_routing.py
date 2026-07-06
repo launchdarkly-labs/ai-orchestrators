@@ -188,6 +188,31 @@ class NativeRoutingSetup:
         time.sleep(0.3)
         return var_key
 
+    def attach_judge(self, project, config_key, variation_key, judge_key, sampling_rate=1.0):
+        """Attach the judge to a variation so its output is scored. Preserves the variation's
+        modelConfigKey/model on the PATCH (cost/pricing is keyed on modelConfigKey). Without this,
+        the per-framework synthesizer variations serve with NO judge and the experiment records no
+        quality score — the judge in the manifest is attached only to the base claude variation."""
+        if self.dry_run:
+            print(f"    [dry-run] attach judge '{judge_key}' -> {config_key}/{variation_key}")
+            return
+        url = f"{self.base_url}/api/v2/projects/{project}/ai-configs/{config_key}/variations/{variation_key}"
+        body = {"judgeConfiguration": {"judges": [{"judgeConfigKey": judge_key, "samplingRate": sampling_rate}]}}
+        cur = requests.get(url, headers=self.headers, timeout=30)
+        if cur.status_code == 200:
+            c = cur.json()
+            if isinstance(c, list):
+                c = c[0] if c else {}
+            if c.get("modelConfigKey"):
+                body["modelConfigKey"] = c["modelConfigKey"]
+            if c.get("model"):
+                body["model"] = c["model"]
+        r = requests.patch(url, headers=self.headers, json=body, timeout=30)
+        ok = r.status_code == 200
+        print(f"    {'✓ judge' if ok else '✗ judge failed'} '{judge_key}' -> {config_key}/{variation_key} "
+              f"({int(sampling_rate * 100)}%)" + ("" if ok else f": {r.status_code} {r.text[:150]}"))
+        time.sleep(0.3)
+
     # --- targeting -----------------------------------------------------------
     def _patch_targeting(self, project, config_key, instructions):
         """PATCH targeting with semantic-patch instruction(s). The instructions form REQUIRES
@@ -281,6 +306,12 @@ def main():
 
     setup = NativeRoutingSetup(api_key, dry_run=dry_run)
 
+    # The manifest attaches the judge only to the base variation; mirror it onto every per-framework
+    # variation of the same config, or the experiment records NO quality score for the served arms.
+    judge_def = manifest["project"].get("judge") or {}
+    judge_key = judge_def.get("key")
+    judge_targets = {t["config"]: t.get("samplingRate", 1.0) for t in judge_def.get("attach", [])}
+
     for ai_config in manifest["project"]["ai_config"]:
         config_key = ai_config["key"]
         base_variation = ai_config["variations"][0]
@@ -306,9 +337,13 @@ def main():
             }
 
         print(f"🤖 {config_key} (base: {base_var_key})")
-        for spec in NATIVE_MODELS.values():
-            setup.upsert_variation(project, config_key, base_src, spec)
+        created = [setup.upsert_variation(project, config_key, base_src, spec)
+                   for spec in NATIVE_MODELS.values()]
         setup.route(project, config_key, base_var_key)
+        # If the judge scores this config's output, attach it to each per-framework variation too.
+        if judge_key and config_key in judge_targets:
+            for vk in created:
+                setup.attach_judge(project, config_key, vk, judge_key, judge_targets[config_key])
         print()
 
     print("✨ Done." if not dry_run else "✨ Dry run complete — no changes made.")

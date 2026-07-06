@@ -34,7 +34,15 @@ Needs Python 3.11+, a LaunchDarkly account with AgentControl, and `ANTHROPIC_API
    ```bash
    uv run python scripts/launchdarkly/bootstrap.py config/graph_experiment_manifest.yaml
    ```
-3. **Create the experiment** in the LaunchDarkly UI: treatment = `orchestrator` flag, randomization unit = `request`, primary metric = end-to-end graph latency, secondaries = the gap-quality judge (guardrail) + graph total tokens (the cost ranking at a pinned model). Start an iteration.
+3. **Create the metric + experiment.** Add the custom dollar-cost metric (LD has no built-in cost metric — see [Cost & metrics](#cost--metrics)):
+   ```bash
+   uv run python scripts/launchdarkly/create_cost_metric.py
+   ```
+   Then create the experiment in the UI with treatment = `orchestrator` flag, control = `langgraph`, Bayesian. **Metrics are split by randomization unit** and an experiment's metrics must match its unit, so pick one framing:
+   - **Cost + quality (recommended for the native bake-off):** randomization unit = **`user`**, primary = **AI graph cost (USD)**, guardrail = gap-quality judge, secondary = graph total tokens. *(cost / judge / tokens are all `user`-unit.)*
+   - **Latency:** randomization unit = **`request`**, primary = **Graph latency**. *(latency / duration are `request`-unit; the judge/cost can't be in this one.)*
+
+   Start an iteration.
 4. **Drive traffic.** Each run feeds a topic's **full** paper set through the graph (gap analysis needs every paper) and the judge scores the report. Two modes:
    - **Matched head-to-head** (`uv run python scripts/run_experiment.py --all-frameworks`): every topic runs through all four orchestrators once — apples-to-apples, read the per-framework means in the harness summary. Best for a small, fixed topic set.
    - **Randomized experiment** (default `uv run python scripts/run_experiment.py`): the `orchestrator` flag assigns each run one framework; the LD experiment attributes metrics per variation. Confidence bands tighten as you add **topics** (real traffic), so scale the query set for statistical power.
@@ -99,7 +107,37 @@ uv run python orchestrators/verify_run.py all
 
 The experiment setup is unchanged (same `orchestrator` flag), but the ranking now compares whole
 **orchestrator + native model** stacks — latency, tokens, and the quality judge reflect framework
-*and* model together, not the framework in isolation.
+*and* model together, not the framework in isolation. The setup script also attaches the gap-quality
+judge to every per-framework synthesizer variation (the manifest attaches it only to the base), so
+each arm gets a quality score.
+
+## Cost & metrics
+
+LaunchDarkly's auto-generated AI metrics are token/duration only — **there is no built-in dollar-cost
+metric**, and the `get-ai-config-metrics` REST endpoint reports cost only **per config (all variations
+combined)**, never per-variation, and isn't reachable through the SDK. So for a per-orchestrator cost
+ranking, the harness computes each run's **graph cost** (node tokens × the served model's catalog
+price) and emits it as a custom metric, `ai-graph-cost-usd`:
+
+```bash
+uv run python scripts/launchdarkly/create_cost_metric.py      # one-time: create the metric
+# run_experiment.py then emits it every run; results CSV gets a cost_usd column
+uv run python scripts/launchdarkly/fetch_costs.py --hours 24   # read LD's own per-config cost (Insights)
+```
+
+Raw token counts are **not** a fair cost proxy across the different-model arms (per-token prices
+differ), so use the dollar metric. **Metric randomization units are split**, and an experiment can
+only include metrics matching its unit:
+
+| metric | unit | use as |
+|---|---|---|
+| AI graph cost (USD) `ai-graph-cost-usd` | `user` | primary (cost bake-off) |
+| Gap-quality judge | `user` | guardrail |
+| Graph total tokens | `user` | secondary |
+| Graph latency / duration | `request` | primary (separate latency experiment) |
+
+So a **cost + quality** experiment randomizes by `user`; a **latency** experiment randomizes by
+`request`. They can't be combined in one experiment.
 
 ## Papers (the query set)
 
