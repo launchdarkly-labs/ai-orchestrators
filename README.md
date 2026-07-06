@@ -45,22 +45,35 @@ Needs Python 3.11+, a LaunchDarkly account with AgentControl, and `ANTHROPIC_API
 
 The run above holds the model constant (`claude-sonnet-4-5` on every node) and varies only the
 framework — an isolated read on orchestration overhead (**Experiment A**). **Experiment B** instead
-lets each orchestrator run its provider's native model, ranking *each framework at its best*:
+lets each orchestrator run its provider's native model, ranking *each framework + its model together*.
+The shipped default is a **low-cost demo set** (cheapest recent tier per provider):
 
 | orchestrator | model | provider |
 |---|---|---|
-| langgraph | claude-sonnet-5 | Anthropic (direct API) |
-| openai-agents | gpt-5.1 | OpenAI |
-| google-adk | gemini-3-pro-preview | Gemini |
-| strands | claude-sonnet-5 (Bedrock) | Bedrock |
+| langgraph | claude-haiku-4-5 | Anthropic (direct API) |
+| openai-agents | gpt-5-mini | OpenAI |
+| google-adk | gemini-2.5-flash | Gemini |
+| strands | claude-haiku-4-5 (Bedrock) | Bedrock |
 
-Each provider runs its flagship; langgraph and strands share Claude Sonnet 5 (direct API vs Bedrock —
-a clean same-model framework/runtime signal). Routing is structural, not code. Each node config gets
-one variation per framework, and targeting rules keyed on the `orchestrator` context attribute serve
-the matching model; the SDK derives the provider from each variation's `modelConfigKey` (a
-model-catalog entry), so the runners route to the right SDK unchanged. All four frameworks get an
-explicit variation + rule; the config **fallthrough** stays on the pinned `claude-sonnet-4-5`, so
-Experiment A (no `orchestrator` attribute) is untouched.
+langgraph and strands share Claude Haiku 4.5 (direct API vs Bedrock — a clean same-model
+framework/runtime signal). For a production-grade comparison, edit `NATIVE_MODELS` to the flagships
+(`Anthropic.claude-sonnet-5`, `OpenAI.gpt-5.1`, `Gemini.gemini-3-pro-preview`, and
+`Bedrock.anthropic.claude-sonnet-5`).
+
+**Cost** (this workflow is input-heavy — the full paper set is injected into every node, so ~110–140k
+input + ~15–18k output tokens/run, plus a constant ~$0.14 Sonnet judge call):
+
+| model set | per run | `--all-frameworks` (24 runs) | full randomized (90 runs) |
+|---|---|---|---|
+| demo (Haiku / GPT-5-mini / Gemini Flash) | ~$0.20–0.27 | ~$5–6 | ~$18–25 |
+| flagship (Sonnet 5 / GPT-5.1 / Gemini 3 Pro) | ~$0.65–1.15 | ~$16–28 | ~$60–100 |
+
+`gemini-2.5-flash` runs on the Gemini **free tier** — no Google billing needed for the demo. Routing
+is structural, not code. Each node config gets one variation per framework, and targeting rules keyed
+on the `orchestrator` context attribute serve the matching model; the SDK derives the provider from
+each variation's `modelConfigKey` (a model-catalog entry), so the runners route to the right SDK
+unchanged. All four frameworks get an explicit variation + rule; the config **fallthrough** stays on
+the pinned `claude-sonnet-4-5`, so Experiment A (no `orchestrator` attribute) is untouched.
 
 Set it up **after** `bootstrap.py`:
 

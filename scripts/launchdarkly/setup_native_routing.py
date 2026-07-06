@@ -54,39 +54,42 @@ from dotenv import load_dotenv
 #   modelId         -> informational (the SDK serves the catalog's model name at runtime).
 #   maxOutput       -> clamp for the synthesizer's max_tokens (per the model's output ceiling).
 #
-# Experiment B = each orchestrator at its provider's flagship. langgraph + strands share Claude
-# Sonnet 5 (direct API vs Bedrock — a clean same-model framework/runtime signal); OpenAI and
-# Google each run their own flagship. All four get an explicit variation + rule; the config
-# fallthrough stays on the pinned claude-sonnet-4-5 so Experiment A is untouched.
+# Experiment B = each orchestrator at its provider's cheapest RECENT model (a low-cost demo
+# config; swap the modelConfigKeys below for flagships — e.g. Anthropic.claude-sonnet-5,
+# OpenAI.gpt-5.1, Gemini.gemini-3-pro-preview — for a production-grade comparison). langgraph +
+# strands share Claude Haiku 4.5 (direct API vs Bedrock — a clean same-model framework/runtime
+# signal); OpenAI and Google run their cheap recent tiers. All four get an explicit variation +
+# rule; the config fallthrough stays on the pinned claude-sonnet-4-5 so Experiment A is untouched.
+# Note: gemini-2.5-flash runs on the Gemini FREE tier (no billing needed for the demo).
 NATIVE_MODELS = {
     "langgraph": {
-        "modelId": "claude-sonnet-5",
-        "modelConfigKey": "Anthropic.claude-sonnet-5",   # -> provider Anthropic (direct API)
-        "suffix": "sonnet5",
-        "label": "Claude Sonnet 5",
+        "modelId": "claude-haiku-4-5-20251001",
+        "modelConfigKey": "Anthropic.claude-haiku-4-5-20251001",  # -> provider Anthropic (direct API)
+        "suffix": "anthropic",
+        "label": "Claude Haiku 4.5",
         "maxOutput": 32000,
     },
     "openai-agents": {
-        "modelId": "gpt-5.1",
-        "modelConfigKey": "OpenAI.gpt-5.1",              # -> provider OpenAI (native in the runner)
+        "modelId": "gpt-5-mini",
+        "modelConfigKey": "OpenAI.gpt-5-mini",           # -> provider OpenAI (native in the runner)
         "suffix": "gpt",
-        "label": "GPT-5.1",
+        "label": "GPT-5 mini",
         "maxOutput": 32000,
     },
     "google-adk": {
-        "modelId": "gemini-3-pro-preview",
-        "modelConfigKey": "Gemini.gemini-3-pro-preview",  # -> provider Gemini (runner: google/gemini native)
+        "modelId": "gemini-2.5-flash",
+        "modelConfigKey": "Gemini.gemini-2.5-flash",     # -> provider Gemini (runner: google/gemini native)
         "suffix": "gemini",
-        "label": "Gemini 3 Pro",
+        "label": "Gemini 2.5 Flash",
         "maxOutput": 32000,
     },
     "strands": {
         # Bedrock on-demand needs the region-prefixed inference-profile id; the strands runner
         # prepends the geo (us./eu./apac.) to the catalog's bare name automatically.
-        "modelId": "anthropic.claude-sonnet-5",
-        "modelConfigKey": "Bedrock.anthropic.claude-sonnet-5",  # -> provider Bedrock
+        "modelId": "anthropic.claude-haiku-4-5-20251001",
+        "modelConfigKey": "Bedrock.anthropic.claude-haiku-4-5-20251001-v1:0",  # -> provider Bedrock
         "suffix": "bedrock",
-        "label": "Claude Sonnet 5 (Bedrock)",
+        "label": "Claude Haiku 4.5 (Bedrock)",
         "maxOutput": 32000,
     },
 }
