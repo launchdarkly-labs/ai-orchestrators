@@ -70,17 +70,21 @@ NATIVE_MODELS = {
         "maxOutput": 32000,
     },
     "openai-agents": {
-        "modelId": "gpt-5-mini",
-        "modelConfigKey": "OpenAI.gpt-5-mini",           # -> provider OpenAI (native in the runner)
+        # Newest cheap OpenAI (Mar 2026). Reasoning model — cost is captured in full (reasoning
+        # tokens are billed as output and reported in output_tokens), so it's a fair cost arm.
+        "modelId": "gpt-5.4-mini",
+        "modelConfigKey": "OpenAI.gpt-5.4-mini",         # -> provider OpenAI (native in the runner)
         "suffix": "gpt",
-        "label": "GPT-5 mini",
+        "label": "GPT-5.4 mini",
         "maxOutput": 32000,
     },
     "google-adk": {
-        "modelId": "gemini-2.5-flash",
-        "modelConfigKey": "Gemini.gemini-2.5-flash",     # -> provider Gemini (runner: google/gemini native)
+        # Newest cheap Gemini flash that's catalog-priced (gemini-3.5-flash is newer but not in the
+        # LD catalog → no cost tracking). Preview channel.
+        "modelId": "gemini-3-flash-preview",
+        "modelConfigKey": "Gemini.gemini-3-flash-preview",  # -> provider Gemini (runner: google/gemini native)
         "suffix": "gemini",
-        "label": "Gemini 2.5 Flash",
+        "label": "Gemini 3 Flash",
         "maxOutput": 32000,
     },
     "strands": {
