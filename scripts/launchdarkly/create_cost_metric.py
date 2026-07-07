@@ -52,6 +52,10 @@ def main():
         "analysisType": "mean",
         "unitAggregationType": "average",
         "randomizationUnits": ["request"],         # natural per-run unit; matches built-in latency
+        # Count only units that emitted a cost event — matches LD's autogen AI metrics. WITHOUT
+        # this (default {disabled: False, value: 0}) LD imputes 0 for every exposed unit with no
+        # event, inflating sample size to the exposure count AND deflating the mean.
+        "eventDefault": {"disabled": True},
         "tags": ["ai", "cost", "experiment"],
     }
     r = requests.post(f"{base}/api/v2/metrics/{project}", headers=headers, json=payload, timeout=30)
