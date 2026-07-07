@@ -313,34 +313,40 @@ project:
         variation: "synthesizer-claude"
         samplingRate: 1.0
     provider: "anthropic"
-    # Cheap-demo judge: Claude Haiku 4.5 (swap to claude-sonnet-5 for a more reliable score).
-    # The judge fires once per run and is the dominant cost when the graph runs cheap models.
-    modelId: "claude-haiku-4-5-20251001"
-    # Deduction-count rubric: the judge COUNTS specific defects and computes the score
-    # arithmetically. Holistic 0-1 scoring anchor-biases LLM judges into a constant
-    # (every report scored exactly 0.88); counting concrete defects first breaks that.
+    # Judge on Claude Sonnet 4.5 — a stronger judge discriminates report quality far better than
+    # Haiku (which clustered every report at ~0.72). It fires once per run (~$0.13); worth it for a
+    # quality guardrail that actually differentiates. Tune its rubric with scripts/judge_lab.py.
+    modelId: "claude-sonnet-4-5"
+    # Combined rubric (tuned with scripts/judge_lab.py): graded quality dimensions (reward grounded
+    # DEPTH) × a faithfulness floor (penalize fabrication). Beats the two failure modes we measured:
+    # a pure deduction rubric rewards BREVITY (a terse report has fewer defects to count → the
+    # shortest report won), while a pure reward rubric SATURATES at 1.0. This one has headroom below
+    # 1.0 and distinguishes even same-model arms (langgraph 0.94 vs strands 0.79 on the lab set).
     instructions: |
-      You are an expert research methodologist scoring a RESEARCH GAP ANALYSIS report
-      that was produced from a fixed set of papers. Score by COUNTING specific defects,
-      then computing the score arithmetically. Do NOT assign a holistic score first.
+      You are an expert research methodologist scoring a RESEARCH GAP ANALYSIS report produced
+      from a fixed set of papers. A good report is COMPREHENSIVE AND GROUNDED: it surfaces
+      specific, evidence-based gaps and actionable directions across ALL the papers, without
+      fabricating or over-claiming. Reward grounded depth; penalize both shallowness and fabrication.
 
-      Step 1 — count these defects, citing each specific instance in your reasoning:
-      - H (hallucinations): claims, findings, methods, datasets, or named techniques
-        attributed to the papers but not present in them; citations that do not support
-        the claim they are attached to.
-      - E (unevidenced gaps): identified gaps or recommended directions drawn from
-        general knowledge rather than grounded in cited evidence from the papers.
-      - C (citation lapses): substantive claims with no [n] citation, or papers in the
-        set the report never engages with.
-      - A (actionability lapses): recommended directions missing any of — the papers
-        they build on, a concrete method or dataset, or a feasible first step.
+      Step 1 — grounding defects (count each instance, cite it in your reasoning):
+        H = claims/methods/findings/datasets attributed to the papers but not present, or citations
+            that do not support the claim they are attached to.
+        E = gaps or recommended directions drawn from general knowledge rather than grounded in
+            cited evidence from the papers.
+        faithfulness = max(0, 1 - 0.08*H - 0.05*E)
 
-      Step 2 — compute the score:
-        score = 1.00 - 0.05*H - 0.04*E - 0.02*C - 0.02*A
-      Clamp to [0, 1]. Round to two decimals.
+      Step 2 — quality dimensions, each scored 0-4. Be STRICT: 4 is reserved for genuinely
+      exceptional work; most solid work is 2-3. Cite evidence for each score.
+        COVERAGE: engages the ACTUAL papers thoroughly (all of them), not a subset.
+        GAP_SPECIFICITY: gaps are concrete and tied to specific cited evidence, not generic/obvious.
+        ACTIONABILITY: directions give concrete methods/datasets AND feasible first steps.
+        SYNTHESIS: real cross-paper insight (contradictions, consensus, trends), not enumeration.
+        quality = (COVERAGE + GAP_SPECIFICITY + ACTIONABILITY + SYNTHESIS) / 16
 
-      Step 3 — in your reasoning, list the counts (H, E, C, A) with the specific
-      instances behind each, show the arithmetic, then return the computed score.
+      Step 3 — compute: score = round(faithfulness * quality, 2). Clamp to [0, 1].
+
+      In your reasoning, list H and E with instances, the four 0-4 scores each with a one-line
+      justification, and the arithmetic, then return the computed score.
 
       Be strict: count every instance, even minor ones. A perfect 1.00 should be rare.
 
