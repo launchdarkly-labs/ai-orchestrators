@@ -463,7 +463,32 @@ class AgentGraphBootstrap:
                 project_key, target["config"], target["variation"],
                 judge_key, target.get("samplingRate", 1.0),
             )
+
+        # 5. Put the judge's auto-generated metric on the experiment's randomization unit
+        #    (default "request"). LD generates judge metrics as user-unit, but this experiment
+        #    randomizes by request (the natural per-run unit, matching the built-in latency +
+        #    the custom cost metric), so cost + latency + quality can share one experiment.
+        unit = judge_data.get("randomizationUnit", "request")
+        autogen_metric = "ld_autogen__ai-judge-" + judge_data["evaluationMetricKey"].split(":")[-1]
+        self.set_metric_randomization_unit(project_key, autogen_metric, [unit])
         return True
+
+    def set_metric_randomization_unit(self, project_key, metric_key, units):
+        """Set a metric's randomization unit via JSON-patch. Used to align the judge's
+        auto-generated metric with the experiment's unit. Tolerant: autogen metrics can lag a
+        fresh judge creation, so a 404 just prints a note instead of failing the bootstrap."""
+        url = f"{self.base_url}/api/v2/metrics/{project_key}/{metric_key}"
+        r = requests.patch(
+            url, headers=self.headers,
+            json=[{"op": "replace", "path": "/randomizationUnits", "value": units}], timeout=30,
+        )
+        if r.status_code == 200:
+            print(f"    ✓ Metric '{metric_key}' randomization unit -> {units}")
+        elif r.status_code == 404:
+            print(f"    ℹ️  Metric '{metric_key}' not registered yet — set its unit to {units} in the "
+                  f"UI, or re-run bootstrap after the judge's first evaluation")
+        else:
+            print(f"    ⚠️  Could not set '{metric_key}' unit: {r.status_code} {r.text[:150]}")
 
     def attach_judge(self, project_key, config_key, variation_key, judge_key, sampling_rate=1.0):
         """Attach a judge to a config variation (registers its evaluation metric).

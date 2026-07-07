@@ -86,7 +86,7 @@ async def execute_graph(ai_client, graph_key, context, user_input, build_agent, 
     Returns:
         ``{"output": <terminal node text>, "path": [<node keys, completion order>],
            "judge_scores": {<metric_key>: <score>}, "tokens": {"input", "output"},
-           "model": {"provider", "name"}}``.
+           "model": {"provider", "name"}, "duration_ms": <int>}``.
     """
     if require_context_attr and not _context_has_attr(context, require_context_attr):
         raise RuntimeError(
@@ -182,9 +182,11 @@ async def execute_graph(ai_client, graph_key, context, user_input, build_agent, 
                 f"{sorted(pending)}; check for a cycle or a graph deeper than max_rounds={max_rounds})"
             )
 
-        # End-to-end graph latency ($ld:ai:graph:duration:total) — the experiment's primary
-        # metric, recorded once per run on the request-kind context.
-        graph_tracker.track_duration(int((time.monotonic() - start) * 1000))
+        # End-to-end graph latency ($ld:ai:graph:duration:total) — recorded once per run on the
+        # request-kind context. Also returned so the caller can emit a user-unit latency metric
+        # (the built-in one is request-unit and can't sit in a user-randomized experiment).
+        duration_ms = int((time.monotonic() - start) * 1000)
+        graph_tracker.track_duration(duration_ms)
         if totals["in"] or totals["out"]:
             graph_tracker.track_total_tokens(
                 TokenUsage(input=totals["in"], output=totals["out"], total=totals["in"] + totals["out"])
@@ -202,4 +204,5 @@ async def execute_graph(ai_client, graph_key, context, user_input, build_agent, 
     # tokens + model let the caller compute a per-run dollar cost (tokens × catalog price). These
     # are the GRAPH's node tokens (the judge runs separately and is not counted here).
     return {"output": final_output, "path": path, "judge_scores": judge_scores,
-            "tokens": {"input": totals["in"], "output": totals["out"]}, "model": dict(model_used)}
+            "tokens": {"input": totals["in"], "output": totals["out"]}, "model": dict(model_used),
+            "duration_ms": duration_ms}

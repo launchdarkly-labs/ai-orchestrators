@@ -70,8 +70,12 @@ async def invoke(agent, input_text, tracker):
         async for event in runner.run_async(
             user_id="harness", session_id=session.id, new_message=content
         ):
+            # Count usage once per model call. ADK reports usage_metadata on the FINAL
+            # response of each call; skipping partial (streaming) events avoids double-counting
+            # cumulative usage — so this matches the "total billed across all calls" the other
+            # runners report via their SDK's aggregate usage.
             um = getattr(event, "usage_metadata", None)
-            if um:
+            if um and not getattr(event, "partial", False):
                 in_tok += getattr(um, "prompt_token_count", 0) or 0
                 out_tok += getattr(um, "candidates_token_count", 0) or 0
             if event.is_final_response() and event.content and event.content.parts:

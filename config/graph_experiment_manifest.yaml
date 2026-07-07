@@ -299,6 +299,11 @@ project:
     name: "Gap-analysis quality judge"
     evaluationMetricKey: "$ld:ai:judge:gap-quality"
     isInverted: false
+    # Randomization unit for the judge's auto-generated metric. LD defaults judge metrics to
+    # "user", but the experiment randomizes by "request" (the natural per-run unit, matching the
+    # built-in graph-latency + the custom cost metric) so cost + latency + quality share one
+    # experiment. bootstrap PATCHes the autogen metric to this unit.
+    randomizationUnit: "request"
     # Attach the judge to the node whose output it scores (the synthesizer's final
     # report). Attaching registers the evaluation metric so it's selectable in the
     # experiment; the dispatcher fires the attached judge after the node runs and records

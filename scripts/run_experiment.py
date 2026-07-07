@@ -67,6 +67,8 @@ FLAG_KEY = "orchestrator"
 # ranking (raw tokens aren't, since per-token prices differ). Create it with:
 #   python scripts/launchdarkly/create_cost_metric.py
 COST_METRIC = "ai-graph-cost-usd"
+# Latency needs no custom metric: the experiment is request-randomized, so it uses the BUILT-IN
+# Graph latency (request-unit), which the dispatcher already records via track_duration.
 _PRICE_MAP = {}  # (provider_lower, model_name_lower) -> (costPerInputToken, costPerOutputToken)
 
 
@@ -133,6 +135,7 @@ async def run_one(ld, ai_client, item_id, papers, override=None):
     framework = override or ld.variation(FLAG_KEY, _ctx(), "langgraph")
     if framework not in RUNNERS:
         return {"id": item_id, "framework": framework, "path": "", "score": None,
+                "cost_usd": None, "latency_ms": None, "in_tokens": None, "out_tokens": None,
                 "error": f"no runner for '{framework}'"}
 
     # Run the graph on a context WITH orchestrator=framework so each node config's targeting
@@ -149,7 +152,8 @@ async def run_one(ld, ai_client, item_id, papers, override=None):
         )
     except Exception as e:
         return {"id": item_id, "framework": framework, "path": "", "score": None,
-                "cost_usd": None, "error": str(e)[:200]}
+                "cost_usd": None, "latency_ms": None, "in_tokens": None, "out_tokens": None,
+                "error": str(e)[:200]}
 
     # The dispatcher fired the attached judge (online evaluation) and recorded the score.
     score = result["judge_scores"].get(JUDGE_METRIC)
@@ -165,7 +169,9 @@ async def run_one(ld, ai_client, item_id, papers, override=None):
         ld.track(COST_METRIC, context, metric_value=cost)
 
     return {"id": item_id, "framework": framework, "path": " > ".join(result["path"]),
-            "score": score, "cost_usd": round(cost, 6) if cost is not None else None, "error": None}
+            "score": score, "cost_usd": round(cost, 6) if cost is not None else None,
+            "latency_ms": result.get("duration_ms"),
+            "in_tokens": tok.get("input"), "out_tokens": tok.get("output"), "error": None}
 
 
 async def main():
@@ -258,7 +264,7 @@ async def main():
     out_dir.mkdir(exist_ok=True)
     out_path = out_dir / f"experiment_{datetime.datetime.now():%Y%m%d_%H%M%S}.csv"
     with open(out_path, "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=["id", "framework", "score", "cost_usd", "path", "error"])
+        w = csv.DictWriter(f, fieldnames=["id", "framework", "score", "cost_usd", "latency_ms", "in_tokens", "out_tokens", "path", "error"])
         w.writeheader()
         w.writerows(results)
 
@@ -270,13 +276,15 @@ async def main():
     if ok:
         by_fw = {}
         for r in ok:
-            by_fw.setdefault(r["framework"], []).append((r["score"], r.get("cost_usd")))
-        print("  per-framework mean quality + cost:")
+            by_fw.setdefault(r["framework"], []).append((r["score"], r.get("cost_usd"), r.get("latency_ms")))
+        print("  per-framework mean quality + cost + latency:")
         for fw, rows in sorted(by_fw.items()):
-            scores = [s for s, _ in rows]
-            costs = [c for _, c in rows if c is not None]
+            scores = [s for s, _, _ in rows]
+            costs = [c for _, c, _ in rows if c is not None]
+            lats = [l for _, _, l in rows if l is not None]
             cost_str = f"${sum(costs) / len(costs):.4f}/run" if costs else "cost n/a"
-            print(f"    {fw:<14} n={len(scores):>2}  quality={sum(scores) / len(scores):.3f}  {cost_str}")
+            lat_str = f"{sum(lats) / len(lats) / 1000:.1f}s" if lats else "lat n/a"
+            print(f"    {fw:<14} n={len(scores):>2}  quality={sum(scores) / len(scores):.3f}  {cost_str}  {lat_str}")
 
 
 if __name__ == "__main__":
