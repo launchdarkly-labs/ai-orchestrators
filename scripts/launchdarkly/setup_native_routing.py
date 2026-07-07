@@ -88,12 +88,12 @@ NATIVE_MODELS = {
         "maxOutput": 32000,
     },
     "strands": {
-        # Bedrock on-demand needs the region-prefixed inference-profile id; the strands runner
-        # prepends the geo (us./eu./apac.) to the catalog's bare name automatically.
-        "modelId": "anthropic.claude-haiku-4-5-20251001",
-        "modelConfigKey": "Bedrock.anthropic.claude-haiku-4-5-20251001-v1:0",  # -> provider Bedrock
+        # Amazon Nova 2 Lite — latest cheap Nova, Bedrock-native. The strands runner prepends the
+        # geo (us./eu./apac.) inference-profile prefix to the catalog's bare name automatically.
+        "modelId": "amazon.nova-2-lite-v1:0",
+        "modelConfigKey": "Bedrock.amazon.nova-2-lite-v1:0",  # -> provider Bedrock
         "suffix": "bedrock",
-        "label": "Claude Haiku 4.5 (Bedrock)",
+        "label": "Nova 2 Lite (Bedrock)",
         "maxOutput": 32000,
     },
 }
