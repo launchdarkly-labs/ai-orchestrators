@@ -602,6 +602,11 @@ def main():
     if graph_def:
         print("🕸️  Creating agent graph (topology + handoff edges)...")
         bootstrap.create_agent_graph(project_key, graph_def)
+        # Align the graph's total-tokens metric with the experiment's randomization unit (request,
+        # like cost + latency + judge). LD generates it as user-unit; flip it so tokens can sit in
+        # the same request-randomized experiment. (Autogen metrics may lag; the helper tolerates 404.)
+        bootstrap.set_metric_randomization_unit(
+            project_key, "ld_autogen__ai-graph-total-tokens", ["request"])
         print()
 
     # Step 4: Create experiment flags (e.g. the orchestrator routing flag)
