@@ -279,11 +279,55 @@ class NativeRoutingSetup:
             print(f"    {'✓ fallthrough' if ok else '✗ fallthrough failed'} -> {base_var_key} (langgraph + default)"
                   + ("" if ok else f": {r.status_code} {r.text[:200]}"))
 
+    def pin(self, project, config_key, suffix):
+        """Experiment A: clear the per-framework orchestrator rules and point the fallthrough at the
+        {config}-{suffix} variation, so EVERY orchestrator value serves that one pinned model. The
+        per-framework variations stay in place — re-running without --pin restores Experiment B."""
+        targeting = self.get_targeting(project, config_key)
+        if not targeting:
+            print(f"    ✗ Cannot read targeting for '{config_key}'")
+            return
+        idx = self._variation_index_and_ids(targeting)
+        var_key = f"{config_key}-{suffix}"
+        if var_key not in idx:
+            print(f"    ✗ variation '{var_key}' not found; skipping '{config_key}'")
+            return
+        if self.dry_run:
+            print(f"    [dry-run] clear rules + fallthrough -> {var_key} (all frameworks serve it)")
+            return
+        # Drop the per-framework rules so every context falls through, then point the fallthrough
+        # at the pinned variation (reuses the same instructions route() uses).
+        self._patch_targeting(project, config_key, [{"kind": "replaceRules", "rules": []}])
+        r = self._patch_targeting(project, config_key,
+                                  [{"kind": "updateFallthroughVariationOrRollout", "variationId": idx[var_key][1]}])
+        ok = r.status_code == 200
+        print(f"    {'✓ pinned' if ok else '✗ pin failed'} '{config_key}' -> {var_key} (rules cleared; all frameworks)"
+              + ("" if ok else f": {r.status_code} {r.text[:200]}"))
+        time.sleep(0.3)
+
 
 def main():
     load_dotenv()
-    args = [a for a in sys.argv[1:] if not a.startswith("-")]
-    dry_run = "--dry-run" in sys.argv
+    argv = sys.argv[1:]
+    dry_run = "--dry-run" in argv
+    # --pin <suffix> (default "anthropic"): Experiment A — pin every framework to the *-<suffix>
+    # variation instead of per-framework routing.
+    pin_suffix = None
+    if "--pin" in argv:
+        i = argv.index("--pin")
+        v = argv[i + 1] if i + 1 < len(argv) else None
+        pin_suffix = v if (v and not v.startswith("-")) else "anthropic"
+    # positional args (optional manifest path), excluding --pin and its value
+    args, skip = [], False
+    for j, a in enumerate(argv):
+        if skip:
+            skip = False
+            continue
+        if a == "--pin":
+            skip = pin_suffix is not None and j + 1 < len(argv) and not argv[j + 1].startswith("-")
+            continue
+        if not a.startswith("-"):
+            args.append(a)
 
     api_key = os.getenv("LD_API_KEY")
     if not api_key:
@@ -298,6 +342,28 @@ def main():
     manifest = yaml.safe_load(open(manifest_path))
     project = os.getenv("LD_PROJECT_KEY") or manifest["project"]["key"]
 
+    setup = NativeRoutingSetup(api_key, dry_run=dry_run)
+
+    # --- Experiment A: pin every framework to one model -----------------------------------------
+    if pin_suffix:
+        print("╔═══════════════════════════════════════════════════════╗")
+        print("║  Experiment A — pin ALL frameworks to one model       ║")
+        print("╚═══════════════════════════════════════════════════════╝")
+        print(f"📦 Project: {project}   🌍 production" + ("   [DRY RUN — no writes]" if dry_run else ""))
+        print(f"Clearing per-framework rules; fallthrough -> *-{pin_suffix} on every node config.")
+        print("Every orchestrator value now serves the same pinned model. Re-run WITHOUT --pin for Experiment B.")
+        print()
+        for ai_config in manifest["project"]["ai_config"]:
+            ck = ai_config["key"]
+            print(f"🤖 {ck}")
+            setup.pin(project, ck, pin_suffix)
+            print()
+        print("✨ Done." if not dry_run else "✨ Dry run complete — no changes made.")
+        print("Next: python orchestrators/verify_run.py all  (confirm all frameworks serve the pinned model),")
+        print("      then restart the experiment iteration for clean Experiment A data.")
+        return
+
+    # --- Experiment B: per-framework native-model routing ---------------------------------------
     print("╔═══════════════════════════════════════════════════════╗")
     print("║  Experiment B — native-model routing per orchestrator ║")
     print("╚═══════════════════════════════════════════════════════╝")
@@ -307,8 +373,6 @@ def main():
         print(f"    {fw:<14} -> {spec['modelConfigKey']}")
     print("    (fallthrough    -> base claude-sonnet-4-5 variation — Experiment A / unmatched)")
     print()
-
-    setup = NativeRoutingSetup(api_key, dry_run=dry_run)
 
     # The manifest attaches the judge only to the base variation; mirror it onto every per-framework
     # variation of the same config, or the experiment records NO quality score for the served arms.

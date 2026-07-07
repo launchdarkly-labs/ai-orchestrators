@@ -111,6 +111,31 @@ The experiment setup is unchanged (same `orchestrator` flag), but the ranking no
 judge to every per-framework synthesizer variation (the manifest attaches it only to the base), so
 each arm gets a quality score.
 
+### Switching between Experiment A (pinned model) and Experiment B (native models)
+
+The same `setup_native_routing.py` script toggles the two experiment shapes — no variation rewrites,
+fully reversible:
+
+```bash
+# Experiment B — each framework on its own native model (per-framework targeting rules)
+uv run python scripts/launchdarkly/setup_native_routing.py
+
+# Experiment A — pin ALL frameworks to one model, isolating orchestration overhead
+uv run python scripts/launchdarkly/setup_native_routing.py --pin anthropic   # --dry-run to preview
+```
+
+`--pin <suffix>` clears the per-framework rules and points every node config's **fallthrough** at the
+`*-<suffix>` variation, so every `orchestrator` value serves that one model. The per-framework
+variations are left untouched, so re-running **without** `--pin` restores Experiment B.
+
+Use **`--pin anthropic`** (Claude Haiku 4.5). It has to be the Anthropic variation: the LangGraph
+runner only has `langchain-anthropic` installed (no LiteLLM), so it can't run GPT/Gemini — pinning to
+`gpt`/`gemini`/`bedrock` would break the langgraph arm. In Experiment A the quality judge should read
+roughly flat across arms (same model), so **cost and latency — framework overhead at a fixed model —
+are the differentiators.**
+
+After switching either way, **restart the experiment iteration** so the two shapes' data don't mix.
+
 ## Cost & metrics
 
 LaunchDarkly's auto-generated AI metrics are token/duration only — **there is no built-in dollar-cost
