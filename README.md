@@ -98,8 +98,9 @@ handoffs walk took three things, all config: (1) a **linear-chain graph**
 (`research-gap-graph-linear`, same node configs), (2) handoff-aware prompts authored in the
 OpenAI `*-gpt` node variations (not in code), and (3) a **message-carrying handoff** — the
 transfer tool requires the agent's findings as its payload, fusing "do the work" and "hand
-off" into one act. With all three, the arm walks the chain reliably and scores competitively
-(~0.73 gap-quality). Which graph each arm reads is routed by a separate **`graph-key` flag**
+off" into one act. With all three, the arm walks the chain reliably and — in the first
+iteration — scored the *highest* gap-quality of any arm (0.78, the only one above the
+dispatcher control), on a graph handoffs couldn't traverse an hour earlier. Which graph each arm reads is routed by a separate **`graph-key` flag**
 (targets the `orchestrator` attribute: `openai-agents-native` → linear, everyone else →
 diamond), evaluated per request during the same experiment.
 
@@ -123,6 +124,13 @@ python scripts/run_experiment.py --runs-per-category 5   # flag-assigned; every 
 
 (`--arms`/`--all-frameworks` matched mode still exists for offline smoke-grade CSV reads, but
 it bypasses the flag — zero exposures, invisible to the experiment.)
+
+**First-iteration takeaway** (directional, n=3–8/arm): the cost primary and the quality
+guardrail disagreed — the cheapest arm was the *lowest* quality, and the highest-quality arm
+was OpenAI on its linear chain. Cross-arm cost is still partly model (pairs mode); the clean
+read is the model-held pair (dispatcher vs. managed, both Claude), where structural traversal
+completed the walk and handoff routing traded completeness for fewer tokens. "Cheapest" is not
+"best" — which is the whole reason the judge rides along as a guardrail.
 
 ## Cheat sheet
 
