@@ -2,8 +2,10 @@
 Smoke test: run a framework over a tiny paper set against the live graph.
 
     python orchestrators/verify_run.py langgraph     # one framework
-    python orchestrators/verify_run.py all            # all four, with a summary
+    python orchestrators/verify_run.py all            # all four frameworks, with a summary
     python orchestrators/verify_run.py                # no arg == all four
+    python orchestrators/verify_run.py c              # Experiment C: dispatcher vs
+                                                      # native vs managed walk (langgraph)
 
 Confirms the framework executes the shared graph (whatever shape the LD edges define),
 routing read from the LD edges, and that metrics land in AgentControl.
@@ -37,7 +39,19 @@ RUNNERS = {
     "openai-agents": "orchestrators.openai_agents_runner",
     "google-adk": "orchestrators.google_adk_runner",
 }
+# Experiment C arms: each framework's native orchestrator owns the walk of the same
+# drawn graph (see run_experiment.py).
+GRAPH_RUNNERS = {
+    "langgraph-native": "orchestrators.langgraph_native_runner",
+    "strands-native": "orchestrators.strands_native_runner",
+    "openai-agents-native": "orchestrators.openai_agents_native_runner",
+    "google-adk-native": "orchestrators.google_adk_native_runner",
+    "langgraph-managed": "orchestrators.langgraph_managed_runner",
+}
 GRAPH_KEY = "research-gap-graph"
+# Topology routing lives in the `graph-key` LD flag (targets the orchestrator attribute):
+# structural arms → diamond, openai-agents-native → linear chain. See bootstrap_graph_key_flag.py.
+GRAPH_KEY_FLAG = "graph-key"
 
 
 def load_papers(n=2):
@@ -47,8 +61,7 @@ def load_papers(n=2):
 
 
 async def smoke(framework, ai_client, papers):
-    """Run one framework over the shared graph; return True on success."""
-    runner = importlib.import_module(RUNNERS[framework])
+    """Run one arm over the shared graph; return True on success."""
     user_input = build_paper_prompt(papers)
     # Multi-context: "user" keeps user-unit metrics populating, "request" is the per-run unit
     # for AI/graph latency + token metrics (and the experiment's randomization unit).
@@ -57,12 +70,22 @@ async def smoke(framework, ai_client, papers):
         Context.builder(rid).kind("user").set("orchestrator", framework).build(),
         Context.builder(rid).kind("request").set("orchestrator", framework).build(),
     )
-    print(f"\n▶ Running '{framework}' over {len(papers)} papers on graph '{GRAPH_KEY}'...")
+    graph_key = ldclient.get().variation(GRAPH_KEY_FLAG, context, GRAPH_KEY)
+    print(f"\n▶ Running '{framework}' over {len(papers)} papers on graph '{graph_key}'...")
     try:
-        result = await execute_graph(
-            ai_client, GRAPH_KEY, context, user_input, runner.build_agent, runner.invoke,
-            require_context_attr="orchestrator",
-        )
+        if framework in GRAPH_RUNNERS:
+            # Experiment C arm: the runner owns the whole walk (same result shape).
+            runner = importlib.import_module(GRAPH_RUNNERS[framework])
+            result = await runner.run_graph(
+                ai_client, graph_key, context, user_input,
+                require_context_attr="orchestrator",
+            )
+        else:
+            runner = importlib.import_module(RUNNERS[framework])
+            result = await execute_graph(
+                ai_client, graph_key, context, user_input, runner.build_agent, runner.invoke,
+                require_context_attr="orchestrator",
+            )
     except Exception as e:
         print(f"  ✗ {framework} FAILED: {str(e)[:200]}")
         return False
@@ -74,10 +97,18 @@ async def smoke(framework, ai_client, papers):
 
 async def main():
     arg = sys.argv[1] if len(sys.argv) > 1 else "all"
-    frameworks = list(RUNNERS) if arg == "all" else [arg]
-    unknown = [f for f in frameworks if f not in RUNNERS]
+    if arg == "all":
+        frameworks = list(RUNNERS)  # the original four framework arms, unchanged
+    elif arg == "c":
+        # Experiment C smoke: every native-orchestrator arm (each framework walks the
+        # same drawn graph its own way), with the dispatcher's langgraph arm as control.
+        frameworks = ["langgraph", *GRAPH_RUNNERS]
+    else:
+        frameworks = [arg]
+    known = set(RUNNERS) | set(GRAPH_RUNNERS)
+    unknown = [f for f in frameworks if f not in known]
     if unknown:
-        print(f"Unknown framework {unknown}. Choose one of {list(RUNNERS)}, or 'all'.")
+        print(f"Unknown arm {unknown}. Choose one of {sorted(known)}, 'all', or 'c'.")
         return
 
     ldclient.set_config(Config(os.environ["LD_SDK_KEY"]))

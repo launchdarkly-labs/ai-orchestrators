@@ -270,10 +270,12 @@ project:
         target: "gap-synthesizer"
 
   # The orchestrator flag is the experiment's treatment AND the app's router: the app
-  # evaluates it per request to dispatch to that framework's runner (all four execute
-  # the same shared graph above). Because it's a flag, a LaunchDarkly experiment attaches
+  # evaluates it per request to dispatch to that arm's runner (every arm executes the
+  # same shared graph above). Because it's a flag, a LaunchDarkly experiment attaches
   # to it, splits contexts across the variations, and attributes metrics per variation.
-  # Experiment A uses all four; Experiment B (native bake-off) narrows to the top two.
+  # Experiments A/B use the four framework arms (dispatcher walk); Experiment C adds the
+  # *-native arms, where each FRAMEWORK'S OWN ORCHESTRATOR walks the same drawn graph
+  # (see scripts/launchdarkly/add_experiment_c_arms.py for an existing project).
   flag:
     - key: "orchestrator"
       name: "Orchestrator"
@@ -289,6 +291,16 @@ project:
           name: "OpenAI Agents"
         - value: "google-adk"
           name: "Google ADK"
+        - value: "langgraph-native"
+          name: "LangGraph (native walk)"
+        - value: "strands-native"
+          name: "Strands (native walk)"
+        - value: "openai-agents-native"
+          name: "OpenAI Agents (native handoffs)"
+        - value: "google-adk-native"
+          name: "Google ADK (native workflow agents)"
+        - value: "langgraph-managed"
+          name: "LangGraph (LD managed runner)"
 
   # Custom LLM-as-judge: the experiment's guardrail/secondary metric. A judge-mode config that
   # generates its own metric ($ld:ai:judge:gap-quality) — no separate custom metric.

@@ -33,9 +33,16 @@ def _create_strands_model(config):
     if provider == "openai":
         return OpenAIModel(model_id=model_id, params=params or None)
     # Bedrock fallback (Strands via AWS). Any non-anthropic/openai provider (e.g. LD's "Bedrock")
-    # lands here.
+    # lands here. Forward the LD config's max_tokens — Bedrock's converse default is tiny, and a
+    # truncated agent loop raises Strands' unrecoverable MaxTokensReachedException (the synthesizer's
+    # long report can't fit); default to 32k (Nova 2 Lite's max output) when the config doesn't say.
     region = params.pop("region_name", None) or os.environ.get("AWS_REGION") or "us-west-2"
-    return BedrockModel(model_id=_bedrock_profile_id(model_id, region), region_name=region)
+    max_tokens = int(params.pop("max_tokens", None) or params.pop("maxTokens", None) or 32000)
+    temperature = params.get("temperature")
+    kwargs = {"max_tokens": max_tokens}
+    if temperature is not None:
+        kwargs["temperature"] = temperature
+    return BedrockModel(model_id=_bedrock_profile_id(model_id, region), region_name=region, **kwargs)
 
 
 def _bedrock_profile_id(model_id, region):

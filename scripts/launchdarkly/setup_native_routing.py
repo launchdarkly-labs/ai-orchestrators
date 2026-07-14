@@ -40,6 +40,16 @@ import requests
 import yaml
 from dotenv import load_dotenv
 
+# Experiment C arms inherit their framework's native model: each framework's rule also
+# matches its `-native` (and managed) `orchestrator` values, so e.g. strands-native serves
+# Nova just like strands. With --pin, all values (aliases included) serve the pinned model.
+NATIVE_ARM_ALIASES = {
+    "langgraph": ["langgraph-native", "langgraph-managed"],
+    "strands": ["strands-native"],
+    "openai-agents": ["openai-agents-native"],
+    "google-adk": ["google-adk-native"],
+}
+
 # The `orchestrator` flag value -> the native model that framework should run. langgraph is
 # intentionally absent: it keeps the base claude variation, served by the fallthrough.
 #   provider        -> written to the variation so the runner routes correctly (see module docstring)
@@ -240,7 +250,8 @@ class NativeRoutingSetup:
         if self.dry_run:
             print(f"    [dry-run] replaceRules [] then re-add {len(NATIVE_MODELS)} orchestrator rules")
             for framework, spec in NATIVE_MODELS.items():
-                print(f"    [dry-run]   orchestrator=={framework} -> {config_key}-{spec['suffix']}")
+                arms = [framework, *NATIVE_ARM_ALIASES.get(framework, [])]
+                print(f"    [dry-run]   orchestrator in {arms} -> {config_key}-{spec['suffix']}")
         else:
             # Rebuild from scratch so re-runs are idempotent AND heal any clause-only rules left
             # by an earlier plain-content-type PATCH. These node configs' rules are managed solely
@@ -251,10 +262,11 @@ class NativeRoutingSetup:
                 if var_key not in idx:
                     print(f"    ✗ variation '{var_key}' not found in targeting; skipping rule")
                     continue
+                arms = [framework, *NATIVE_ARM_ALIASES.get(framework, [])]
                 instr = {
                     "kind": "addRule",
                     "clauses": [{"contextKind": "user", "attribute": "orchestrator",
-                                 "op": "in", "values": [framework], "negate": False}],
+                                 "op": "in", "values": arms, "negate": False}],
                     # AI-config targeting addRule binds by variation UUID (not index), and REQUIRES
                     # the semantic-patch content-type (see _patch_targeting), else the variation is
                     # silently dropped and the rule serves nothing.
@@ -262,7 +274,7 @@ class NativeRoutingSetup:
                 }
                 r = self._patch_targeting(project, config_key, [instr])
                 ok = r.status_code == 200
-                print(f"    {'✓ routed' if ok else '✗ rule failed'} orchestrator=={framework} -> {var_key}"
+                print(f"    {'✓ routed' if ok else '✗ rule failed'} orchestrator in {arms} -> {var_key}"
                       + ("" if ok else f": {r.status_code} {r.text[:200]}"))
                 time.sleep(0.3)
 

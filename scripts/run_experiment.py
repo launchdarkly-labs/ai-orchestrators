@@ -12,6 +12,12 @@ the SHARED graph, judge the output, and emit the quality metric. Graph/node metr
 
     # smoke test before the experiment exists: force a framework, one context
     python scripts/run_experiment.py --framework langgraph --limit 1
+
+    # Experiment C (orchestrator bake-off): the same drawn graph, walked by each
+    # framework's NATIVE orchestrator (StateGraph / Strands Graph / SDK handoffs / ADK
+    # workflow agents), with dispatcher arms as controls — pin one model first
+    python scripts/run_experiment.py --arms langgraph langgraph-native strands-native \
+        openai-agents-native google-adk-native langgraph-managed
 """
 
 import argparse
@@ -57,7 +63,27 @@ RUNNERS = {
     "openai-agents": "orchestrators.openai_agents_runner",
     "google-adk": "orchestrators.google_adk_runner",
 }
+# Experiment C arms: whole-graph runners where each FRAMEWORK'S NATIVE ORCHESTRATOR owns
+# the walk of the same drawn graph (StateGraph / Strands Graph / SDK handoffs / ADK
+# workflow agents), plus the LD SDK's managed runner as a zero-code baseline. These bypass
+# execute_graph — the module's run_graph() does the traversal — but return the same result
+# dict, so everything downstream (judge score, cost, CSV) is arm-agnostic. The four
+# dispatcher-walked RUNNERS arms above stay exactly as they were.
+GRAPH_RUNNERS = {
+    "langgraph-native": "orchestrators.langgraph_native_runner",
+    "strands-native": "orchestrators.strands_native_runner",
+    "openai-agents-native": "orchestrators.openai_agents_native_runner",
+    "google-adk-native": "orchestrators.google_adk_native_runner",
+    "langgraph-managed": "orchestrators.langgraph_managed_runner",
+}
 GRAPH_KEY = "research-gap-graph"
+# Topology routing lives in LD, not code: a separate `graph-key` string flag (targeted on the
+# orchestrator context attribute) picks which graph each arm reads — the diamond for the
+# structural arms, the linear handoff chain for openai-agents-native. Evaluated per request on
+# the same context as the running orchestrator experiment (serving one flag while experimenting
+# on another is fine). LD agent graphs are single-shape (no variations/targeting), which is why
+# graph selection is a separate flag rather than a graph variation. See bootstrap_graph_key_flag.py.
+GRAPH_KEY_FLAG = "graph-key"
 FLAG_KEY = "orchestrator"
 # The judge ($ld:ai:judge:gap-quality) generates its own metric.
 # Custom dollar-cost metric: LD's auto AI metrics are token/duration only (no cost), and the
@@ -133,7 +159,7 @@ async def run_one(ld, ai_client, item_id, papers, override=None):
     # Evaluate the orchestrator flag (the experiment's randomized split, bucketed by the request
     # key) on a context WITHOUT the attribute, then resolve the framework.
     framework = override or ld.variation(FLAG_KEY, _ctx(), "langgraph")
-    if framework not in RUNNERS:
+    if framework not in RUNNERS and framework not in GRAPH_RUNNERS:
         return {"id": item_id, "framework": framework, "path": "", "score": None,
                 "cost_usd": None, "latency_ms": None, "in_tokens": None, "out_tokens": None,
                 "error": f"no runner for '{framework}'"}
@@ -143,13 +169,24 @@ async def run_one(ld, ai_client, item_id, papers, override=None):
     # execute_graph). Without this, node targeting keyed on `orchestrator` finds the attribute
     # absent and serves the fallthrough model to every framework in the randomized path.
     context = _ctx(framework)
-    runner = importlib.import_module(RUNNERS[framework])
     user_input = build_paper_prompt(papers)
+    # Resolve the graph shape from LD (targets the orchestrator attribute now set on the context).
+    graph_key = ld.variation(GRAPH_KEY_FLAG, context, GRAPH_KEY)
     try:
-        result = await execute_graph(
-            ai_client, GRAPH_KEY, context, user_input, runner.build_agent, runner.invoke,
-            require_context_attr="orchestrator",
-        )
+        if framework in GRAPH_RUNNERS:
+            # Experiment C: the arm's runner owns the whole walk (the orchestrator is the
+            # treatment); same result shape as execute_graph, so nothing below changes.
+            runner = importlib.import_module(GRAPH_RUNNERS[framework])
+            result = await runner.run_graph(
+                ai_client, graph_key, context, user_input,
+                require_context_attr="orchestrator",
+            )
+        else:
+            runner = importlib.import_module(RUNNERS[framework])
+            result = await execute_graph(
+                ai_client, graph_key, context, user_input, runner.build_agent, runner.invoke,
+                require_context_attr="orchestrator",
+            )
     except Exception as e:
         return {"id": item_id, "framework": framework, "path": "", "score": None,
                 "cost_usd": None, "latency_ms": None, "in_tokens": None, "out_tokens": None,
@@ -186,8 +223,12 @@ async def main():
                     help="data file(s) to run over (e.g. a set from download_papers.py); "
                          "default = the shipped 3-category set")
     ap.add_argument("--all-frameworks", action="store_true",
-                    help="matched mode: run EACH data set through ALL four orchestrators once "
+                    help="matched mode: run EACH data set through ALL four frameworks once "
                          "(apples-to-apples head-to-head) instead of the flag's randomized split")
+    ap.add_argument("--arms", nargs="+", default=None,
+                    help="matched mode over an explicit arm list (e.g. Experiment C: "
+                         "--arms langgraph langgraph-native langgraph-managed); each data set "
+                         "runs once per arm. Overrides --all-frameworks.")
     ap.add_argument("--concurrency", type=int, default=4,
                     help="how many contexts to run at once (runs are independent; lower if you "
                          "hit model-provider rate limits, raise on higher API tiers, 1 = serial)")
@@ -224,8 +265,13 @@ async def main():
         papers = load_category(fname, args.papers_per_context)
         # Topic label = the filename stem (used in context keys and the results CSV).
         category = Path(fname).name.removesuffix("_papers.json").rstrip("_")
-        if args.all_frameworks:
-            # Matched head-to-head: every orchestrator analyzes the SAME full topic set, once.
+        if args.arms:
+            # Matched head-to-head over an explicit arm list (Experiment C: dispatcher vs
+            # native vs managed walk — same framework/model, the orchestrator is the treatment).
+            for fw in args.arms:
+                jobs.append((f"{category}-{fw}", papers, fw))
+        elif args.all_frameworks:
+            # Matched head-to-head: every framework analyzes the SAME full topic set, once.
             for fw in RUNNERS:
                 jobs.append((f"{category}-{fw}", papers, fw))
         else:

@@ -1,195 +1,196 @@
-# One Agent Graph, N Orchestrators
+# One Agent Graph, Every Variable Behind a Flag
 
-A research-gap-analysis workflow whose topology lives in **one shared LaunchDarkly agent graph** (`intake → [approach-analyzer ∥ contradiction-detector] → gap-synthesizer`). Four frameworks — LangGraph, Strands, OpenAI Agents, Google ADK — all execute that same graph via a generic dispatcher, selected per request by an `orchestrator` flag. A LaunchDarkly experiment ranks them on **end-to-end latency and tokens** with the model held constant, while an LLM-judge **quality guardrail** confirms no framework degrades the output. Or flip on a [native-model bake-off](#native-model-bake-off-experiment-b) — each framework at its provider's best model — with no code change.
+A research-gap-analysis workflow (`intake → [approach-analyzer ∥ contradiction-detector] → gap-synthesizer`) whose topology, prompts, models, tools, and judge all live in **one LaunchDarkly agent graph**. An `orchestrator` routing flag selects the arm per request; a LaunchDarkly experiment ranks the arms; an LLM-judge quality score guards them. Three experiments, each isolating one layer of the agent stack:
+
+| | varies | holds constant | the decision it answers |
+|---|---|---|---|
+| **A** | framework (node execution) | graph, walk, judge, **model** | **Migration**: "what would swapping frameworks cost?" — measures the framework tax (agent loop + adapter). Small tax ⇒ the choice is reversible |
+| **B** | framework + its native model | graph, walk, judge | **Adoption**: "which stack do we build on?" — each vendor's happy path, whole-bundle |
+| **C** | the **orchestrator** (who walks) | graph, judge, model-per-pair | **Architecture**: "who owns the traversal — our dispatcher, the framework's engine, or a managed runner?" |
+
+The suite hangs on one intentional design decision: a shared ~100-line **dispatcher** (`orchestrators/dispatcher.py`) owns the walk in A/B — holding traversal byte-identical so framework execution paths compare cleanly — then serves as the **control arm** when C makes the walk itself the treatment. An orchestrator is really a *context manager*: what it carries between nodes is the lever C measures, and on this input-heavy workload it can swing the token bill more than the framework tax.
 
 Sequel to [*Framework-Agnostic AI Swarms*](https://launchdarkly.com/docs/tutorials/ai-orchestrators).
 
 ## Setup
 
-With [uv](https://docs.astral.sh/uv/) (recommended — installs from the lockfile, no venv to activate):
-
 ```bash
-uv sync
+uv sync                # or: python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
 cp .env.example .env   # fill in keys; set LD_PROJECT_KEY to your project
 ```
 
-Then prefix the commands below with `uv run` (e.g. `uv run python orchestrators/verify_run.py langgraph`).
-
-Or with pip:
-
-```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-```
-
-With an activated venv, drop the `uv run` prefix and call `python` directly.
-
-Needs Python 3.11+, a LaunchDarkly account with AgentControl, and `ANTHROPIC_API_KEY` (the pinned model). `OPENAI_API_KEY` / `GOOGLE_API_KEY` are only needed for the native-model bake-off.
+Needs Python 3.11+, a LaunchDarkly account with AgentControl, and `ANTHROPIC_API_KEY`. For Experiment B/C native models also: `OPENAI_API_KEY`, `GOOGLE_API_KEY`, AWS credentials for Bedrock (e.g. `scripts/aws/` SSO). Prefix commands with `uv run` (or activate the venv and drop it).
 
 ## Run
 
-1. **Create a LaunchDarkly project** (MCP / skill / UI) and set `LD_PROJECT_KEY` to its key.
-2. **Bootstrap** the node configs, agent graph, `orchestrator` flag, and judge:
-   ```bash
-   uv run python scripts/launchdarkly/bootstrap.py config/graph_experiment_manifest.yaml
-   ```
-3. **Create the metric + experiment.** Add the custom dollar-cost metric (LD has no built-in cost metric — see [Cost & metrics](#cost--metrics)):
-   ```bash
-   uv run python scripts/launchdarkly/create_cost_metric.py
-   ```
-   Then create the experiment in the UI with treatment = `orchestrator` flag, control = `langgraph`, Bayesian. **Metrics are split by randomization unit** and an experiment's metrics must match its unit, so pick one framing:
-   - **Cost + quality (recommended for the native bake-off):** randomization unit = **`user`**, primary = **AI graph cost (USD)**, guardrail = gap-quality judge, secondary = graph total tokens. *(cost / judge / tokens are all `user`-unit.)*
-   - **Latency:** randomization unit = **`request`**, primary = **Graph latency**. *(latency / duration are `request`-unit; the judge/cost can't be in this one.)*
+1. **Create an LD project**, set `LD_PROJECT_KEY`.
+2. **Bootstrap** node configs, graph, `orchestrator` flag, judge:
+   `python scripts/launchdarkly/bootstrap.py config/graph_experiment_manifest.yaml`
+3. **Metric + experiment**: `python scripts/launchdarkly/create_cost_metric.py`, then create the experiment in the UI (treatment = `orchestrator` flag, control = `langgraph`, Bayesian). Pick ONE randomization unit ([why](#cost--metrics)): **`user`** → primary = AI graph cost (USD), guardrail = gap-quality judge, secondary = tokens; or **`request`** → primary = graph latency. Start an iteration.
+4. **Drive traffic** (each run feeds a topic's FULL paper set through the graph):
+   - Randomized (default): `python scripts/run_experiment.py` — the flag splits arms; add topics for statistical power.
+   - Matched head-to-head: `--all-frameworks` (four framework arms) or `--arms <arm ...>` (any arm list).
+   - Smoke test: `python orchestrators/verify_run.py all` (frameworks) / `c` (orchestrators) / `<arm>`.
+5. Read the per-variation winner in the LD UI (or the harness's per-arm means / results CSV).
 
-   Start an iteration.
-4. **Drive traffic.** Each run feeds a topic's **full** paper set through the graph (gap analysis needs every paper) and the judge scores the report. Two modes:
-   - **Matched head-to-head** (`uv run python scripts/run_experiment.py --all-frameworks`): every topic runs through all four orchestrators once — apples-to-apples, read the per-framework means in the harness summary. Best for a small, fixed topic set.
-   - **Randomized experiment** (default `uv run python scripts/run_experiment.py`): the `orchestrator` flag assigns each run one framework; the LD experiment attributes metrics per variation. Confidence bands tighten as you add **topics** (real traffic), so scale the query set for statistical power.
-   - Smoke test: `uv run python orchestrators/verify_run.py langgraph` (one framework) or `verify_run.py all` (all four, with a pass/fail summary).
-5. Read the per-variation winner in the UI (or the matched means in the harness output).
+## Experiment B — native models
 
-## Native-model bake-off (Experiment B)
+`setup_native_routing.py` (run after bootstrap; idempotent) adds one variation per provider to every **node config** plus targeting rules on the `orchestrator` context attribute. Provider is derived from each variation's `modelConfigKey` (must exist in your LD model catalog). Fallthrough stays on base `claude-sonnet-4-5`. Default demo roster (edit `NATIVE_MODELS` in the script for flagships):
 
-The run above holds the model constant (`claude-sonnet-4-5` on every node) and varies only the
-framework — an isolated read on orchestration overhead (**Experiment A**). **Experiment B** instead
-lets each orchestrator run its provider's native model, ranking *each framework + its model together*.
-The shipped default is a **low-cost demo set** (cheapest recent tier per provider):
-
-| orchestrator | model | provider |
+| arm | model | provider |
 |---|---|---|
 | langgraph | claude-haiku-4-5 | Anthropic (direct API) |
-| openai-agents | gpt-5-mini | OpenAI |
-| google-adk | gemini-2.5-flash | Gemini |
-| strands | claude-haiku-4-5 (Bedrock) | Bedrock |
+| openai-agents | gpt-5.4-mini | OpenAI |
+| google-adk | gemini-3-flash-preview | Gemini (free tier OK) |
+| strands | amazon nova-2-lite | Bedrock (geo prefix auto-added) |
 
-langgraph and strands share Claude Haiku 4.5 (direct API vs Bedrock — a clean same-model
-framework/runtime signal). For a production-grade comparison, edit `NATIVE_MODELS` to the flagships
-(`Anthropic.claude-sonnet-5`, `OpenAI.gpt-5.1`, `Gemini.gemini-3-pro-preview`, and
-`Bedrock.anthropic.claude-sonnet-5`).
+```bash
+python scripts/launchdarkly/setup_native_routing.py --dry-run   # preview
+python scripts/launchdarkly/setup_native_routing.py             # variations + rules + judge attachment
+```
 
-**Cost** (this workflow is input-heavy — the full paper set is injected into every node, so ~110–140k
-input + ~15–18k output tokens/run, plus a constant ~$0.14 Sonnet judge call):
+**Cost** (~110–140k input + ~15–18k output tokens/run + ~$0.14 judge): demo set ≈ $0.20–0.27/run (≈$5–6 per 24-run matched sweep); flagships ≈ $0.65–1.15/run.
 
-| model set | per run | `--all-frameworks` (24 runs) | full randomized (90 runs) |
+### Toggling A ↔ B
+
+```bash
+python scripts/launchdarkly/setup_native_routing.py                  # B: per-arm native models
+python scripts/launchdarkly/setup_native_routing.py --pin anthropic  # A: ONE model on every arm
+```
+
+`--pin` clears the rules and points every node's fallthrough at the `*-anthropic` variation (must be Anthropic — the langgraph arms have only `langchain-anthropic`); re-run without `--pin` to restore B. **Restart the experiment iteration after any switch** so shapes' data don't mix.
+
+## Experiment C — orchestrator bake-off
+
+Every multi-agent app makes two silent decisions, usually inherited from a framework's
+quickstart: **context strategy** (what each agent sees — a curated fresh input, or the
+accumulating transcript) and **routing authority** (who picks the path — the drawn graph, or
+the model at runtime). Context strategy is directly your token bill and compounds with graph
+size; routing authority decides whether the drawn edges are a contract or a suggestion. This
+experiment prices both: same drawn graph, same judge, but each framework's **native
+orchestration engine** owns the walk. Every input still comes from LaunchDarkly.
+
+**The arms as a 2×2** (★ = dispatcher control):
+
+| | **structural routing** (drawn edges execute) | **model-decided routing** (edges are options) |
+|---|---|---|
+| **curated context** | ★ dispatcher (all four framework arms) · `strands-native` | *(empty — no framework ships this)* |
+| **accumulating context** | `langgraph-native` · `google-adk-native` | `openai-agents-native` (linear chain) |
+
+| arm | orchestrator | routing | context between nodes |
 |---|---|---|---|
-| demo (Haiku / GPT-5-mini / Gemini Flash) | ~$0.20–0.27 | ~$5–6 | ~$18–25 |
-| flagship (Sonnet 5 / GPT-5.1 / Gemini 3 Pro) | ~$0.65–1.15 | ~$16–28 | ~$60–100 |
+| dispatcher arms *(controls)* | shared dispatcher | structural, ALL-join | fresh: papers + predecessor outputs |
+| `langgraph-native` | LangGraph `StateGraph` | structural, ALL-join | one accumulating message state (full transcripts) |
+| `strands-native` | Strands `Graph` | structural, **ANY-trigger** | task + dependency-output digest (≈ dispatcher's) |
+| `openai-agents-native` | Agents SDK **handoffs** | **model-decided**, sequential | can't traverse the diamond — runs a **linear chain** (see below) |
+| `google-adk-native` | ADK workflow agents | structural, level barriers | one shared session (accumulates) |
 
-`gemini-2.5-flash` runs on the Gemini **free tier** — no Google billing needed for the demo. Routing
-is structural, not code. Each node config gets one variation per framework, and targeting rules keyed
-on the `orchestrator` context attribute serve the matching model; the SDK derives the provider from
-each variation's `modelConfigKey` (a model-catalog entry), so the runners route to the right SDK
-unchanged. All four frameworks get an explicit variation + rule; the config **fallthrough** stays on
-the pinned `claude-sonnet-4-5`, so Experiment A (no `orchestrator` attribute) is untouched.
+**How to read it** — the same drawing means different things to different engines: ALL-join
+(dispatcher, LangGraph `StateGraph`) vs ANY-trigger re-execution (Strands fires a node when
+*any* predecessor completes) vs level barriers (ADK) vs model-decided handoffs (OpenAI). The
+structural engines walk the diamond as drawn; a drawn graph is a *contract* only under
+structural orchestration.
 
-Set it up **after** `bootstrap.py`:
+**The handoff exception (OpenAI).** Handoffs are sequential and model-decided, so they can't
+express the diamond's parallel fan-out at all — the arm bailed at the entry node (and so did
+LaunchDarkly's own managed handoff runner, so it's the paradigm, not the runner). Making
+handoffs walk took three things, all config: (1) a **linear-chain graph**
+(`research-gap-graph-linear`, same node configs), (2) handoff-aware prompts authored in the
+OpenAI `*-gpt` node variations (not in code), and (3) a **message-carrying handoff** — the
+transfer tool requires the agent's findings as its payload, fusing "do the work" and "hand
+off" into one act. With all three, the arm walks the chain reliably and scores competitively
+(~0.73 gap-quality). Which graph each arm reads is routed by a separate **`graph-key` flag**
+(targets the `orchestrator` attribute: `openai-agents-native` → linear, everyone else →
+diamond), evaluated per request during the same experiment.
 
-```bash
-uv run python scripts/launchdarkly/setup_native_routing.py --dry-run   # preview, no writes
-uv run python scripts/launchdarkly/setup_native_routing.py             # create variations + rules
-```
-
-Pick the models by editing `NATIVE_MODELS` at the top of the script. Each entry needs a
-`modelConfigKey` that exists in your LaunchDarkly model catalog — list them with
-`GET /api/v2/projects/{projectKey}/ai-configs/model-configs` — or the provider resolves empty and
-the runner misroutes. The script is idempotent (re-run to change models) and applies to all four
-node configs, so routing already works when you add `contradiction-detector` to the graph.
-
-Credentials in `.env`: `OPENAI_API_KEY` (openai-agents), `GOOGLE_API_KEY` (google-adk / Gemini), and
-AWS credentials for Bedrock (strands) — e.g. via `scripts/aws/` SSO. Bedrock serves newer Claude
-models on-demand only through a cross-region inference profile; the strands runner prepends the
-region geo prefix (`us.`/`eu.`/`apac.`) automatically. Confirm every route without spending tokens:
+Setup (all config, additive — run after `setup_native_routing.py`):
 
 ```bash
-uv run python orchestrators/verify_run.py all
+python scripts/launchdarkly/add_experiment_c_arms.py          # add the *-native arm values to the orchestrator flag
+python scripts/launchdarkly/bootstrap_linear_graph.py         # the linear chain graph (reuses node configs)
+python scripts/launchdarkly/bootstrap_openai_handoff_prompts.py  # handoff prompts into *-gpt variations + judge
+python scripts/launchdarkly/bootstrap_graph_key_flag.py       # graph-key flag: routes openai-agents-native → linear
+python orchestrators/verify_run.py c                          # smoke each walk (no experiment needed)
 ```
 
-The experiment setup is unchanged (same `orchestrator` flag), but the ranking now compares whole
-**orchestrator + native model** stacks — latency, tokens, and the quality judge reflect framework
-*and* model together, not the framework in isolation. The setup script also attaches the gap-quality
-judge to every per-framework synthesizer variation (the manifest attaches it only to the base), so
-each arm gets a quality score.
-
-### Switching between Experiment A (pinned model) and Experiment B (native models)
-
-The same `setup_native_routing.py` script toggles the two experiment shapes — no variation rewrites,
-fully reversible:
+Then run it **as an experiment** (capture-or-don't-run): add the `*-native` arms as treatments
+on the `orchestrator` experiment (control = `langgraph`, unit = `user`, primary = cost,
+guardrail = judge), **start a fresh iteration**, and drive randomized traffic:
 
 ```bash
-# Experiment B — each framework on its own native model (per-framework targeting rules)
-uv run python scripts/launchdarkly/setup_native_routing.py
-
-# Experiment A — pin ALL frameworks to one model, isolating orchestration overhead
-uv run python scripts/launchdarkly/setup_native_routing.py --pin anthropic   # --dry-run to preview
+python scripts/run_experiment.py --runs-per-category 5   # flag-assigned; every run is an exposure
 ```
 
-`--pin <suffix>` clears the per-framework rules and points every node config's **fallthrough** at the
-`*-<suffix>` variation, so every `orchestrator` value serves that one model. The per-framework
-variations are left untouched, so re-running **without** `--pin` restores Experiment B.
+(`--arms`/`--all-frameworks` matched mode still exists for offline smoke-grade CSV reads, but
+it bypasses the flag — zero exposures, invisible to the experiment.)
 
-Use **`--pin anthropic`** (Claude Haiku 4.5). It has to be the Anthropic variation: the LangGraph
-runner only has `langchain-anthropic` installed (no LiteLLM), so it can't run GPT/Gemini — pinning to
-`gpt`/`gemini`/`bedrock` would break the langgraph arm. In Experiment A the quality judge should read
-roughly flat across arms (same model), so **cost and latency — framework overhead at a fixed model —
-are the differentiators.**
+## Cheat sheet
 
-After switching either way, **restart the experiment iteration** so the two shapes' data don't mix.
+**The layer cake** — everything is a harness around the layer below it; each experiment
+varies exactly one layer:
+
+| layer | job | in this repo | varied by |
+|---|---|---|---|
+| model API | generate | Claude / GPT / Gemini / Nova | **B** |
+| framework | agent loop for ONE node: prompts, tool calls, retries | LangGraph, Strands, OpenAI Agents SDK, Google ADK | **A** |
+| **orchestrator** | the walk: who runs, what they see, who routes | dispatcher · native engines · LD managed runner | **C** |
+| measurement | randomize, judge, price, record | `run_experiment.py` + the LD experiment | — |
+
+**Arm naming** — the `orchestrator` flag value decodes as *who walks*:
+
+| value pattern | who walks the graph | example |
+|---|---|---|
+| plain (`langgraph`, `strands`, …) | **our dispatcher**; the framework only executes nodes | `google-adk` |
+| `*-native` | **that framework's own engine** | `strands-native` (Strands `Graph`) |
+| `langgraph-managed` | **LaunchDarkly's SDK runner** (`create_agent_graph().run()`) — zero orchestration code | — |
+
+**One drawing, many compilers** — every arm reads the same LD graph per request; each
+engine executes it with its own semantics:
+
+| engine | multi-input node | parallel fan-out | drawn edges are | quirks |
+|---|---|---|---|---|
+| dispatcher | waits for ALL preds | yes (`asyncio.gather`) | contract | fails loudly on cycles |
+| LangGraph `StateGraph` | ALL (list-edge join) | yes (supersteps) | contract | join must be explicit or it fires per edge |
+| Strands `Graph` | fires on ANY pred | yes | contract, OR-interpreted | re-executes multi-input nodes |
+| ADK workflow agents | level barrier | per level | contract + extra sync | reshaped into Sequential/Parallel levels |
+| OpenAI handoffs | n/a — one agent at a time | **no** | **options** (model decides) | can't walk the diamond — runs the linear chain with a message-carrying handoff |
+
+**Run modes** — capture-or-don't-run:
+
+| mode | command | captured in the LD experiment? | allowed use |
+|---|---|---|---|
+| randomized | `run_experiment.py` (no overrides) | **yes** — flag assigns arms, every run is an exposure | the real experiments |
+| matched | `--arms` / `--all-frameworks` | **no** — flag bypassed, CSV only | offline smoke-grade reads only |
+| smoke | `verify_run.py <arm>` / `c` / `all` | no (metrics flow, no exposures) | route/walk validation |
+
+**What lives where:**
+
+| from LaunchDarkly (edit in UI, no deploy) | from code |
+|---|---|
+| topology (nodes + edges), per-node model, prompt, tools, judge attachment, routing (`orchestrator` flag → arm, `graph-key` flag → graph shape, targeting rules → per-node model), all metric trackers | the walk implementations (dispatcher + runners), tool *bodies* (`shared/tools`), the harness, the papers |
+
+Metric units: cost / judge / tokens randomize by `user`; latency by `request` — one unit per
+experiment, so cost+quality and latency are separate experiments (see [Cost & metrics](#cost--metrics)).
+
+**Model modes** (same `setup_native_routing.py` toggle; the `-native` arms inherit their framework's model, so `strands-native` serves **Nova** like `strands`): **pairs** (default — each arm on its native model, so every dispatcher-vs-native pair holds the model constant) or **`--pin anthropic`** (one model on every arm, for cross-family comparability). Metric honesty: the OpenAI result reports graph-level tokens only (no per-node attribution); ADK reports no per-node duration — gaps stay unreported, not faked.
 
 ## Cost & metrics
 
-LaunchDarkly's auto-generated AI metrics are token/duration only — **there is no built-in dollar-cost
-metric**, and the `get-ai-config-metrics` REST endpoint reports cost only **per config (all variations
-combined)**, never per-variation, and isn't reachable through the SDK. So for a per-orchestrator cost
-ranking, the harness computes each run's **graph cost** (node tokens × the served model's catalog
-price) and emits it as a custom metric, `ai-graph-cost-usd`:
+LD's auto AI metrics are token/duration only (no dollar cost, and the REST cost endpoint isn't per-variation), so the harness computes each run's graph cost (node tokens × the served model's catalog price) and emits custom metric **`ai-graph-cost-usd`** — a fair cross-model primary where raw tokens aren't. Metric randomization units are split, and an experiment's metrics must match its unit:
 
-```bash
-uv run python scripts/launchdarkly/create_cost_metric.py      # one-time: create the metric
-# run_experiment.py then emits it every run; results CSV gets a cost_usd column
-uv run python scripts/launchdarkly/fetch_costs.py --hours 24   # read LD's own per-config cost (Insights)
-```
+| metric | unit |
+|---|---|
+| `ai-graph-cost-usd`, gap-quality judge, graph total tokens | `user` |
+| graph latency / duration | `request` |
 
-Raw token counts are **not** a fair cost proxy across the different-model arms (per-token prices
-differ), so use the dollar metric. **Metric randomization units are split**, and an experiment can
-only include metrics matching its unit:
-
-| metric | unit | use as |
-|---|---|---|
-| AI graph cost (USD) `ai-graph-cost-usd` | `user` | primary (cost bake-off) |
-| Gap-quality judge | `user` | guardrail |
-| Graph total tokens | `user` | secondary |
-| Graph latency / duration | `request` | primary (separate latency experiment) |
-
-So a **cost + quality** experiment randomizes by `user`; a **latency** experiment randomizes by
-`request`. They can't be combined in one experiment.
+So cost + quality live in a `user`-randomized experiment; latency needs a separate `request`-randomized one.
 
 ## Papers (the query set)
 
-The experiment runs over the arXiv topic files in `data/` — auto-discovered, one file per
-topic. The shipped set is six **complete niche literatures** (every paper arXiv has on the
-topic in the last 3 years, no sampling):
-
-| Topic | Query | Papers |
-|---|---|---|
-| Length generalization | `ti:"length generalization"` | 49 |
-| Model collapse | `ti:"model collapse"` | 55 |
-| Reward hacking | `ti:"reward hacking"` | 67 |
-| Process reward models | `ti:"process reward model"` | 73 |
-| Sycophancy | `ti:"sycophancy"` | 94 |
-| Activation steering | `ti:"activation steering"` | 99 |
-
-**The dataset IS the topic.** Gap analysis only works on a topic's *full* literature — a
-capped sample of a broad query yields "gaps" that are artifacts of the sample. So never cap
-results; instead pick a **narrow query** (title-phrase `ti:"..."` searches work well) whose
-complete literature is run-sized (~10–100 papers). The downloader fetches all matches and
-warns if the query is too broad.
-
-To add or replace a topic (auto-discovered on the next run — no code change):
+Topic files in `data/` are auto-discovered (one file = one topic). Shipped: six complete niche literatures, 49–99 papers each (length generalization, model collapse, reward hacking, process reward models, sycophancy, activation steering). **The dataset IS the topic** — gap analysis needs a topic's *full* literature; a capped sample yields artifact "gaps". Pick narrow `ti:"..."` queries whose complete literature is run-sized (~10–100 papers):
 
 ```bash
-uv run python scripts/download_papers.py --query 'ti:"your niche topic"'
+python scripts/download_papers.py --query 'ti:"your niche topic"'
 ```
 
-The agents analyze abstracts; the `fetch_paper` tool pulls a paper's full text on demand when
-an abstract isn't enough.
+Agents analyze abstracts; the `fetch_paper` tool pulls full text on demand.
