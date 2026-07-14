@@ -125,12 +125,24 @@ python scripts/run_experiment.py --runs-per-category 5   # flag-assigned; every 
 (`--arms`/`--all-frameworks` matched mode still exists for offline smoke-grade CSV reads, but
 it bypasses the flag — zero exposures, invisible to the experiment.)
 
-**First-iteration takeaway** (directional, n=3–8/arm): the cost primary and the quality
-guardrail disagreed — the cheapest arm was the *lowest* quality, and the highest-quality arm
-was OpenAI on its linear chain. Cross-arm cost is still partly model (pairs mode); the clean
-read is the model-held pair (dispatcher vs. managed, both Claude), where structural traversal
-completed the walk and handoff routing traded completeness for fewer tokens. "Cheapest" is not
-"best" — which is the whole reason the judge rides along as a guardrail.
+**Findings** (directional, first iterations, n=5–8/arm) — two runs, two lessons:
+
+- **Native models (pairs mode):** cross-arm cost varied ~4×, but that's mostly the *model* —
+  the cheapest arm ran the cheapest model, and it was also the *lowest* quality. The cost
+  primary and the quality guardrail disagreed: cheapest ≠ best.
+- **Pinned model (every arm on Claude Haiku):** with the model held constant, the remaining
+  differences are the *orchestrator* alone. The four arms that complete the drawn walk cluster
+  tightly (~0.75–0.79 gap-quality at ~$0.28–0.34/run) — the structural engines and the
+  adapted-handoff OpenAI arm alike. The one arm that short-circuits — handoff routing run
+  *unadapted* on the structural graph — is both the cheapest (~$0.10/run, ~half the tokens) and
+  the worst (~0.40), because it walks the least of the graph. **Cost tracks how much of the
+  graph an orchestrator actually traverses; once the walk completes, the engine barely moves
+  quality.**
+
+The paradigm point: handoff routing isn't worse — it needs a handoff-shaped setup. Left on a
+structural graph it collapses; given a linear chain and a message-carrying handoff (the OpenAI
+arm) it's the top scorer. The judge rides along as a guardrail precisely because the cheapest
+option is often the one doing the least work.
 
 ## Cheat sheet
 
