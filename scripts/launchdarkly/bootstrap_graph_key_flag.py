@@ -33,7 +33,7 @@ load_dotenv(Path(__file__).parent.parent.parent / ".env")
 FLAG_KEY = "graph-key"
 DIAMOND = "research-gap-graph"
 LINEAR = "research-gap-graph-linear"
-LINEAR_ARMS = ["openai-agents-native"]  # arms routed to the linear (handoff) graph
+LINEAR_ARMS = ["openai-agents-native", "langgraph-managed"]  # arms routed to the linear (handoff) graph
 
 
 class GraphKeyFlag:
