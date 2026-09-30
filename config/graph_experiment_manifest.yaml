@@ -304,8 +304,10 @@ project:
 
   # Custom LLM-as-judge: the experiment's guardrail/secondary metric. A judge-mode config that
   # generates its own metric ($ld:ai:judge:gap-quality) — no separate custom metric.
-  # The harness invokes it programmatically and records the score via the evaluated
-  # node's tracker (track_judge_result). UI-editable; the code keeps a fallback rubric.
+  # The harness fires it through the SDK's judge runner, which scores the output and records
+  # the metric against the judged node's variation. UI-editable; the code keeps a fallback
+  # rubric. The rubric must not specify its own output format: the SDK requires a JSON
+  # {score, reasoning} response and appends that instruction itself.
   judge:
     key: "gap-quality-judge"
     name: "Gap-analysis quality judge"
@@ -318,8 +320,8 @@ project:
     randomizationUnit: "request"
     # Attach the judge to the node whose output it scores (the synthesizer's final
     # report). Attaching registers the evaluation metric so it's selectable in the
-    # experiment; the dispatcher fires the attached judge after the node runs and records
-    # the score via track_judge_result.
+    # experiment; the dispatcher fires the attached judge after the node runs, and the SDK
+    # records the score against the judged node's variation.
     attach:
       - config: "gap-synthesizer"
         variation: "synthesizer-claude"
@@ -357,8 +359,11 @@ project:
 
       Step 3 — compute: score = round(faithfulness * quality, 2). Clamp to [0, 1].
 
-      In your reasoning, list H and E with instances, the four 0-4 scores each with a one-line
-      justification, and the arithmetic, then return the computed score.
+      Return the computed score as `score` and put your working in `reasoning`: list H and E
+      with instances, the four 0-4 scores each with a one-line justification, and the
+      arithmetic. The SDK's judge runner appends the required JSON response format, so do not
+      restate an output format here — an instruction to emit a bare "SCORE: <n>" line (what
+      the previous SDK's judge parsed) conflicts with it and the score fails to parse.
 
       Be strict: count every instance, even minor ones. A perfect 1.00 should be rare.
 

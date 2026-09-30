@@ -384,8 +384,9 @@ class AgentGraphBootstrap:
 
         A judge config generates its own evaluation metric (evaluationMetricKey, e.g.
         $ld:ai:judge:gap-quality) — no separate custom metric. The harness invokes the
-        judge via the SDK and records the score with tracker.track_judge_result. Created
-        with the fallthrough at the disabled stub, so we repoint it at the rubric variation.
+        judge through the SDK's run_judges(), which records the score against that
+        evaluationMetricKey itself. Created with the fallthrough at the disabled stub, so
+        we repoint it at the rubric variation.
         """
         judge_key = judge_data["key"]
         base = f"{self.base_url}/api/v2/projects/{project_key}/ai-configs"

@@ -7,8 +7,9 @@ MESSAGE STATE. That accumulating state is the treatment: every node inherits the
 every upstream agent's full run (vs the dispatcher's fresh per-node input) — compare
 ``in_tokens`` against the dispatcher arm to read the context-management cost.
 
-Metrics parity with the dispatcher (graph tracker + per-node config trackers), and any
-attached judge fires per node with the source papers as input. Returns execute_graph's dict.
+Metrics parity with the dispatcher (graph tracker + per-node config trackers, both from
+`shared.ldai_compat`), and any attached judge fires per node with the source papers as
+input. Returns execute_graph's dict.
 """
 
 import time
@@ -17,17 +18,23 @@ from typing import Annotated, TypedDict
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import create_react_agent
-from ldai.tracker import TokenUsage
-from ldai.providers.types import LDAIMetrics
-from ldai_langchain import (
+from orchestrators.langgraph_runner import _content_to_text
+from shared.ldai_compat import (
+    ConfigTracker,
+    LDAIMetrics,
+    TokenUsage,
+    adjacency,
+    build_tools,
+    context_has_attr,
     create_langchain_model,
     get_tool_calls_from_response,
-    sum_token_usage_from_messages,
+    instructions,
+    model_name,
+    provider_name,
+    read_nodes,
+    resolve_graph_run,
+    sum_langchain_usage,
 )
-from ldai_langchain.langchain_helper import build_tools
-
-from orchestrators.dispatcher import _context_has_attr
-from orchestrators.langgraph_runner import _content_to_text
 from shared.tools import TOOL_REGISTRY
 
 
@@ -42,39 +49,24 @@ class _GraphState(TypedDict):
     messages: Annotated[list, add_messages]
 
 
-async def run_graph(ai_client, graph_key, context, user_input, require_context_attr=None):
+async def run_graph(graph_key, context, user_input, require_context_attr=None):
     """Run the LD agent graph with LangGraph as the orchestrator (native `StateGraph` walk).
 
     Same signature intent and return shape as ``dispatcher.execute_graph`` so the harness
     treats the arms interchangeably:
     ``{"output", "path", "judge_scores", "tokens", "model", "duration_ms"}``.
     """
-    if require_context_attr and not _context_has_attr(context, require_context_attr):
+    if require_context_attr and not context_has_attr(context, require_context_attr):
         raise RuntimeError(
             f"run_graph: context is missing the '{require_context_attr}' attribute — set it to "
             f"the resolved arm before calling (see run_experiment.run_one)."
         )
-    graph = ai_client.agent_graph(graph_key, context)
-    if not graph.is_enabled():
-        raise RuntimeError(
-            f"Agent graph '{graph_key}' is not enabled "
-            "(check the graph is on and every node config serves a real variation)"
-        )
-
-    graph_tracker = graph.create_tracker()
+    graph, graph_tracker, run_id = await resolve_graph_run(graph_key, context)
 
     # Enumerate nodes + adjacency from the LD edges — identical read to the dispatcher's,
     # so both arms execute the exact same drawn topology.
-    nodes = {}
-    graph.reverse_traverse(lambda node, _acc: nodes.update({node.get_key(): node}), {})
-    succ = {k: [] for k in nodes}
-    preds = {k: [] for k in nodes}
-    for key, node in nodes.items():
-        for edge in node.get_edges():
-            target = edge.target_config
-            if target in nodes:
-                succ[key].append(target)
-                preds[target].append(key)
+    nodes = await read_nodes(graph)
+    succ, preds = adjacency(nodes)
 
     outputs = {}        # node_key -> final text of that node's new messages
     judge_scores = {}
@@ -83,26 +75,26 @@ async def run_graph(ai_client, graph_key, context, user_input, require_context_a
     model_used = {}
 
     def _make_node_fn(key, node):
-        config = node.get_config()
-        model_used["provider"] = config.provider.name if config.provider else ""
-        model_used["name"] = config.model.name if config.model else ""
+        config = node.config
+        model_used["provider"] = provider_name(config)
+        model_used["name"] = model_name(config)
         # Same per-node agent as the dispatcher arm (create_react_agent + LD model/tools/
         # instructions) — the node executor is held constant; only the walk + state differ.
         agent = create_react_agent(
             create_langchain_model(config),
             build_tools(config, TOOL_REGISTRY),
-            prompt=config.instructions,
+            prompt=instructions(config),
         )
 
         async def node_fn(state):
-            tracker = config.create_tracker()
+            tracker = ConfigTracker(key, config, node.meta, context, graph_key, run_id)
             in_len = len(state["messages"])
             # Usage is summed over the NEW messages only: upstream AI messages in the shared
             # state carry their own usage_metadata and are already counted by their node.
             result = await tracker.track_metrics_of_async(
                 lambda res: LDAIMetrics(
                     success=True,
-                    tokens=sum_token_usage_from_messages(res.get("messages", [])[in_len:]),
+                    tokens=sum_langchain_usage(res.get("messages", [])[in_len:]),
                 ),
                 lambda: agent.ainvoke({"messages": state["messages"]}),
             )
@@ -115,14 +107,9 @@ async def run_graph(ai_client, graph_key, context, user_input, require_context_a
 
             # Judge parity with the dispatcher: the judge gets the SOURCE PAPERS as input so
             # grounding checks run against ground truth, not the accumulated transcript.
-            evaluator = getattr(config, "evaluator", None)
-            if evaluator is not None:
-                for r in await evaluator.evaluate(user_input, out):
-                    if r.sampled and r.success:
-                        tracker.track_judge_result(r)
-                        judge_scores[r.metric_key] = r.score
+            judge_scores.update(await tracker.track_judges(config, context, user_input, out))
 
-            usage = sum_token_usage_from_messages(new_msgs)
+            usage = sum_langchain_usage(new_msgs)
             if usage:
                 totals["in"] += usage.input or 0
                 totals["out"] += usage.output or 0
