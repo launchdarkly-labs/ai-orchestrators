@@ -325,7 +325,10 @@ project:
     # The rubric asks for its working, so the reply needs room. Two failure modes sit on
     # either side of this number: left unset, the judge generates to the model's ceiling
     # and the call times out; set too low, the JSON truncates mid-string and fails to
-    # parse. 8000 clears the longest reasoning we measured, and the rubric caps the prose.
+    # parse. Raise the ceiling rather than telling the judge to be brief, which costs
+    # reasoning without buying much room: the longest we measured was around 1800 tokens.
+    # Scores cluster on smoke runs (--papers-per-context 2) because two papers give every
+    # arm the same thin material; judge spread needs the full topic set.
     customParameters:
       max_tokens: 8000
     # Combined rubric (tuned with scripts/judge_lab.py): graded quality dimensions (reward grounded
@@ -363,9 +366,6 @@ project:
       fails to parse.
 
       Be strict: count every instance, even minor ones. A perfect 1.00 should be rare.
-
-      Keep `reasoning` under 250 words. It is a diagnostic note, not a review, and a
-      long one truncates against the token limit and fails to parse as JSON.
 
       {{message_history}}
 
