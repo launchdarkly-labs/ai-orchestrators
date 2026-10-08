@@ -426,7 +426,16 @@ class AgentGraphBootstrap:
             "name": "Default",
             "messages": [{"role": "system", "content": judge_data.get("instructions", "")}],
             "modelConfigKey": model_config_key,
-            "model": {"modelName": model_id, "parameters": {"temperature": 0.0}},
+            "model": {
+                "modelName": model_id,
+                # max_tokens has to be set: left unbounded the judge generates until the
+                # provider's ceiling and the call times out before it ever returns.
+                "parameters": {
+                    "temperature": 0.0,
+                    "max_tokens": 2000,
+                    **(judge_data.get("customParameters") or {}),
+                },
+            },
         }
         r = requests.post(f"{base}/{judge_key}/variations", headers=self.headers, json=var_payload, timeout=30)
         if r.status_code in (200, 201):

@@ -331,6 +331,12 @@ project:
     # Haiku (which clustered every report at ~0.72). It fires once per run (~$0.13); worth it for a
     # quality guardrail that actually differentiates. Tune its rubric with scripts/judge_lab.py.
     modelId: "claude-sonnet-4-5"
+    # The rubric asks for its working, so the reply needs room. Two failure modes sit on
+    # either side of this number: left unset, the judge generates to the model's ceiling
+    # and the call times out; set too low, the JSON truncates mid-string and fails to
+    # parse. 8000 clears the longest reasoning we measured, and the rubric caps the prose.
+    customParameters:
+      max_tokens: 8000
     # Combined rubric (tuned with scripts/judge_lab.py): graded quality dimensions (reward grounded
     # DEPTH) × a faithfulness floor (penalize fabrication). Beats the two failure modes we measured:
     # a pure deduction rubric rewards BREVITY (a terse report has fewer defects to count → the
@@ -361,11 +367,16 @@ project:
 
       Return the computed score as `score` and put your working in `reasoning`: list H and E
       with instances, the four 0-4 scores each with a one-line justification, and the
-      arithmetic. The SDK's judge runner appends the required JSON response format, so do not
-      restate an output format here — an instruction to emit a bare "SCORE: <n>" line (what
-      the previous SDK's judge parsed) conflicts with it and the score fails to parse.
+      arithmetic. Do not restate an output format of your own — a bare "SCORE: <n>" line
+      (what the previous SDK's judge parsed) conflicts with the required JSON and the score
+      fails to parse.
 
       Be strict: count every instance, even minor ones. A perfect 1.00 should be rare.
+
+      Keep `reasoning` under 250 words. It is a diagnostic note, not a review, and a
+      long one truncates against the token limit and fails to parse as JSON.
+
+      {{message_history}}
 
 # Model config key mapping (provider.modelId -> LD model config key)
 modelConfigKeys:
