@@ -2,13 +2,12 @@
 name = "ai-orchestrators"
 version = "0.1.0"
 description = "One agent graph, N orchestrators — a LaunchDarkly experiment to pick the winning orchestration framework (DEVREL-741)."
-requires-python = ">=3.11"
+requires-python = ">=3.12"  # floor set by launchdarkly-ai-server
 dependencies = [
-    # LaunchDarkly — agent-graph SDK + per-framework companion packages
+    # LaunchDarkly — agent-graph SDK (open beta, pinned) + its managed LangGraph adapter
     "launchdarkly-server-sdk>=9.0.0",
-    "launchdarkly-server-sdk-ai>=1.0.1",
-    "launchdarkly-server-sdk-ai-langchain>=0.8.0",
-    "launchdarkly-server-sdk-ai-openai>=0.7.0",
+    "launchdarkly-ai-server==0.2.4",
+    "launchdarkly-ai-langchain-agents==0.2.4",
     # The four orchestration frameworks (the experiment variants)
     "langgraph>=1.0.0",
     "langchain>=1.0.0",

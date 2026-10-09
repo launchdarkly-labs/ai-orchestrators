@@ -319,8 +319,11 @@ class AgentGraphBootstrap:
 
         # 1. Create the graph with its root config (idempotent)
         check = requests.get(f"{base}/{graph_key}", headers=self.headers, timeout=30)
-        if check.status_code == 200:
-            print(f"  ℹ️  Agent graph '{graph_key}' already exists")
+        exists = check.status_code == 200
+        if exists:
+            # The topology belongs to the UI once the graph exists: re-running the bootstrap
+            # (Step 7 suggests it to fix metric units) must not undo edges drawn there.
+            print(f"  ℹ️  Agent graph '{graph_key}' already exists, keeping its current edges")
         else:
             payload = {
                 "key": graph_key,
@@ -346,7 +349,7 @@ class AgentGraphBootstrap:
             }
             for e in graph_data.get("edges", [])
         ]
-        if edges:
+        if edges and not exists:
             r = requests.patch(
                 f"{base}/{graph_key}",
                 headers=self.headers,
@@ -384,8 +387,9 @@ class AgentGraphBootstrap:
 
         A judge config generates its own evaluation metric (evaluationMetricKey, e.g.
         $ld:ai:judge:gap-quality) — no separate custom metric. The harness invokes the
-        judge via the SDK and records the score with tracker.track_judge_result. Created
-        with the fallthrough at the disabled stub, so we repoint it at the rubric variation.
+        judge through the SDK's run_judges(), which records the score against that
+        evaluationMetricKey itself. Created with the fallthrough at the disabled stub, so
+        we repoint it at the rubric variation.
         """
         judge_key = judge_data["key"]
         base = f"{self.base_url}/api/v2/projects/{project_key}/ai-configs"
@@ -425,7 +429,16 @@ class AgentGraphBootstrap:
             "name": "Default",
             "messages": [{"role": "system", "content": judge_data.get("instructions", "")}],
             "modelConfigKey": model_config_key,
-            "model": {"modelName": model_id, "parameters": {"temperature": 0.0}},
+            "model": {
+                "modelName": model_id,
+                # max_tokens has to be set: left unbounded the judge generates until the
+                # provider's ceiling and the call times out before it ever returns.
+                "parameters": {
+                    "temperature": 0.0,
+                    "max_tokens": 2000,
+                    **(judge_data.get("customParameters") or {}),
+                },
+            },
         }
         r = requests.post(f"{base}/{judge_key}/variations", headers=self.headers, json=var_payload, timeout=30)
         if r.status_code in (200, 201):

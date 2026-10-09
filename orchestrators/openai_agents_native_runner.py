@@ -20,12 +20,21 @@ import time
 from pydantic import BaseModel
 from agents import Agent, Runner, handoff
 from agents.items import HandoffOutputItem
-from ldai.tracker import TokenUsage
-from ldai_openai import get_ai_usage_from_response
-from ldai_openai.openai_helper import get_tool_calls_from_run_items
 
-from orchestrators.dispatcher import _context_has_attr
 from orchestrators.openai_agents_runner import _bind_tools, _create_model, _model_settings
+from shared.ldai_compat import (
+    ConfigTracker,
+    TokenUsage,
+    adjacency,
+    context_has_attr,
+    instructions,
+    model_name,
+    openai_agents_usage,
+    provider_name,
+    read_nodes,
+    resolve_graph_run,
+    tool_names_from_run_items,
+)
 
 _MAX_TURNS = 40  # one run spans every agent in the walk, so give it more room than a node
 
@@ -45,49 +54,31 @@ async def _on_handoff(ctx, payload):  # noqa: ARG001 - SDK requires a callback w
     return None
 
 
-async def run_graph(ai_client, graph_key, context, user_input, require_context_attr=None):
+async def run_graph(graph_key, context, user_input, require_context_attr=None):
     """Run the LD agent graph with the Agents SDK's native handoffs as the orchestrator.
 
     Same return shape as ``dispatcher.execute_graph``:
     ``{"output", "path", "judge_scores", "tokens", "model", "duration_ms"}``.
     """
-    if require_context_attr and not _context_has_attr(context, require_context_attr):
+    if require_context_attr and not context_has_attr(context, require_context_attr):
         raise RuntimeError(
             f"run_graph: context is missing the '{require_context_attr}' attribute — set it to "
             f"the resolved arm before calling (see run_experiment.run_one)."
         )
-    graph = ai_client.agent_graph(graph_key, context)
-    if not graph.is_enabled():
-        raise RuntimeError(
-            f"Agent graph '{graph_key}' is not enabled "
-            "(check the graph is on and every node config serves a real variation)"
-        )
+    graph, graph_tracker, run_id = await resolve_graph_run(graph_key, context)
 
-    graph_tracker = graph.create_tracker()
+    nodes = await read_nodes(graph)
+    succ, preds = adjacency(nodes)
 
-    nodes = {}
-    graph.reverse_traverse(lambda node, _acc: nodes.update({node.get_key(): node}), {})
-    succ = {k: [] for k in nodes}
-    preds = {k: [] for k in nodes}
-    for key, node in nodes.items():
-        for edge in node.get_edges():
-            target = edge.target_config
-            if target in nodes:
-                succ[key].append(target)
-                preds[target].append(key)
-
-    configs = {k: n.get_config() for k, n in nodes.items()}
-    any_config = next(iter(configs.values()), None)
-    model_used = {
-        "provider": any_config.provider.name if any_config and any_config.provider else "",
-        "name": any_config.model.name if any_config and any_config.model else "",
-    }
+    configs = {k: n.config for k, n in nodes.items()}
+    any_config = next(iter(configs.values()), None) or {}
+    model_used = {"provider": provider_name(any_config), "name": model_name(any_config)}
 
     # Build each agent from its LD config as-is (prompts are authored in LD, not here).
     agents_by_key = {
         key: Agent(
             name=key,
-            instructions=config.instructions,
+            instructions=instructions(config),
             model=_create_model(config),
             model_settings=_model_settings(config),
             tools=_bind_tools(config),
@@ -143,28 +134,28 @@ async def run_graph(ai_client, graph_key, context, user_input, require_context_a
         if name in nodes:
             items_by_agent.setdefault(name, []).append(item)
     for key in dict.fromkeys(path):  # de-dup, preserve order
-        tracker = configs[key].create_tracker()
+        tracker = ConfigTracker(key, configs[key], nodes[key].meta, context, graph_key, run_id)
         tracker.track_success()
-        for tool_name in get_tool_calls_from_run_items(items_by_agent.get(key, [])) or []:
-            tracker.track_tool_call(tool_name)
+        tracker.track_tool_calls(tool_names_from_run_items(items_by_agent.get(key, [])))
 
     output = str(result.final_output or "")
-    usage = get_ai_usage_from_response(result)
+    usage = openai_agents_usage(result)
     in_tok = (usage.input or 0) if usage else 0
     out_tok = (usage.output or 0) if usage else 0
 
-    # Judge on the drawn TERMINAL node's evaluator with the source papers — the quality
+    # Judge on the drawn TERMINAL node's attached judges with the source papers — the quality
     # contract is the same even if the model's route never reached that node.
     judge_scores = {}
     terminals = [k for k in nodes if not succ[k]] or list(nodes)
     for term_key in terminals:
-        evaluator = getattr(configs[term_key], "evaluator", None)
-        if evaluator is None or not output:
+        if not output:
             continue
-        for r in await evaluator.evaluate(user_input, output):
-            if r.sampled and r.success:
-                configs[term_key].create_tracker().track_judge_result(r)
-                judge_scores[r.metric_key] = r.score
+        term_tracker = ConfigTracker(
+            term_key, configs[term_key], nodes[term_key].meta, context, graph_key, run_id
+        )
+        judge_scores.update(
+            await term_tracker.track_judges(configs[term_key], context, user_input, output)
+        )
 
     graph_tracker.track_duration(duration_ms)
     if in_tok or out_tok:

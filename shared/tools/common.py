@@ -56,7 +56,7 @@ def fetch_paper(arxiv_id: str) -> dict:
 
 
 # Canonical ToolRegistry (name -> plain callable) — the shape the LD AI SDK expects
-# (ldai.providers.types.ToolRegistry = Dict[str, Callable]). Each runner binds these to
+# (a plain Dict[str, Callable], the shape the SDK takes for tool_handlers). Each runner binds these to
 # its framework (LangGraph/OpenAI via the companion packages; Strands/ADK natively).
 TOOL_REGISTRY = {
     "fetch_paper": fetch_paper,

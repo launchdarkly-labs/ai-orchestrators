@@ -26,10 +26,10 @@ from dotenv import load_dotenv
 load_dotenv(project_root / ".env")
 
 import ldclient
-from ldclient import Context
 from ldclient.config import Config
-from ldai.client import LDAIClient
+from launchdarkly_ai_server import init_client
 
+from shared.ldai_compat import multi_context, to_ld_context
 from shared.prompt import build_paper_prompt
 from orchestrators.dispatcher import execute_graph
 
@@ -60,30 +60,28 @@ def load_papers(n=2):
     return papers[:n]
 
 
-async def smoke(framework, ai_client, papers):
+async def smoke(framework, papers):
     """Run one arm over the shared graph; return True on success."""
     user_input = build_paper_prompt(papers)
     # Multi-context: "user" keeps user-unit metrics populating, "request" is the per-run unit
     # for AI/graph latency + token metrics (and the experiment's randomization unit).
     rid = f"verify-{framework}"
-    context = Context.create_multi(
-        Context.builder(rid).kind("user").set("orchestrator", framework).build(),
-        Context.builder(rid).kind("request").set("orchestrator", framework).build(),
-    )
-    graph_key = ldclient.get().variation(GRAPH_KEY_FLAG, context, GRAPH_KEY)
+    # Contexts are plain dicts for the AI SDK; to_ld_context converts for the flag read.
+    context = multi_context(rid, orchestrator=framework)
+    graph_key = ldclient.get().variation(GRAPH_KEY_FLAG, to_ld_context(context), GRAPH_KEY)
     print(f"\n▶ Running '{framework}' over {len(papers)} papers on graph '{graph_key}'...")
     try:
         if framework in GRAPH_RUNNERS:
             # Experiment C arm: the runner owns the whole walk (same result shape).
             runner = importlib.import_module(GRAPH_RUNNERS[framework])
             result = await runner.run_graph(
-                ai_client, graph_key, context, user_input,
+                graph_key, context, user_input,
                 require_context_attr="orchestrator",
             )
         else:
             runner = importlib.import_module(RUNNERS[framework])
             result = await execute_graph(
-                ai_client, graph_key, context, user_input, runner.build_agent, runner.invoke,
+                graph_key, context, user_input, runner.build_agent, runner.invoke,
                 require_context_attr="orchestrator",
             )
     except Exception as e:
@@ -116,12 +114,13 @@ async def main():
         if ldclient.get().is_initialized():
             break
         time.sleep(0.5)
-    ai_client = LDAIClient(ldclient.get())
+    # Hand the AI SDK the client built here, so reads and tracking share one event buffer.
+    await init_client(client=ldclient.get())
 
     papers = load_papers(2)
     results = {}
     for fw in frameworks:
-        results[fw] = await smoke(fw, ai_client, papers)
+        results[fw] = await smoke(fw, papers)
 
     # Flush before close — short-lived scripts lose trailing events otherwise.
     ldclient.get().flush()

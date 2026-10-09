@@ -13,18 +13,24 @@ from strands import Agent, tool as strands_tool
 from strands.models.anthropic import AnthropicModel
 from strands.models.openai import OpenAIModel
 from strands.models.bedrock import BedrockModel
-from ldai.tracker import TokenUsage
-from ldai.providers.types import LDAIMetrics
-
+from shared.ldai_compat import (
+    LDAIMetrics,
+    TokenUsage,
+    model_name,
+    model_parameters,
+    provider_name,
+    tool_names,
+)
 from shared.tools import TOOL_REGISTRY
 
 
 def _create_strands_model(config):
     """Map an LD node config to the matching Strands model class."""
-    provider = (config.provider.name if config.provider else "").lower()
-    model_id = config.model.name
-    params = dict(config.model.to_dict().get("parameters") or {})
-    params.pop("tools", None)  # tools live on config.tools, not model params
+    provider = provider_name(config).lower()
+    model_id = model_name(config)
+    # model_parameters drops the tool definitions, which ride under model.parameters.tools
+    # on the wire and are bound separately by _bind_tools.
+    params = model_parameters(config)
 
     if provider == "anthropic":
         # Default to 64k output so the synthesizer's long report isn't truncated.
@@ -57,8 +63,8 @@ def _bedrock_profile_id(model_id, region):
 
 
 def _bind_tools(config):
-    """Bind this node's attached tools (config.tools) with Strands' native @tool."""
-    return [strands_tool(TOOL_REGISTRY[n]) for n in (config.tools or {}) if n in TOOL_REGISTRY]
+    """Bind this node's attached tools with Strands' native @tool."""
+    return [strands_tool(TOOL_REGISTRY[n]) for n in tool_names(config) if n in TOOL_REGISTRY]
 
 
 def build_agent(node_key, config, instructions):
