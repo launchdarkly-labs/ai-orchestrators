@@ -319,8 +319,11 @@ class AgentGraphBootstrap:
 
         # 1. Create the graph with its root config (idempotent)
         check = requests.get(f"{base}/{graph_key}", headers=self.headers, timeout=30)
-        if check.status_code == 200:
-            print(f"  ℹ️  Agent graph '{graph_key}' already exists")
+        exists = check.status_code == 200
+        if exists:
+            # The topology belongs to the UI once the graph exists: re-running the bootstrap
+            # (Step 7 suggests it to fix metric units) must not undo edges drawn there.
+            print(f"  ℹ️  Agent graph '{graph_key}' already exists, keeping its current edges")
         else:
             payload = {
                 "key": graph_key,
@@ -346,7 +349,7 @@ class AgentGraphBootstrap:
             }
             for e in graph_data.get("edges", [])
         ]
-        if edges:
+        if edges and not exists:
             r = requests.patch(
                 f"{base}/{graph_key}",
                 headers=self.headers,
