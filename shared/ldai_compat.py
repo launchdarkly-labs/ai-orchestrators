@@ -585,6 +585,19 @@ def adjacency(nodes: Dict[str, Any]) -> Tuple[Dict[str, List[str]], Dict[str, Li
 
 _JUDGE_HANDLER = None
 
+_JUDGE_RESPONSE_FORMAT = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "judge_result",
+        "schema": {
+            "type": "object",
+            "properties": {"score": {"type": "number"}, "reasoning": {"type": "string"}},
+            "required": ["score", "reasoning"],
+            "additionalProperties": False,
+        },
+    },
+}
+
 
 def judge_handler():
     """A LiteLLM-backed wildcard messages handler, used only to run the judge.
@@ -629,7 +642,12 @@ async def _judge_call(config, user_input, _tool_handlers, variables, history):
         messages.append({"role": "user", "content": user_input})
 
     params = model_parameters(config)
-    response = await litellm.acompletion(model=litellm_model, messages=messages, **params)
+    # Without a schema the judge writes its reasoning freehand inside the JSON string, and
+    # about a third of the time it runs past max_tokens and truncates mid-string, which the
+    # SDK rejects as invalid JSON and the run loses its quality score.
+    response = await litellm.acompletion(
+        model=litellm_model, messages=messages, response_format=_JUDGE_RESPONSE_FORMAT, **params
+    )
     usage = getattr(response, "usage", None)
     return {
         "output": response.choices[0].message.content or "",
