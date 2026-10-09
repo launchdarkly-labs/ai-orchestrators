@@ -591,8 +591,8 @@ _JUDGE_RESPONSE_FORMAT = {
         "name": "judge_result",
         "schema": {
             "type": "object",
-            "properties": {"score": {"type": "number"}, "reasoning": {"type": "string"}},
-            "required": ["score", "reasoning"],
+            "properties": {"reasoning": {"type": "string"}, "score": {"type": "number"}},
+            "required": ["reasoning", "score"],
             "additionalProperties": False,
         },
     },
@@ -642,9 +642,10 @@ async def _judge_call(config, user_input, _tool_handlers, variables, history):
         messages.append({"role": "user", "content": user_input})
 
     params = model_parameters(config)
-    # Without a schema the judge writes its reasoning freehand inside the JSON string, and
-    # about a third of the time it runs past max_tokens and truncates mid-string, which the
-    # SDK rejects as invalid JSON and the run loses its quality score.
+    # The schema keeps the reply parseable, and its property order is the generation order:
+    # with `score` first the judge commits to a number before the rubric's arithmetic, then
+    # re-litigates it inside `reasoning` until max_tokens truncates the reply (3 in 8 runs).
+    # Reasoning first means the score is written once, after the working.
     response = await litellm.acompletion(
         model=litellm_model, messages=messages, response_format=_JUDGE_RESPONSE_FORMAT, **params
     )
