@@ -224,7 +224,7 @@ async def main():
     ap.add_argument("--limit", type=int, default=None, help="cap total contexts (for smoke tests)")
     ap.add_argument("--data", nargs="+", default=None,
                     help="data file(s) to run over (e.g. a set from download_papers.py); "
-                         "default = the shipped 3-category set")
+                         "default = every data/*_papers.json topic")
     ap.add_argument("--all-frameworks", action="store_true",
                     help="matched mode: run EACH data set through ALL four frameworks once "
                          "(apples-to-apples head-to-head) instead of the flag's randomized split")

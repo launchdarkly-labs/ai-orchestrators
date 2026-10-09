@@ -12,7 +12,7 @@ from that package's last release.
 
 import os
 
-from agents import Agent, ModelSettings, Runner, function_tool
+from agents import Agent, ModelSettings, Runner, function_tool, set_tracing_disabled
 from agents.extensions.models.litellm_model import LitellmModel
 from shared.ldai_compat import (
     LDAIMetrics,
@@ -24,6 +24,12 @@ from shared.ldai_compat import (
     tool_names_from_run_items,
 )
 from shared.tools import TOOL_REGISTRY
+
+# The SDK exports traces to OpenAI with OPENAI_API_KEY, which the pinned-Claude walk doesn't
+# otherwise need. Left unset or at the .env.example placeholder, every run logs a 401.
+_openai_key = os.environ.get("OPENAI_API_KEY", "")
+if not _openai_key or "xxxxx" in _openai_key:
+    set_tracing_disabled(True)
 
 
 def _create_model(config):
