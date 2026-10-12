@@ -41,7 +41,7 @@ source .venv/bin/activate
 # 4. Install dependencies
 echo -e "\n${YELLOW}📦 Installing dependencies...${NC}"
 pip install -q --upgrade pip
-pip install -q ldai ldclient python-dotenv arxiv PyPDF2 requests
+pip install -q launchdarkly-ai-server launchdarkly-server-sdk python-dotenv arxiv PyPDF2 requests
 pip install -q strands-sdk langgraph autogen-agentchat swarm anthropic openai
 echo -e "${GREEN}✓ All dependencies installed${NC}"
 

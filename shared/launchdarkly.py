@@ -7,12 +7,16 @@ import os
 import requests
 from typing import Dict, List, Tuple, Any
 import ldclient
-from ldclient import Context
 from ldclient.config import Config
-from ldai.client import LDAIClient, AIAgentConfigRequest, AIAgentConfigDefault
+from launchdarkly_ai_server import init_client, inspect_config
+
+# ConfigTracker replaces the retired `config.tracker`. It lives in ldai_compat because the
+# orchestrator arms on this branch need the same tracker plus graph-level tracking; on main
+# it is defined here instead. Same class, same event keys, one definition.
+from shared.ldai_compat import ConfigTracker
 
 
-def init_launchdarkly_clients(sdk_key: str = None, send_events: bool = True, flush_interval: int = 5) -> Tuple[Any, Any]:
+async def init_launchdarkly_clients(sdk_key: str = None, send_events: bool = True, flush_interval: int = 5) -> Tuple[Any, Any]:
     """
     Initialize LaunchDarkly SDK and AI clients.
 
@@ -22,7 +26,12 @@ def init_launchdarkly_clients(sdk_key: str = None, send_events: bool = True, flu
         flush_interval: Event flush interval in seconds
 
     Returns:
-        Tuple of (ld_client, ai_client)
+        Tuple of (ld_client, ld_client)
+
+    The second element used to be an LDAIClient. There is no such object now --
+    the AI SDK keeps a single global client, which this hands it -- so both
+    elements are the same client and the tuple shape is kept only so the
+    runners' unpacking still works.
 
     Raises:
         ValueError: If SDK key is not found
@@ -47,8 +56,10 @@ def init_launchdarkly_clients(sdk_key: str = None, send_events: bool = True, flu
     if not ld_client.is_initialized():
         raise RuntimeError("LaunchDarkly failed to initialize after 5 seconds")
 
-    ai_client = LDAIClient(ld_client)
-    return ld_client, ai_client
+    # Hand the client built here to the AI SDK rather than letting it build
+    # its own, so AI reads and the runners' direct track() calls share one.
+    await init_client(client=ld_client)
+    return ld_client, ld_client
 
 
 def fetch_agent_configs_from_api(
@@ -99,7 +110,7 @@ def create_context(
     orchestrator: str = None,
     agent: str = None,
     **additional_attrs
-) -> Context:
+) -> Dict[str, Any]:
     """
     Create a LaunchDarkly context with standard attributes.
 
@@ -110,23 +121,23 @@ def create_context(
         **additional_attrs: Any additional attributes to set on the context
 
     Returns:
-        LaunchDarkly Context object
+        A LaunchDarkly context dict -- contexts are plain dicts now, there is
+        no builder.
     """
-    builder = Context.builder(execution_id).kind("user")
+    context: Dict[str, Any] = {"kind": "user", "key": execution_id}
 
     if orchestrator:
-        builder.set("orchestrator", orchestrator)
+        context["orchestrator"] = orchestrator
 
     if agent:
-        builder.set("agent", agent)
+        context["agent"] = agent
 
-    for key, value in additional_attrs.items():
-        builder.set(key, value)
+    context.update(additional_attrs)
 
-    return builder.build()
+    return context
 
 
-def build_agent_requests(items: List[Dict[str, Any]]) -> Tuple[List[Any], Dict[str, str]]:
+def build_agent_requests(items: List[Dict[str, Any]]) -> Tuple[List[str], Dict[str, str]]:
     """
     Build AI agent config requests from LaunchDarkly items.
 
@@ -134,9 +145,13 @@ def build_agent_requests(items: List[Dict[str, Any]]) -> Tuple[List[Any], Dict[s
         items: List of items from LaunchDarkly API
 
     Returns:
-        Tuple of (agent_requests list, agent_metadata dict mapping key -> name)
+        Tuple of (agent_keys list, agent_metadata dict mapping key -> name)
+
+    These were AIAgentConfigRequest objects carrying a disabled default.
+    Neither exists now -- configs are fetched a key at a time and there is no
+    `default=` to attach -- so the first element is just the keys.
     """
-    agent_requests = []
+    agent_keys = []
     agent_metadata = {}
 
     for item in items:
@@ -145,11 +160,36 @@ def build_agent_requests(items: List[Dict[str, Any]]) -> Tuple[List[Any], Dict[s
             continue
         name = (item.get("name") or key).strip()
         agent_metadata[key] = name
-        agent_requests.append(
-            AIAgentConfigRequest(
-                key=key,
-                default_value=AIAgentConfigDefault(enabled=False)
-            )
-        )
+        agent_keys.append(key)
 
-    return agent_requests, agent_metadata
+    return agent_keys, agent_metadata
+
+
+async def fetch_agent_config(agent_key: str, context: Dict[str, Any]):
+    """Fetch one agent config and a tracker for it.
+
+    Returns (config, tracker), or (None, None) when the config is not served.
+    inspect_config reads the variation without invoking a model, which is what
+    these runners need: they drive their own frameworks and only want the
+    model name, instructions, and parameters.
+    """
+    inspected = await inspect_config(agent_key, context)
+    if not inspected["enabled"] or not inspected["config"]:
+        return None, None
+    config = inspected["config"]
+    return config, ConfigTracker(agent_key, config, inspected["meta"] or {}, context)
+
+
+async def fetch_agent_configs(agent_keys: List[str], context: Dict[str, Any]) -> Dict[str, Any]:
+    """Fetch several agent configs.
+
+    Replaces ai_client.agent_configs(), which took a batch of requests. The
+    current SDK has no batch call, so this loops. Disabled or unserved keys are
+    omitted, matching how callers already treat a missing entry.
+    """
+    configs: Dict[str, Any] = {}
+    for key in agent_keys:
+        config, tracker = await fetch_agent_config(key, context)
+        if config is not None:
+            configs[key] = {"config": config, "tracker": tracker}
+    return configs

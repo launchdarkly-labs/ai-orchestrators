@@ -3,19 +3,23 @@ LangGraph runner.
 
 Per-node agent builder + invoke for the shared dispatcher. Everything dynamic comes
 from the LD node config: the model (`create_langchain_model`), the attached tools
-(`build_tools` binds the node's `config.tools` to the registry callables), and the
+(`build_tools` binds the node's attached tools to the registry callables), and the
 instructions (with routes injected by the dispatcher). The dispatcher owns the walk.
+
+`create_langchain_model` / `build_tools` / the usage readers used to come from the
+`ldai_langchain` companion package, which the current SDK generation does not replace.
+They now live in `shared.ldai_compat`, ported from that package's last release.
 """
 
 from langgraph.prebuilt import create_react_agent
-from ldai_langchain import (
+
+from shared.ldai_compat import (
+    LDAIMetrics,
+    build_tools,
     create_langchain_model,
     get_tool_calls_from_response,
-    sum_token_usage_from_messages,
+    sum_langchain_usage,
 )
-from ldai_langchain.langchain_helper import build_tools
-from ldai.providers.types import LDAIMetrics
-
 from shared.tools import TOOL_REGISTRY
 
 
@@ -40,7 +44,7 @@ def build_agent(node_key, config, instructions):
 async def invoke(agent, input_text, tracker):
     """Invoke the agent; `track_metrics_of_async` records duration + success + tokens."""
     result = await tracker.track_metrics_of_async(
-        lambda res: LDAIMetrics(success=True, tokens=sum_token_usage_from_messages(res.get("messages", []))),
+        lambda res: LDAIMetrics(success=True, tokens=sum_langchain_usage(res.get("messages", []))),
         lambda: agent.ainvoke({"messages": [{"role": "user", "content": input_text}]}),
     )
     messages = result.get("messages", [])
@@ -48,4 +52,4 @@ async def invoke(agent, input_text, tracker):
         for name in get_tool_calls_from_response(message):
             tracker.track_tool_call(name)
     text = _content_to_text(messages[-1].content) if messages else ""
-    return text, sum_token_usage_from_messages(messages)
+    return text, sum_langchain_usage(messages)

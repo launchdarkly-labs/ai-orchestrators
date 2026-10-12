@@ -16,10 +16,19 @@ import time
 from google.adk.agents import Agent, ParallelAgent, SequentialAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types
-from ldai.tracker import TokenUsage
 
-from orchestrators.dispatcher import _context_has_attr
 from orchestrators.google_adk_runner import _bind_tools, _model, _safe_name
+from shared.ldai_compat import (
+    ConfigTracker,
+    TokenUsage,
+    adjacency,
+    context_has_attr,
+    instructions,
+    model_name,
+    provider_name,
+    read_nodes,
+    resolve_graph_run,
+)
 
 _APP = "gap-analysis"
 
@@ -39,43 +48,25 @@ def _topological_levels(nodes, preds):
     return levels
 
 
-async def run_graph(ai_client, graph_key, context, user_input, require_context_attr=None):
+async def run_graph(graph_key, context, user_input, require_context_attr=None):
     """Run the LD agent graph with ADK's native workflow agents as the orchestrator.
 
     Same return shape as ``dispatcher.execute_graph``:
     ``{"output", "path", "judge_scores", "tokens", "model", "duration_ms"}``.
     """
-    if require_context_attr and not _context_has_attr(context, require_context_attr):
+    if require_context_attr and not context_has_attr(context, require_context_attr):
         raise RuntimeError(
             f"run_graph: context is missing the '{require_context_attr}' attribute — set it to "
             f"the resolved arm before calling (see run_experiment.run_one)."
         )
-    graph = ai_client.agent_graph(graph_key, context)
-    if not graph.is_enabled():
-        raise RuntimeError(
-            f"Agent graph '{graph_key}' is not enabled "
-            "(check the graph is on and every node config serves a real variation)"
-        )
+    graph, graph_tracker, run_id = await resolve_graph_run(graph_key, context)
 
-    graph_tracker = graph.create_tracker()
+    nodes = await read_nodes(graph)
+    succ, preds = adjacency(nodes)
 
-    nodes = {}
-    graph.reverse_traverse(lambda node, _acc: nodes.update({node.get_key(): node}), {})
-    succ = {k: [] for k in nodes}
-    preds = {k: [] for k in nodes}
-    for key, node in nodes.items():
-        for edge in node.get_edges():
-            target = edge.target_config
-            if target in nodes:
-                succ[key].append(target)
-                preds[target].append(key)
-
-    configs = {k: n.get_config() for k, n in nodes.items()}
-    any_config = next(iter(configs.values()), None)
-    model_used = {
-        "provider": any_config.provider.name if any_config and any_config.provider else "",
-        "name": any_config.model.name if any_config and any_config.model else "",
-    }
+    configs = {k: n.config for k, n in nodes.items()}
+    any_config = next(iter(configs.values()), None) or {}
+    model_used = {"provider": provider_name(any_config), "name": model_name(any_config)}
 
     # Reshape the DAG into ADK's native constructs: levels → SequentialAgent steps,
     # multi-node levels → ParallelAgent fan-outs. Node agents are built exactly like the
@@ -88,7 +79,7 @@ async def run_graph(ai_client, graph_key, context, user_input, require_context_a
         return Agent(
             name=safe,
             model=_model(config),
-            instruction=config.instructions or "Process the input and respond.",
+            instruction=instructions(config) or "Process the input and respond.",
             tools=_bind_tools(config),
         )
 
@@ -137,19 +128,17 @@ async def run_graph(ai_client, graph_key, context, user_input, require_context_a
         out = outputs.get(key, "")
         if not (in_tok or out_tok or out):
             continue  # node never ran (e.g. reshape dropped it) — nothing to record
-        tracker = configs[key].create_tracker()
+        tracker = ConfigTracker(key, configs[key], nodes[key].meta, context, graph_key, run_id)
         if in_tok or out_tok:
             tracker.track_tokens(TokenUsage(input=in_tok, output=out_tok, total=in_tok + out_tok))
             totals["in"] += in_tok
             totals["out"] += out_tok
         tracker.track_success() if out.strip() else tracker.track_error()
 
-        evaluator = getattr(configs[key], "evaluator", None)
-        if evaluator is not None and out:
-            for r in await evaluator.evaluate(user_input, out):
-                if r.sampled and r.success:
-                    tracker.track_judge_result(r)
-                    judge_scores[r.metric_key] = r.score
+        if out:
+            judge_scores.update(
+                await tracker.track_judges(configs[key], context, user_input, out)
+            )
 
     for key in path:
         for p in preds[key]:

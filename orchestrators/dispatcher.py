@@ -19,38 +19,40 @@ Data flow — the papers are the SHARED GROUND TRUTH:
     add or remove a node/edge and the next request runs the new shape, no code change.
 
 Online evaluations: after a node runs, the dispatcher fires any judges attached to that
-node's config via `config.evaluator.evaluate(papers, output)` — note the judge is given the
-SOURCE PAPERS as its input so faithfulness/citation checks have the ground truth. This
-records the judge metric (e.g. `$ld:ai:judge:gap-quality`), driven by the LD attachment.
+node's config via the tracker's `track_judges`, which is given the SOURCE PAPERS as the
+judge's input so faithfulness/citation checks have the ground truth. That records the
+judge's metric (e.g. `$ld:ai:judge:gap-quality`), driven by the LD attachment.
 
-Metrics are automatic: the graph tracker records handoffs / path / invocation / tokens, and
-each node's `config.create_tracker()` records duration + tokens + tool calls via the runner's
-`track_metrics_of_async`. Cost / latency / token totals derive from these in AgentControl.
+Metrics: the graph tracker records handoffs / path / invocation / tokens, and each node's
+tracker records duration + tokens + tool calls via the runner's `track_metrics_of_async`.
+Both trackers are hand-rolled in `shared.ldai_compat` — the SDK fires those events from
+inside its own execution paths, and this dispatcher exists precisely to own the walk.
+Cost / latency / token totals derive from these in AgentControl.
 
-A note on the SDK's managed graph: `LDAIClient.create_agent_graph().run()` hands the whole
+A note on the SDK's managed graph: `graph(key, handlers=...).invoke()` hands the whole
 traversal to a built-in runner — orchestration, state handling, and metrics come for free,
 which is the fastest path when you're building on one of its supported frameworks (LangGraph,
-OpenAI Agents). This project's needs are narrower and stricter: a bake-off requires the walk
-itself to be a held-constant variable — byte-identical traversal semantics across four
-frameworks — plus control over the judge's evaluation input (the source papers). Owning the
-~100-line walk gives us both, so the dispatcher is the experiment's control surface and the
-frameworks supply only `build_agent` + `invoke`.
+OpenAI Agents, Claude Agents). This project's needs are narrower and stricter: a bake-off
+requires the walk itself to be a held-constant variable — byte-identical traversal semantics
+across four frameworks — plus control over the judge's evaluation input (the source papers).
+Owning the ~100-line walk gives us both, so the dispatcher is the experiment's control
+surface and the frameworks supply only `build_agent` + `invoke`.
 """
 
 import asyncio
 import time
 
-from ldai.tracker import TokenUsage
-
-
-def _context_has_attr(context, attr):
-    """True if ``attr`` is set on ``context`` (checked across every kind of a multi-context)."""
-    if context.multiple:
-        return any(
-            (ind := context.get_individual_context(i)) is not None and ind.get(attr) is not None
-            for i in range(context.individual_context_count)
-        )
-    return context.get(attr) is not None
+from shared.ldai_compat import (
+    ConfigTracker,
+    TokenUsage,
+    adjacency,
+    context_has_attr,
+    instructions,
+    model_name,
+    provider_name,
+    read_nodes,
+    resolve_graph_run,
+)
 
 
 def compose_input(user_input, predecessor_outputs):
@@ -66,14 +68,16 @@ def compose_input(user_input, predecessor_outputs):
     return "\n\n".join(parts)
 
 
-async def execute_graph(ai_client, graph_key, context, user_input, build_agent, invoke, max_rounds=10,
+async def execute_graph(graph_key, context, user_input, build_agent, invoke, max_rounds=10,
                         require_context_attr=None):
     """Execute the LD agent graph as a parallel DAG.
 
     Args:
-        ai_client: an ``LDAIClient``.
         graph_key: the agent graph key (e.g. ``"research-gap-graph"``).
-        context: the LaunchDarkly ``Context`` for this run.
+        context: the LaunchDarkly context for this run, as a plain dict (see
+            ``shared.ldai_compat.multi_context``). The AI SDK has no client object to pass
+            any more — ``init_client`` is called once at startup and the SDK keeps a
+            singleton — so this no longer takes an ``ai_client``.
         user_input: the SOURCE PAPERS prompt (injected into every node).
         build_agent: ``(node_key, config, instructions) -> agent`` (framework-specific).
         invoke: ``async (agent, input_text, node_tracker) -> (output_text, TokenUsage|None)``.
@@ -85,10 +89,10 @@ async def execute_graph(ai_client, graph_key, context, user_input, build_agent, 
 
     Returns:
         ``{"output": <terminal node text>, "path": [<node keys, completion order>],
-           "judge_scores": {<metric_key>: <score>}, "tokens": {"input", "output"},
+           "judge_scores": {<judge_config_key>: <score>}, "tokens": {"input", "output"},
            "model": {"provider", "name"}, "duration_ms": <int>}``.
     """
-    if require_context_attr and not _context_has_attr(context, require_context_attr):
+    if require_context_attr and not context_has_attr(context, require_context_attr):
         raise RuntimeError(
             f"execute_graph: context is missing the '{require_context_attr}' attribute. The graph's "
             f"node configs route on it (targeting rule: orchestrator == <framework>), so without it "
@@ -97,27 +101,12 @@ async def execute_graph(ai_client, graph_key, context, user_input, build_agent, 
             f"'{require_context_attr}'=<resolved framework> on the context (all kinds) before "
             f"calling execute_graph — see run_experiment.run_one."
         )
-    graph = ai_client.agent_graph(graph_key, context)
-    if not graph.is_enabled():
-        raise RuntimeError(
-            f"Agent graph '{graph_key}' is not enabled "
-            "(check the graph is on and every node config serves a real variation)"
-        )
-
-    graph_tracker = graph.create_tracker()
+    graph, graph_tracker, run_id = await resolve_graph_run(graph_key, context)
     start = time.monotonic()
 
     # Enumerate nodes and build adjacency from the graph edges (the execution DAG).
-    nodes = {}
-    graph.reverse_traverse(lambda node, _acc: nodes.update({node.get_key(): node}), {})
-    succ = {k: [] for k in nodes}
-    preds = {k: [] for k in nodes}
-    for key, node in nodes.items():
-        for edge in node.get_edges():
-            target = edge.target_config
-            if target in nodes:
-                succ[key].append(target)
-                preds[target].append(key)
+    nodes = await read_nodes(graph)
+    succ, preds = adjacency(nodes)
 
     outputs = {}        # node_key -> output text
     judge_scores = {}
@@ -126,27 +115,23 @@ async def execute_graph(ai_client, graph_key, context, user_input, build_agent, 
     model_used = {}     # provider + name of the served model (same across nodes in one run)
 
     async def run_node(key):
-        config = nodes[key].get_config()
+        node = nodes[key]
+        config = node.config
         # Capture the served model so the caller can price the run (all nodes share it per run).
-        model_used["provider"] = config.provider.name if config.provider else ""
-        model_used["name"] = config.model.name if config.model else ""
+        model_used["provider"] = provider_name(config)
+        model_used["name"] = model_name(config)
         pred_outputs = [(p, outputs.get(p, "")) for p in preds[key]]
         node_input = compose_input(user_input, pred_outputs)
-        agent = build_agent(key, config, config.instructions)
-        node_tracker = config.create_tracker()
+        node_tracker = ConfigTracker(key, config, node.meta, context, graph_key, run_id)
+        agent = build_agent(key, config, instructions(config))
         out, usage = await invoke(agent, node_input, node_tracker)
         out = out or ""
 
         # Fire any judges attached to this node (online evaluation). The judge is given the
         # SOURCE PAPERS as input so it can verify the output's grounding/citations against the
-        # ground truth — not against a derived upstream analysis. Unattached nodes carry a
-        # no-op evaluator, so this is safe on every node.
-        evaluator = getattr(config, "evaluator", None)
-        if evaluator is not None:
-            for r in await evaluator.evaluate(user_input, out):
-                if r.sampled and r.success:
-                    node_tracker.track_judge_result(r)
-                    judge_scores[r.metric_key] = r.score
+        # ground truth — not against a derived upstream analysis. A node with no judges
+        # attached returns an empty map, so this is safe on every node.
+        judge_scores.update(await node_tracker.track_judges(config, context, user_input, out))
         return key, out, usage
 
     try:

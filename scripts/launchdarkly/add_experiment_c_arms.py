@@ -15,7 +15,7 @@ arm — nothing else changes:
                            full-conversation transfer — drawn edges become options)
     google-adk-native      ADK workflow agents own the walk (levels → Sequential/Parallel,
                            one shared session)
-    langgraph-managed      the LD SDK's create_agent_graph().run() (zero-code baseline,
+    langgraph-managed      the LD SDK's to_lang_graph() adapter (zero-code baseline,
                            handoff-tool routing)
 
 ADDITIVE + IDEMPOTENT: existing variations (langgraph / strands / openai-agents /
