@@ -6,8 +6,8 @@ requires-python = ">=3.12"  # floor set by launchdarkly-ai-server
 dependencies = [
     # LaunchDarkly — agent-graph SDK (open beta, pinned) + its managed LangGraph adapter
     "launchdarkly-server-sdk>=9.0.0",
-    "launchdarkly-ai-server==0.2.4",
-    "launchdarkly-ai-langchain-agents==0.2.4",
+    "launchdarkly-ai-server==0.3.0",
+    "launchdarkly-ai-langchain-agents==0.2.5",
     # The four orchestration frameworks (the experiment variants)
     "langgraph>=1.0.0",
     "langchain>=1.0.0",

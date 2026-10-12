@@ -1,11 +1,11 @@
 # LaunchDarkly — agent-graph SDK. In open beta, so it is pinned exactly.
 # Requires Python 3.12 or later.
 launchdarkly-server-sdk>=9.0.0
-launchdarkly-ai-server==0.2.4
+launchdarkly-ai-server==0.3.0
 # The SDK's managed LangGraph adapter, used by the langgraph-managed arm. The retired
 # per-framework companion packages (…-ai-langchain / …-ai-openai) have no equivalent; the
 # helpers this project used from them are ported into shared/ldai_compat.py.
-launchdarkly-ai-langchain-agents==0.2.4
+launchdarkly-ai-langchain-agents==0.2.5
 
 # The four orchestration frameworks (the experiment variants)
 langgraph>=1.0.0
