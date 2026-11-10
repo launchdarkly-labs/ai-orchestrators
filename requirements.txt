@@ -1,5 +1,5 @@
 # LaunchDarkly — agent-graph SDK. Requires Python 3.12 or later.
-launchdarkly-server-sdk>=9.0.0
+launchdarkly-server-sdk>=9.18.4,<10
 launchdarkly-ai-server>=1.0.0
 # The SDK's managed LangGraph adapter, used by the langgraph-managed arm. The retired
 # per-framework companion packages (…-ai-langchain / …-ai-openai) have no equivalent; the

@@ -292,6 +292,7 @@ class AgentGraphBootstrap:
                 {"value": v["value"], "name": v.get("name", v["value"])}
                 for v in flag_data.get("variations", [])
             ],
+            "defaults": {"onVariation": 0, "offVariation": 0},
         }
         print(f"  Creating flag '{flag_key}' ({len(payload['variations'])} variations)...")
         r = requests.post(
