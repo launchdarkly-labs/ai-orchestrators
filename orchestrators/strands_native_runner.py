@@ -16,10 +16,19 @@ import time
 
 from strands.multiagent import GraphBuilder
 from strands import Agent
-from ldai.tracker import TokenUsage
 
-from orchestrators.dispatcher import _context_has_attr
 from orchestrators.strands_runner import _bind_tools, _create_strands_model, _message_text
+from shared.ldai_compat import (
+    ConfigTracker,
+    TokenUsage,
+    adjacency,
+    context_has_attr,
+    instructions,
+    model_name,
+    provider_name,
+    read_nodes,
+    resolve_graph_run,
+)
 
 _COMPLETED = "completed"
 
@@ -35,44 +44,26 @@ def _usage_tokens(usage):
     return in_tok, out_tok, total
 
 
-async def run_graph(ai_client, graph_key, context, user_input, require_context_attr=None):
+async def run_graph(graph_key, context, user_input, require_context_attr=None):
     """Run the LD agent graph with Strands' native Graph as the orchestrator.
 
     Same return shape as ``dispatcher.execute_graph``:
     ``{"output", "path", "judge_scores", "tokens", "model", "duration_ms"}``.
     """
-    if require_context_attr and not _context_has_attr(context, require_context_attr):
+    if require_context_attr and not context_has_attr(context, require_context_attr):
         raise RuntimeError(
             f"run_graph: context is missing the '{require_context_attr}' attribute — set it to "
             f"the resolved arm before calling (see run_experiment.run_one)."
         )
-    graph = ai_client.agent_graph(graph_key, context)
-    if not graph.is_enabled():
-        raise RuntimeError(
-            f"Agent graph '{graph_key}' is not enabled "
-            "(check the graph is on and every node config serves a real variation)"
-        )
-
-    graph_tracker = graph.create_tracker()
+    graph, graph_tracker, run_id = await resolve_graph_run(graph_key, context)
 
     # Enumerate nodes + adjacency from the LD edges — identical read to the dispatcher's.
-    nodes = {}
-    graph.reverse_traverse(lambda node, _acc: nodes.update({node.get_key(): node}), {})
-    succ = {k: [] for k in nodes}
-    preds = {k: [] for k in nodes}
-    for key, node in nodes.items():
-        for edge in node.get_edges():
-            target = edge.target_config
-            if target in nodes:
-                succ[key].append(target)
-                preds[target].append(key)
+    nodes = await read_nodes(graph)
+    succ, preds = adjacency(nodes)
 
-    configs = {k: n.get_config() for k, n in nodes.items()}
-    any_config = next(iter(configs.values()), None)
-    model_used = {
-        "provider": any_config.provider.name if any_config and any_config.provider else "",
-        "name": any_config.model.name if any_config and any_config.model else "",
-    }
+    configs = {k: n.config for k, n in nodes.items()}
+    any_config = next(iter(configs.values()), None) or {}
+    model_used = {"provider": provider_name(any_config), "name": model_name(any_config)}
 
     # Compile the drawn topology into a native Strands Graph: same per-node agents as the
     # dispatcher arm (model/tools/instructions from the LD config); Strands owns scheduling,
@@ -83,7 +74,7 @@ async def run_graph(ai_client, graph_key, context, user_input, require_context_a
             Agent(
                 name=key,
                 model=_create_strands_model(config),
-                system_prompt=config.instructions or "Process the input and respond.",
+                system_prompt=instructions(config) or "Process the input and respond.",
                 tools=_bind_tools(config),
                 callback_handler=None,
             ),
@@ -118,7 +109,7 @@ async def run_graph(ai_client, graph_key, context, user_input, require_context_a
     for key, node_result in (result.results or {}).items():
         if key not in configs:
             continue
-        tracker = configs[key].create_tracker()
+        tracker = ConfigTracker(key, configs[key], nodes[key].meta, context, graph_key, run_id)
         in_tok, out_tok, total = _usage_tokens(node_result.accumulated_usage)
         if total:
             tracker.track_tokens(TokenUsage(input=in_tok, output=out_tok, total=total))
@@ -137,12 +128,10 @@ async def run_graph(ai_client, graph_key, context, user_input, require_context_a
         tracker.track_success() if node_ok else tracker.track_error()
 
         # Judge parity: the judge gets the SOURCE PAPERS as input (ground truth).
-        evaluator = getattr(configs[key], "evaluator", None)
-        if evaluator is not None and out:
-            for r in await evaluator.evaluate(user_input, out):
-                if r.sampled and r.success:
-                    tracker.track_judge_result(r)
-                    judge_scores[r.metric_key] = r.score
+        if out:
+            judge_scores.update(
+                await tracker.track_judges(configs[key], context, user_input, out)
+            )
 
     for key in path:
         for p in preds[key]:

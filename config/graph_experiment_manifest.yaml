@@ -273,9 +273,10 @@ project:
   # evaluates it per request to dispatch to that arm's runner (every arm executes the
   # same shared graph above). Because it's a flag, a LaunchDarkly experiment attaches
   # to it, splits contexts across the variations, and attributes metrics per variation.
-  # Experiments A/B use the four framework arms (dispatcher walk); Experiment C adds the
-  # *-native arms, where each FRAMEWORK'S OWN ORCHESTRATOR walks the same drawn graph
-  # (see scripts/launchdarkly/add_experiment_c_arms.py for an existing project).
+  # Experiments A/B use the four framework arms below, all of which take the dispatcher
+  # walk. Experiment C swaps the walk itself for each framework's own orchestrator; its
+  # *-native arms are not part of the tutorial, so add_experiment_c_arms.py adds them on
+  # top of this flag rather than bootstrap creating arms the walkthrough never explains.
   flag:
     - key: "orchestrator"
       name: "Orchestrator"
@@ -291,21 +292,13 @@ project:
           name: "OpenAI Agents"
         - value: "google-adk"
           name: "Google ADK"
-        - value: "langgraph-native"
-          name: "LangGraph (native walk)"
-        - value: "strands-native"
-          name: "Strands (native walk)"
-        - value: "openai-agents-native"
-          name: "OpenAI Agents (native handoffs)"
-        - value: "google-adk-native"
-          name: "Google ADK (native workflow agents)"
-        - value: "langgraph-managed"
-          name: "LangGraph (LD managed runner)"
 
   # Custom LLM-as-judge: the experiment's guardrail/secondary metric. A judge-mode config that
   # generates its own metric ($ld:ai:judge:gap-quality) — no separate custom metric.
-  # The harness invokes it programmatically and records the score via the evaluated
-  # node's tracker (track_judge_result). UI-editable; the code keeps a fallback rubric.
+  # The harness fires it through the SDK's judge runner, which scores the output and records
+  # the metric against the judged node's variation. UI-editable; the code keeps a fallback
+  # rubric. The rubric must not specify its own output format: the SDK requires a JSON
+  # {score, reasoning} response and appends that instruction itself.
   judge:
     key: "gap-quality-judge"
     name: "Gap-analysis quality judge"
@@ -318,8 +311,8 @@ project:
     randomizationUnit: "request"
     # Attach the judge to the node whose output it scores (the synthesizer's final
     # report). Attaching registers the evaluation metric so it's selectable in the
-    # experiment; the dispatcher fires the attached judge after the node runs and records
-    # the score via track_judge_result.
+    # experiment; the dispatcher fires the attached judge after the node runs, and the SDK
+    # records the score against the judged node's variation.
     attach:
       - config: "gap-synthesizer"
         variation: "synthesizer-claude"
@@ -329,6 +322,15 @@ project:
     # Haiku (which clustered every report at ~0.72). It fires once per run (~$0.13); worth it for a
     # quality guardrail that actually differentiates. Tune its rubric with scripts/judge_lab.py.
     modelId: "claude-sonnet-4-5"
+    # The rubric asks for its working, so the reply needs room. Two failure modes sit on
+    # either side of this number: left unset, the judge generates to the model's ceiling
+    # and the call times out; set too low, the JSON truncates mid-string and fails to
+    # parse. Raise the ceiling rather than telling the judge to be brief, which costs
+    # reasoning without buying much room: the longest we measured was around 1800 tokens.
+    # Scores cluster on smoke runs (--papers-per-context 2) because two papers give every
+    # arm the same thin material; judge spread needs the full topic set.
+    customParameters:
+      max_tokens: 8000
     # Combined rubric (tuned with scripts/judge_lab.py): graded quality dimensions (reward grounded
     # DEPTH) × a faithfulness floor (penalize fabrication). Beats the two failure modes we measured:
     # a pure deduction rubric rewards BREVITY (a terse report has fewer defects to count → the
@@ -357,10 +359,15 @@ project:
 
       Step 3 — compute: score = round(faithfulness * quality, 2). Clamp to [0, 1].
 
-      In your reasoning, list H and E with instances, the four 0-4 scores each with a one-line
-      justification, and the arithmetic, then return the computed score.
+      Return the computed score as `score` and put your working in `reasoning`: list H and E
+      with instances, the four 0-4 scores each with a one-line justification, and the
+      arithmetic. Do not restate an output format of your own — a bare "SCORE: <n>" line
+      (what the previous SDK's judge parsed) conflicts with the required JSON and the score
+      fails to parse.
 
       Be strict: count every instance, even minor ones. A perfect 1.00 should be rare.
+
+      {{message_history}}
 
 # Model config key mapping (provider.modelId -> LD model config key)
 modelConfigKeys:

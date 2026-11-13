@@ -2,8 +2,8 @@
 """
 Download arXiv papers for a research topic, to use as the experiment's query set.
 
-Standalone — separate from the experiment. Writes ``data/<topic>_papers.json``; point the
-experiment at it with:
+Standalone — separate from the experiment. Writes ``data/<topic>_papers.json``, which the
+next ``run_experiment.py`` picks up with the other topics. To run that topic alone:
 
     python scripts/run_experiment.py --data data/<that_file>.json
 
@@ -124,7 +124,8 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(papers, indent=2))
     print(f"\n✨ Saved {len(papers)} papers → {out}")
-    print(f"   Run the experiment over it:\n   python scripts/run_experiment.py --data {out}")
+    print(f"   The next run_experiment.py includes it. To run this topic alone:\n"
+          f"   uv run python scripts/run_experiment.py --data {out}")
 
 
 if __name__ == "__main__":

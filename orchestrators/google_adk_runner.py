@@ -14,9 +14,14 @@ from google.adk.models.lite_llm import LiteLlm
 from google.adk.runners import InMemoryRunner
 from google.genai import types
 
-from ldai.tracker import TokenUsage
-from ldai.providers.types import LDAIMetrics
-
+from shared.ldai_compat import (
+    LDAIMetrics,
+    TokenUsage,
+    model_name,
+    model_parameters,
+    provider_name,
+    tool_names,
+)
 from shared.tools import TOOL_REGISTRY
 
 _APP = "gap-analysis"
@@ -28,11 +33,11 @@ def _model(config):
     Forward the LD config's generation params (max_tokens, temperature) to litellm so the pinned
     model honors them instead of LiteLLM's defaults — otherwise the synthesizer's long report
     truncates and the comparison is confounded (a truncated report is also faster + cheaper)."""
-    provider = (config.provider.name if config.provider else "").lower()
-    model_id = config.model.name
+    provider = provider_name(config).lower()
+    model_id = model_name(config)
     if provider in ("google", "gemini"):
         return model_id
-    params = dict(config.model.to_dict().get("parameters") or {})
+    params = model_parameters(config)
     kwargs = {}
     max_tokens = params.get("max_tokens") or params.get("maxTokens")
     if max_tokens:
@@ -48,8 +53,8 @@ def _safe_name(key):
 
 
 def _bind_tools(config):
-    """Bind this node's attached tools (config.tools) as plain callables (ADK wraps them)."""
-    return [TOOL_REGISTRY[n] for n in (config.tools or {}) if n in TOOL_REGISTRY]
+    """Bind this node's attached tools as plain callables (ADK wraps them)."""
+    return [TOOL_REGISTRY[n] for n in tool_names(config) if n in TOOL_REGISTRY]
 
 
 def build_agent(node_key, config, instructions):

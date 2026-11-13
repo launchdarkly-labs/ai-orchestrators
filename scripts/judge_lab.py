@@ -69,8 +69,13 @@ most solid work is 2-3. Cite evidence for each score.
 
 Step 3 — final = round(faithfulness * quality, 2)
 
-List H and E with instances; the four 0-4 scores each with a one-line justification; the arithmetic;
-then a FINAL line formatted EXACTLY as: SCORE: <number between 0.00 and 1.00>"""
+Put your working in `reasoning`: H and E with instances; the four 0-4 scores each with a one-line
+justification; the arithmetic.
+
+Respond with valid JSON and nothing else: {"score": <number between 0 and 1>, "reasoning": <string>}
+
+That JSON shape is what the live judge has to return — the SDK's judge runner appends the same
+requirement and parses the response as JSON — so tuning this rubric tunes what actually runs."""
 # ──────────────────────────────────────────────────────────────────────────────────────────────
 
 
@@ -84,9 +89,9 @@ def _load_papers(fname, cap):
 async def generate(args):
     import time
     import ldclient
-    from ldclient import Context
     from ldclient.config import Config
-    from ldai.client import LDAIClient
+    from launchdarkly_ai_server import init_client
+    from shared.ldai_compat import multi_context
     from shared.prompt import build_paper_prompt
     from orchestrators.dispatcher import execute_graph
 
@@ -101,19 +106,17 @@ async def generate(args):
         if ldclient.get().is_initialized():
             break
         time.sleep(0.5)
-    ai_client = LDAIClient(ldclient.get())
+    await init_client(client=ldclient.get())
     sem = asyncio.Semaphore(max(1, args.concurrency))
 
     async def one(topic, fw):
         async with sem:
             papers = _load_papers(topic, args.papers_per_context)
             rid = f"lab-{topic}-{fw}"
-            ctx = Context.create_multi(
-                Context.builder(rid).kind("user").set("orchestrator", fw).build(),
-                Context.builder(rid).kind("request").set("orchestrator", fw).build())
+            ctx = multi_context(rid, orchestrator=fw)
             runner = importlib.import_module(FRAMEWORKS[fw])
             try:
-                res = await execute_graph(ai_client, GRAPH_KEY, ctx, build_paper_prompt(papers),
+                res = await execute_graph(GRAPH_KEY, ctx, build_paper_prompt(papers),
                                           runner.build_agent, runner.invoke,
                                           require_context_attr="orchestrator")
             except Exception as e:
@@ -149,7 +152,8 @@ def score(args):
             model=JUDGE_MODEL, max_tokens=2000, system=RUBRIC,
             messages=[{"role": "user", "content": prompt}])
         text = "".join(b.text for b in resp.content if getattr(b, "type", "") == "text")
-        m = re.search(r"SCORE:\s*([0-9]*\.?[0-9]+)", text)
+        # The live judge returns JSON, so read the score the same way here.
+        m = re.search(r'"score"\s*:\s*([0-9]*\.?[0-9]+)', text)
         s = float(m.group(1)) if m else None
         rows.setdefault(d["topic"], {})[d["framework"]] = s
         print(f"  {d['topic']:<32} {d['framework']:<14} -> {s}")

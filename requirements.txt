@@ -1,21 +1,21 @@
-# LaunchDarkly — agent-graph SDK (DEVREL-741: bumped from 0.12.0)
-launchdarkly-server-sdk>=9.0.0
-launchdarkly-server-sdk-ai>=1.0.1
-# Companion packages bind tools + models per framework (used by the LangGraph and
-# OpenAI Agents runners). Strands + ADK bind with their native helpers.
-launchdarkly-server-sdk-ai-langchain>=0.8.0
-launchdarkly-server-sdk-ai-openai>=0.7.0
+# LaunchDarkly — agent-graph SDK. Requires Python 3.12 or later.
+launchdarkly-server-sdk>=9.18.4,<10
+launchdarkly-ai-server>=1.0.0
+# The SDK's managed LangGraph adapter, used by the langgraph-managed arm. The retired
+# per-framework companion packages (…-ai-langchain / …-ai-openai) have no equivalent; the
+# helpers this project used from them are ported into shared/ldai_compat.py.
+launchdarkly-ai-langchain-agents>=1.0.0
 
 # The four orchestration frameworks (the experiment variants)
 langgraph>=1.0.0
 langchain>=1.0.0
 langchain-anthropic>=1.0.0
 strands-agents>=1.0.0   # import name is `strands`
-openai-agents>=0.17.0
+openai-agents>=0.20.0
 google-adk>=2.0.0
 google-genai>=1.0.0     # `from google.genai import types` in the ADK runner
 # Runs the pinned Claude model through the OpenAI Agents + Google ADK runners
-litellm>=1.80.0
+litellm>=1.80.0,<1.89
 
 # Providers
 anthropic>=0.40.0

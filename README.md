@@ -19,7 +19,7 @@ uv sync                # or: python -m venv .venv && source .venv/bin/activate &
 cp .env.example .env   # fill in keys; set LD_PROJECT_KEY to your project
 ```
 
-Needs Python 3.11+, a LaunchDarkly account with AgentControl, and `ANTHROPIC_API_KEY`. For Experiment B/C native models also: `OPENAI_API_KEY`, `GOOGLE_API_KEY`, AWS credentials for Bedrock (e.g. `scripts/aws/` SSO). Prefix commands with `uv run` (or activate the venv and drop it).
+Needs Python 3.12+ (the floor set by `launchdarkly-ai-server`), a LaunchDarkly account with AgentControl, and `ANTHROPIC_API_KEY`. For Experiment B/C native models also: `OPENAI_API_KEY`, `GOOGLE_API_KEY`, AWS credentials for Bedrock (e.g. `scripts/aws/` SSO). Prefix commands with `uv run` (or activate the venv and drop it).
 
 ## Run
 
@@ -162,7 +162,7 @@ varies exactly one layer:
 |---|---|---|
 | plain (`langgraph`, `strands`, …) | **our dispatcher**; the framework only executes nodes | `google-adk` |
 | `*-native` | **that framework's own engine** | `strands-native` (Strands `Graph`) |
-| `langgraph-managed` | **LaunchDarkly's SDK runner** (`create_agent_graph().run()`) — zero orchestration code | — |
+| `langgraph-managed` | **LaunchDarkly's SDK runner** (`to_lang_graph()`) — zero orchestration code | — |
 
 **One drawing, many compilers** — every arm reads the same LD graph per request; each
 engine executes it with its own semantics:
